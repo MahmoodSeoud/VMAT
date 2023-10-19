@@ -33,8 +33,7 @@ function Tlb_table() {
             <table>
                 <thead>
                     <tr>
-
-                        <th>Sets</th>
+                        <th>Set</th>
                         {Array(num_tlb_ways).fill(null).map((_, i) => (
                             <>
                                 <th>Tag</th>
@@ -42,9 +41,28 @@ function Tlb_table() {
                                 <th>Valid</th>
                             </>
                         ))}
-
                     </tr>
                 </thead>
+                <tbody>
+
+                    {Array(num_tlb_sets).fill(null).map((_, i) => {
+
+
+                        return (
+                            <tr>
+                                <td>{i}</td>
+                                {Array(num_tlb_ways).fill(null).map((_, j) => (
+                                    <>
+                                        <td>{tlb[j].tag}</td>
+                                        <td>{tlb[j].ppn}</td>
+                                        <td>{tlb[j].valid}</td>
+                                    </>
+                                ))}
+                            </tr>
+                        )
+                    })}
+
+                </tbody>
             </table>
         </>);
 }
