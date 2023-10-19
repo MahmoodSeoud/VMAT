@@ -12,21 +12,19 @@ type Tlb_tableProps = {
     num_tlb_sets: number;
 }
 
-function Tlb_table( {tlb_entries, num_tlb_ways , num_tlb_sets} : Tlb_tableProps) {
+function Tlb_table({ tlb_entries, num_tlb_ways, num_tlb_sets }: Tlb_tableProps) {
     return (
         <>
             <table className='table'>
                 <thead>
-                    <tr>
-                        <th>Set</th>
-                        {Array(num_tlb_ways).fill(null).map((_, i) => (
-                            <>
-                                <th>Tag</th>
-                                <th>PPN</th>
-                                <th>Valid</th>
-                            </>
-                        ))}
-                    </tr>
+                    <th>Set</th>
+                    {Array(num_tlb_ways).fill(null).map((_, i) => (
+                        <>
+                            <th>Tag</th>
+                            <th>PPN</th>
+                            <th>Valid</th>
+                        </>
+                    ))}
                 </thead>
                 <tbody>
 
