@@ -7,7 +7,7 @@ export type tlb_entry = {
 };
 
 type Tlb_tableProps = {
-    tlb_entries: tlb_entry[];
+    tlb_entries: tlb_entry[][];
     num_tlb_ways: number;
     num_tlb_sets: number;
 }
@@ -37,9 +37,9 @@ function Tlb_table( {tlb_entries, num_tlb_ways , num_tlb_sets} : Tlb_tableProps)
                                 <td>{i}</td>
                                 {Array(num_tlb_ways).fill(null).map((_, j) => (
                                     <>
-                                        <td>{tlb_entries[j].tag}</td>
-                                        <td>{tlb_entries[j].ppn}</td>
-                                        <td>{tlb_entries[j].valid}</td>
+                                        <td>{tlb_entries[i][j].tag.toString(16).toUpperCase()}</td>
+                                        <td>{tlb_entries[i][j].ppn.toString(16).toUpperCase()}</td>
+                                        <td>{tlb_entries[i][j].valid}</td>
                                     </>
                                 ))}
                             </tr>
