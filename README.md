@@ -1,6 +1,6 @@
 # VMAT - Virtual Memory Address Translation
 
-To start the project, do:
+To run the project, do:
 ```
 npm i
 npm run dev
