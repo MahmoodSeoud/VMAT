@@ -18,7 +18,7 @@ function Tlb_table({ tlb_entries, num_tlb_ways, num_tlb_sets }: Tlb_tableProps) 
             <table className='table'>
                 <thead>
                     <th>Set</th>
-                    {Array(num_tlb_ways).fill(null).map((_, i) => (
+                    {tlb_entries[0].map(_ => (
                         <>
                             <th>Tag</th>
                             <th>PPN</th>
@@ -28,12 +28,12 @@ function Tlb_table({ tlb_entries, num_tlb_ways, num_tlb_sets }: Tlb_tableProps) 
                 </thead>
                 <tbody>
 
-                    {Array(num_tlb_sets).fill(null).map((_, i) => {
+                    {tlb_entries.map((_, i) => {
 
                         return (
                             <tr>
                                 <td>{i}</td>
-                                {Array(num_tlb_ways).fill(null).map((_, j) => (
+                                {tlb_entries[0].map((_, j) => (
                                     <>
                                         <td>{tlb_entries[i][j].tag.toString(16).toUpperCase()}</td>
                                         <td>{tlb_entries[i][j].ppn.toString(16).toUpperCase()}</td>
