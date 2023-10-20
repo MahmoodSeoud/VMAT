@@ -4,3 +4,16 @@
   padding: 2rem;
   text-align: center;
 }
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wrapperTable {
+
+}
+
+
+

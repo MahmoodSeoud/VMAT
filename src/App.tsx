@@ -1,6 +1,7 @@
 import './App.css'
 import Tlb_table, { tlb_entry } from './components/Tlb_table/Tlb_table'
 import Page_table, { page_table_entry } from './components/Page_table/Page_table';
+import Input_table from './components/Input_table/Input_table';
 
 // TODO: make this a function that generates random data
 // TLB - Translation Lookaside Buffer
@@ -30,18 +31,24 @@ function App() {
 
   return (
     <>
-      <h2>Tlb</h2>
-      <Tlb_table
-        tlb_entries={tlb_entries}
-        num_tlb_sets={num_tlb_sets}
-        num_tlb_ways={num_tlb_ways}
-      />
-      <h2>Page table</h2>
-      <Page_table
-        page_table_entries={page_table_entries}
-        page_table_size={page_table_size}
-        num_ptes={0}
-      />
+    <div className='wrapper'>
+      <div className='wrapperTable'>
+        <h2>Tlb</h2>
+        <Tlb_table
+          tlb_entries={tlb_entries}
+          num_tlb_sets={num_tlb_sets}
+          num_tlb_ways={num_tlb_ways}
+        />
+        <h2>Page table</h2>
+        <Page_table
+          page_table_entries={page_table_entries}
+          page_table_size={page_table_size}
+          num_ptes={0}
+        />
+
+      </div>
+      <Input_table />
+    </div >
     </>
   )
 }
