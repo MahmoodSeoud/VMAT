@@ -3,6 +3,12 @@ import Tlb_table, { tlb_entry } from './components/Tlb_table/Tlb_table'
 import Page_table, { page_table_entry } from './components/Page_table/Page_table';
 import Input_table from './components/Input_table/Input_table';
 
+// ------ preliminary variables
+const baseConversion : number = 16
+const baseConversionPrefix : string = '0x'
+// ------
+
+
 // TODO: make this a function that generates random data
 // TLB - Translation Lookaside Buffer
 const tlb_entries: tlb_entry[][] = [
@@ -21,6 +27,8 @@ const page_table_entries: page_table_entry[][] = [
   [{ vpn: 0x01, ppn: 0x33, valid: 1 }, { vpn: 0x0C, ppn: 0x0D, valid: 0 }, { vpn: 0x08, ppn: 0x17, valid: 1 }, { vpn: 0x13, ppn: 0x15, valid: 1 }],
   [{ vpn: 0xA0, ppn: 0x21, valid: 0 }, { vpn: 0xFA, ppn: 0x00, valid: 1 }, { vpn: 0xA2, ppn: 0x32, valid: 0 }, { vpn: 0x03, ppn: 0x43, valid: 0 }]
 ];
+
+
 
 
 
@@ -47,7 +55,23 @@ function App() {
         />
 
       </div>
-      <Input_table />
+      <Input_table 
+           given_virtual_address={{
+          address: 1241,
+          bitLength: 10,
+          baseConversion: baseConversion,
+          baseConversionPrefix: baseConversionPrefix
+        }} virtual_address={{
+          address: 0,
+          bitLength: 12,
+          baseConversion: baseConversion,
+          baseConversionPrefix: baseConversionPrefix
+        }} phys_address={{
+          address: 0,
+          bitLength: 13,
+          baseConversion: baseConversion,
+          baseConversionPrefix: baseConversionPrefix
+        }} />
     </div >
     </>
   )

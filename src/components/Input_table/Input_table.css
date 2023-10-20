@@ -3,5 +3,25 @@
     border: 1px white solid;
     min-width: 50em;
     margin: 2em;
-    height: 45em;
+    /* height: 40em; */
+}
+
+.bitInput {
+    width: 10px;
+    padding: .2em;
+}
+
+.inputWrapper {
+    margin: .4em;
+    padding: .4em;
+}
+.bitInput {
+    border: solid white 1px;
+    padding: .3em;
+    font-size: 20px;
+    
+}
+.virtualWrapper {
+    display: flex;
+    justify-content: end;
 }
