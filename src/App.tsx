@@ -5,7 +5,7 @@ import Input_table from './components/Input_table/Input_table';
 
 // ------ preliminary variables
 const baseConversion : number = 16
-const baseConversionPrefix : string = '0x'
+const baseConversionPrefix : string = '0X'
 // ------
 
 
@@ -62,12 +62,10 @@ function App() {
           baseConversion: baseConversion,
           baseConversionPrefix: baseConversionPrefix
         }} virtual_address={{
-          address: 0,
           bitLength: 12,
           baseConversion: baseConversion,
           baseConversionPrefix: baseConversionPrefix
         }} phys_address={{
-          address: 0,
           bitLength: 13,
           baseConversion: baseConversion,
           baseConversionPrefix: baseConversionPrefix

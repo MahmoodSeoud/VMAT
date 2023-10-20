@@ -1,27 +1,45 @@
-
-.inputTable {
+.input-table {
     border: 1px white solid;
     min-width: 50em;
     margin: 2em;
     /* height: 40em; */
 }
 
-.bitInput {
-    width: 10px;
-    padding: .2em;
-}
-
-.inputWrapper {
-    margin: .4em;
+.input-wrapper {
+    margin: 0;
     padding: .4em;
 }
-.bitInput {
+
+.bit-input {
+    width: 10px;
+    padding: .2em;
     border: solid white 1px;
     padding: .3em;
     font-size: 20px;
-    
+
 }
-.virtualWrapper {
+
+.input-text {
+    margin: 0;
+}
+
+.list-item-wrapper {
     display: flex;
-    justify-content: end;
+    justify-content: space-between;
+    align-items: center;
+
+}
+
+.list-item-bit-input-wrapper {
+    display: flex;
+}
+
+.virtual-wrapper {
+    padding: 1em;
+}
+
+.table th {
+    border-bottom: 1px solid white;
+    padding: .5em;
+    font-size: 16px;
 }
