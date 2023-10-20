@@ -12,7 +12,7 @@ type Page_tableProps = {
 
 
 function Page_table({ page_table_entries, page_table_size, num_ptes }: Page_tableProps) {
-
+	const address_prefix : string = "0x"
     return (
         <>
             <table className='table-page'>
@@ -33,8 +33,8 @@ function Page_table({ page_table_entries, page_table_size, num_ptes }: Page_tabl
                             <tr>
                                 {page_table_entries[0].map((_, j) => (
                                     <>
-                                        <td>{page_table_entries[i][j].vpn.toString(16).toUpperCase()}</td>
-                                        <td>{page_table_entries[i][j].ppn.toString(16).toUpperCase()}</td>
+                                        <td>{address_prefix + page_table_entries[i][j].vpn.toString(16)}</td>
+                                        <td>{address_prefix + page_table_entries[i][j].ppn.toString(16)}</td>
                                         <td>{page_table_entries[i][j].valid}</td>
                                     </>
                                 ))}
