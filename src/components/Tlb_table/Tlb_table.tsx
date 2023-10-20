@@ -15,7 +15,7 @@ type Tlb_tableProps = {
 function Tlb_table({ tlb_entries, num_tlb_ways, num_tlb_sets }: Tlb_tableProps) {
     return (
         <>
-            <table className='table'>
+            <table className='table-tlb'>
                 <thead>
                     <th>Set</th>
                     {tlb_entries[0].map(_ => (
