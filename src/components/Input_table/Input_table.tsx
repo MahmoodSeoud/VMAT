@@ -1,20 +1,23 @@
+import { AddressPrefix, BaseConversion, PageSize} from '../../App';
 import './Input_table.css'
 
-type address = {
-    address: number;
-    bitLength: number;
-    baseConversion: number;
-    baseConversionPrefix: string;
-};
-
 type Input_tableProps = {
-    given_virtual_address: address;
-    virtual_address: Omit<address, 'address'>;
-    phys_address: Omit<address, 'address'>;
+    virtualAddress: number;
+    addressPrefix: AddressPrefix;
+    baseConversion: BaseConversion;
+    pageSize: PageSize;
 };
 
-function Input_table({ given_virtual_address, virtual_address, phys_address }: Input_tableProps): JSX.Element {
+function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }: Input_tableProps): JSX.Element {
+    // To determine the physical address bits width when it is not explicitly given,
+    // you need to consider the relationship between the virtual address space, 
+    // the page size, and the physical memory size.
+    const virtualAddressWidth = virtualAddress.toString(2).length; // Convert address to bits and get width 
+    const numOfPages = (2 ^ virtualAddress) / pageSize;
+    const physicalPageMemory = numOfPages * pageSize;
+    const physAddressWidth = Math.floor(Math.log2(physicalPageMemory));
 
+    debugger
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const regex = /^[01]*$/; // regular expression to match only 1's and 0's
         const input = event.target.value;
@@ -29,16 +32,16 @@ function Input_table({ given_virtual_address, virtual_address, phys_address }: I
     return (
         <>
             <div className="input-table">
-                <p><b>Virtual address:</b> {given_virtual_address.baseConversionPrefix + given_virtual_address.address.toString(given_virtual_address.baseConversion).toUpperCase()}</p>
+                <p><b>Virtual address:</b> {addressPrefix + virtualAddress.toString(baseConversion).toUpperCase()}</p>
                 <div className='virtual-wrapper'>
                     <ol>
                         <li>
                             <div className='list-item-wrapper'>
                                 <p>Bits of virtual address</p>
                                 <div className='list-item-bit-input-wrapper'>
-                                    {Array(virtual_address.bitLength).fill(null).map((_, index) => (
+                                    {Array(virtualAddressWidth).fill(null).map((_, index) => (
                                         <div className='input-wrapper'>
-                                            <p className="input-text">{virtual_address.bitLength - index - 1}</p>
+                                            <p className="input-text">{virtualAddressWidth - index - 1}</p>
                                             <input
                                                 className="bit-input"
                                                 maxLength={1}
@@ -105,9 +108,9 @@ function Input_table({ given_virtual_address, virtual_address, phys_address }: I
                             <div className='list-item-wrapper'>
                                 <p>Bits of phys. (if any)</p>
                                 <div className='list-item-bit-input-wrapper'>
-                                    {Array(phys_address.bitLength).fill(null).map((_, index) => (
+                                    {Array(physAddressWidth).fill(null).map((_, index) => (
                                         <div className='input-wrapper'>
-                                            <p className="input-text">{virtual_address.bitLength - index}</p>
+                                            <p className="input-text">{physAddressWidth - index}</p>
                                             <input
                                                 className="bit-input"
                                                 maxLength={1}

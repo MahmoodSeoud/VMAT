@@ -1,3 +1,4 @@
+import { AddressPrefix, BaseConversion } from '../../App';
 import '../table.css'
 
 export type tlb_entry = {
@@ -7,13 +8,14 @@ export type tlb_entry = {
 };
 
 type Tlb_tableProps = {
-    tlb_entries: tlb_entry[][];
-    num_tlb_ways: number;
-    num_tlb_sets: number;
+    tlb_entries: Array<tlb_entry>[];
+    addressPrefix: AddressPrefix;
+    baseConversion: BaseConversion;
 }
 
-function Tlb_table({ tlb_entries, num_tlb_ways, num_tlb_sets }: Tlb_tableProps) {
-	const address_prefix : string = "0x"
+
+
+function Tlb_table({ tlb_entries, addressPrefix, baseConversion }: Tlb_tableProps) {
     return (
         <>
             <table className='table-tlb'>
@@ -36,8 +38,8 @@ function Tlb_table({ tlb_entries, num_tlb_ways, num_tlb_sets }: Tlb_tableProps) 
                                 <td>{i}</td>
                                 {tlb_entries[0].map((_, j) => (
                                     <>
-                                        <td>{address_prefix + tlb_entries[i][j].tag.toString(16).toUpperCase()}</td>
-                                        <td>{address_prefix + tlb_entries[i][j].ppn.toString(16).toUpperCase()}</td>
+                                        <td>{addressPrefix + tlb_entries[i][j].tag.toString(baseConversion).toUpperCase()}</td>
+                                        <td>{addressPrefix + tlb_entries[i][j].ppn.toString(baseConversion).toUpperCase()}</td>
                                         <td>{tlb_entries[i][j].valid}</td>
                                     </>
                                 ))}

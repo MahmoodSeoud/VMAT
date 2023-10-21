@@ -1,3 +1,5 @@
+import { AddressPrefix, BaseConversion } from "../../App";
+
 export type page_table_entry = {
     vpn: number;
     ppn: number;
@@ -5,14 +7,13 @@ export type page_table_entry = {
 }
 
 type Page_tableProps = {
-    page_table_entries: page_table_entry[][];
-    page_table_size: number;
-    num_ptes: number;
+    page_table_entries: Array<page_table_entry>[];
+    addressPrefix: AddressPrefix;
+    baseConversion: BaseConversion;
 }
 
 
-function Page_table({ page_table_entries, page_table_size, num_ptes }: Page_tableProps) {
-	const address_prefix : string = "0x"
+function Page_table({ page_table_entries, addressPrefix, baseConversion }: Page_tableProps) {
     return (
         <>
             <table className='table-page'>
@@ -33,8 +34,8 @@ function Page_table({ page_table_entries, page_table_size, num_ptes }: Page_tabl
                             <tr>
                                 {page_table_entries[0].map((_, j) => (
                                     <>
-                                        <td>{address_prefix + page_table_entries[i][j].vpn.toString(16).toUpperCase()}</td>
-                                        <td>{address_prefix + page_table_entries[i][j].ppn.toString(16).toUpperCase()}</td>
+                                        <td>{addressPrefix + page_table_entries[i][j].vpn.toString(baseConversion).toUpperCase()}</td>
+                                        <td>{addressPrefix + page_table_entries[i][j].ppn.toString(baseConversion).toUpperCase()}</td>
                                         <td>{page_table_entries[i][j].valid}</td>
                                     </>
                                 ))}
