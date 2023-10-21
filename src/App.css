@@ -1,6 +1,6 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
+  max-width: 1920px;
+  margin: 5em auto;
   padding: 2rem;
   text-align: center;
 }
@@ -11,9 +11,36 @@
   align-items: center;
 }
 
-.wrapperTable {
-
+.wrapper-tables {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 }
 
 
 
+@media only screen and (max-width: 1550px) {
+  #root {
+    padding: 1rem;
+  }
+
+  .wrapper {
+    flex-direction: column;
+  }
+
+  .wrapper-tables {
+    flex-direction: column;
+  }
+
+  .table {
+    margin: 0.5rem;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.25rem;
+  }
+}

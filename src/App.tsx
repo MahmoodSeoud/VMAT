@@ -43,7 +43,7 @@ function App() {
   return (
     <>
       <div className='wrapper'>
-        <div className='wrapperTable'>
+        <div className='wrapper-tables'>
           <Tlb_table
             tlb_entries={tlb_entries}
             addressPrefix={AddressPrefixes[0]}
