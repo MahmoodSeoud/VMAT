@@ -1,11 +1,11 @@
-import { AddressPrefix, BaseConversion, PageSize} from '../../App';
+import { AddressPrefix, BaseConversion } from '../../App';
 import './Input_table.css'
 
 type Input_tableProps = {
     virtualAddress: number;
     addressPrefix: AddressPrefix;
     baseConversion: BaseConversion;
-    pageSize: PageSize;
+    pageSize: number;
 };
 
 function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }: Input_tableProps): JSX.Element {

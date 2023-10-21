@@ -16,6 +16,7 @@ type Page_tableProps = {
 function Page_table({ page_table_entries, addressPrefix, baseConversion }: Page_tableProps) {
     return (
         <>
+            <h2>Page table</h2>
             <table className='table-page'>
                 <thead>
                     {page_table_entries[0].map(_ => (

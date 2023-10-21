@@ -18,6 +18,7 @@ type Tlb_tableProps = {
 function Tlb_table({ tlb_entries, addressPrefix, baseConversion }: Tlb_tableProps) {
     return (
         <>
+            <h2>Tlb</h2>
             <table className='table-tlb'>
                 <thead>
                     <th>Set</th>
