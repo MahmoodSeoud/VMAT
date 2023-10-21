@@ -12,6 +12,10 @@ export type BaseConversion = BaseConversionsArray[number];
 const AddressPrefixes = ['0x', '0b'] as const;
 type AddressPrefixesArray = typeof AddressPrefixes;
 export type AddressPrefix = AddressPrefixesArray[number];
+
+const Bits = [0, 1] as const;
+type BitsArray = typeof Bits;
+export type Bit = BitsArray[number];
 // ------
 
 // TODO: make this a function that generates random data

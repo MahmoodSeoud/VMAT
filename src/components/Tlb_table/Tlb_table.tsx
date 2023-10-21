@@ -1,10 +1,10 @@
-import { AddressPrefix, BaseConversion } from '../../App';
+import { AddressPrefix, BaseConversion, Bit } from '../../App';
 import '../table.css'
 
 export type tlb_entry = {
     tag: number;
     ppn: number;
-    valid: number;
+    valid: Bit;
 };
 
 type Tlb_tableProps = {
@@ -20,7 +20,6 @@ function Tlb_table({ tlb_entries, addressPrefix, baseConversion }: Tlb_tableProp
         <>
             <h2>Tlb</h2>
             <table className='table-tlb'>
-                <thead>
                     <th>Set</th>
                     {tlb_entries[0].map(_ => (
                         <>
@@ -29,13 +28,12 @@ function Tlb_table({ tlb_entries, addressPrefix, baseConversion }: Tlb_tableProp
                             <th>Valid</th>
                         </>
                     ))}
-                </thead>
                 <tbody>
 
                     {tlb_entries.map((_, i) => {
 
                         return (
-                            <tr>
+                            <tr key={i}>
                                 <td>{i}</td>
                                 {tlb_entries[0].map((_, j) => (
                                     <>

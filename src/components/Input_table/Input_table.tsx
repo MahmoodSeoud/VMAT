@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { AddressPrefix, BaseConversion } from '../../App';
+
 import './Input_table.css'
 
 type Input_tableProps = {
@@ -9,6 +11,9 @@ type Input_tableProps = {
 };
 
 function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }: Input_tableProps): JSX.Element {
+    const [virtualAddressInputStr, setVirtualAddressInputStr] = useState<string>('');
+    const virtualAddressInput = parseInt(virtualAddressInputStr, 2); // Convert binary string to decimal number
+
     // To determine the physical address bits width when it is not explicitly given,
     // you need to consider the relationship between the virtual address space, 
     // the page size, and the physical memory size.
@@ -17,15 +22,16 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
     const physicalPageMemory = numOfPages * pageSize;
     const physAddressWidth = Math.floor(Math.log2(physicalPageMemory));
 
-    debugger
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const regex = /^[01]*$/; // regular expression to match only 1's and 0's
         const input = event.target.value;
         if (regex.test(input)) {
             event.target.value = input;
+            setVirtualAddressInputStr((prevState) => event.target.value + prevState );
         } else {
             event.target.value = '';
         }
+
     };
 
 
