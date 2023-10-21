@@ -31,9 +31,17 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
         } else {
             event.target.value = '';
         }
-
     };
 
+    const [userInputvirtualAddress, setUserInputVirtualAddress] = useState<number>();
+
+    let InputVirual = Array(virtualAddressWidth).fill(null)
+    function getInputVirtualAddress() {
+        const container = document.querySelector('.bit-input');
+        console.log(container)
+        return container?.querySelector('div')?.innerText;
+    }
+    console.log(getInputVirtualAddress());
 
     return (
         <>
@@ -45,10 +53,11 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
                             <div className='list-item-wrapper'>
                                 <p>Bits of virtual address</p>
                                 <div className='list-item-bit-input-wrapper'>
-                                    {Array(virtualAddressWidth).fill(null).map((_, index) => (
+                                    {InputVirual.map((_, index) => (
                                         <div className='input-wrapper'>
                                             <p className="input-text">{virtualAddressWidth - index - 1}</p>
                                             <input
+                                                id='vbit'
                                                 className="bit-input"
                                                 maxLength={1}
                                                 onChange={handleInputChange}
@@ -116,7 +125,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
                                 <div className='list-item-bit-input-wrapper'>
                                     {Array(physAddressWidth).fill(null).map((_, index) => (
                                         <div className='input-wrapper'>
-                                            <p className="input-text">{physAddressWidth - index}</p>
+                                            <p className="input-text">{physAddressWidth - index - 1}</p>
                                             <input
                                                 className="bit-input"
                                                 maxLength={1}
