@@ -71,7 +71,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
             case 'tlbTag':
                 if (!regexNumbers.test(input)) {
                     event.target.value = '';
-                    break;
+                    return;
                 }
                 setInputFields((prevState) => ({ ...prevState, [fieldName]: parseInt(input) }));
                 break;
@@ -79,7 +79,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
             case 'physicalAddress':
                 if (!regexBits.test(input)) {
                     event.target.value = '';
-                    break;
+                    return;
                 }
                 setInputFields((prevState) => ({ ...prevState, [fieldName]: input + prevState[fieldName] }));
                 break;
@@ -87,7 +87,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
             case 'pageFault':
                 if (!regexYN.test(input)) {
                     event.target.value = '';
-                    break;
+                    return;
                 }
                 setInputFields((prevState) => ({ ...prevState, [fieldName]: input === 'Y' }));
                 break;
