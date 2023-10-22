@@ -39,6 +39,38 @@ function getElementValuesFrom(className: string): string {
     return address
 }
 
+// ppn = Physical Page Number
+// It refers to the identification number assigned to a physical page in
+// the main memory. The PPN is used to translate the virtual addresses 
+// into physical addresses.
+
+// vpm = Virtual Page Number
+// It refers to the identification number assigned to a virtual page in 
+// the virtual memory space. The VPN is used for addressing and managing pages 
+// in the virtual memory, allowing the mapping of virtual addresses to physical addresses.
+
+// Vi har addresse i hex
+// 1. Convert addresse til bits -  virtualAdressField. Tjek om userinput == addresse converted
+// 2. tag log2(pageSize) og marker TLB Index. Dette skrives i feltet TLB Index
+// 3 Tag log2(#sets) og marker TLB tag. Dette skrives i feltet TLB Tag
+// 4. Lookup TLB table. if TLB tag eksistere og valid == 1 -> TLB HIT -> You are done!
+// 5. Lookup TLB table. if TLB tag IKKE eksistere eller valid == 0 -> TLB miss -> Continue
+// 6. Lookup in Page table. if VPN exists and valid == 1 -> No page fault -> You are done!
+// 7. Lookup in Page table. if VPN 
+
+
+
+
+function validateFieldInput(input: InputFields, facit: InputFields): void {
+    
+    if (input.virtualAddress === facit.virtualAddress)  {
+        console.log("CORRECT    ")
+    } 
+
+    if (input.ppn === facit.ppn) {
+
+    }
+}
 
 function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }: Input_tableProps): JSX.Element {
 
@@ -113,6 +145,17 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
                 break;
         }
     };
+
+    validateFieldInput(inputFields, {
+        virtualAddress: '1010011100101',
+        vpn: 0,
+        physicalAddress: '',
+        tlbIndex: 0,
+        tlbTag: 0,
+        tlbHit: false,
+        pageFault: false,
+        ppn: 0
+    })
 
     return (
         <>
