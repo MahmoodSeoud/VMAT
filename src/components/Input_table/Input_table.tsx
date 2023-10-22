@@ -26,6 +26,20 @@ function createNullArr(addresWidth: number): Array<null> {
     return Array(addresWidth).fill(null);
 }
 
+// Brabs the bit-input element values which carries the input bits 
+// and appends them together into one string
+function getElementValuesFrom(className: string): string {
+    let address = ""
+    const container = document.getElementsByClassName(className)
+
+    for (let i = 0; i < container.length; i++) {
+        address += (container[i] as HTMLInputElement).value
+    }
+
+    return address
+}
+
+
 function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }: Input_tableProps): JSX.Element {
 
     const [inputFields, setInputFields] = useState<InputFields>({
@@ -43,6 +57,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
     const virtualAddressInput = inputFields.virtualAddress && parseInt(inputFields.virtualAddress, 2); // Convert binary string to decimal number
     const physAddressInput = inputFields.physicalAddress && parseInt(inputFields.physicalAddress, 2); // Convert binary string to decimal number
 
+
     // To determine the physical address bits width when it is not explicitly given,
     // you need to consider the relationship between the virtual address space, 
     // the page size, and the physical memory size.
@@ -57,7 +72,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
     }, [inputFields])
 
     // Handle changes in input fields
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: string, index: number) => {
         const regexBits = /^[01]*$/; // regular expression to match only 1's and 0's
         const regexYN = /^[YN]*$/; // regular expression to match only Y AND N
         const regexNumbers = /^[0-9]*$/; // regular expression to match only digits
@@ -76,12 +91,14 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
                 setInputFields((prevState) => ({ ...prevState, [fieldName]: parseInt(input) }));
                 break;
             case 'virtualAddress':
+                setInputFields((prevState) => ({ ...prevState, [fieldName]: getElementValuesFrom("vbit-input") }));
+                break;
             case 'physicalAddress':
                 if (!regexBits.test(input)) {
                     event.target.value = '';
                     return;
                 }
-                setInputFields((prevState) => ({ ...prevState, [fieldName]: input + prevState[fieldName] }));
+                setInputFields((prevState) => ({ ...prevState, [fieldName]: getElementValuesFrom("pbit-input") }));
                 break;
             case 'tlbHit':
             case 'pageFault':
@@ -112,10 +129,10 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
                                             <p className="input-text">{virtualAddressWidth - index - 1}</p>
                                             <input
                                                 id='vbit'
-                                                className="bit-input"
+                                                className="vbit-input"
                                                 name='virtualAddress'
                                                 maxLength={1}
-                                                onChange={(ev) => handleInputChange(ev, 'virtualAddress')}
+                                                onChange={(ev) => handleInputChange(ev, 'virtualAddress', index)}
                                             />
                                         </div>
                                     ))}
@@ -138,7 +155,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
                                             <td>VPN</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'vpn')}
+                                                    onChange={(ev) => handleInputChange(ev, 'vpn', 0)}
                                                 />
                                             </td>
                                         </tr>
@@ -146,7 +163,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
                                             <td>TLB index</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'tlbIndex')}
+                                                    onChange={(ev) => handleInputChange(ev, 'tlbIndex', 0)}
                                                 />
                                             </td>
                                         </tr>
@@ -154,7 +171,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
                                             <td>TLB tag</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'tlbTag')}
+                                                    onChange={(ev) => handleInputChange(ev, 'tlbTag', 0)}
                                                 />
                                             </td>
                                         </tr>
@@ -162,7 +179,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
                                             <td>TLB hit? (Y/N)</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'tlbHit')}
+                                                    onChange={(ev) => handleInputChange(ev, 'tlbHit', 0)}
                                                 />
                                             </td>
                                         </tr>
@@ -170,7 +187,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
                                             <td>Page fault? (Y/N)</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'pageFault')}
+                                                    onChange={(ev) => handleInputChange(ev, 'pageFault', 0)}
                                                 />
                                             </td>
                                         </tr>
@@ -178,7 +195,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
                                             <td>PPN</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'ppn')}
+                                                    onChange={(ev) => handleInputChange(ev, 'ppn', 0)}
                                                 />
                                             </td>
                                         </tr>
@@ -194,9 +211,9 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
                                         <div className='input-wrapper'>
                                             <p className="input-text">{physAddressWidth - index - 1}</p>
                                             <input
-                                                className="bit-input"
+                                                className="pbit-input"
                                                 maxLength={1}
-                                                onChange={(ev) => handleInputChange(ev, 'physicalAddress')}
+                                                onChange={(ev) => handleInputChange(ev, 'physicalAddress', index)}
                                             />
                                         </div>
                                     ))}
