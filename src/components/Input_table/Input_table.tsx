@@ -4,24 +4,24 @@ import { AddressPrefix, BaseConversion } from '../../App';
 import './Input_table.css'
 
 type Input_tableProps = {
-    virtualAddress: number;
+    VirtualAddress: number;
     virtualAddressWidth: number;
     physcialAddressWidth: number;
     addressPrefix: AddressPrefix;
     baseConversion: BaseConversion;
     pageSize: number;
+    facit: InputFields;
 };
 
-
-type InputFields = {
-    virtualAddress: string;
-    vpn: number;
-    tlbIndex: number;
-    tlbTag: number;
-    tlbHit: boolean;
-    pageFault: boolean;
-    ppn: number;
-    physicalAddress: string;
+export type InputFields = {
+    VirtualAddress: string;
+    VPN: string;
+    TLBI: string;
+    TLBT: string;
+    TLBHIT: boolean;
+    PageFault: boolean;
+    PPN: string;
+    PhysicalAddress: string;
 }
 
 function createNullArr(addresWidth: number): Array<null> {
@@ -41,7 +41,7 @@ function getElementValuesFrom(className: string): string {
     return address
 }
 
-// ppn = Physical Page Number
+// PPN = Physical Page Number
 // It refers to the identification number assigned to a physical page in
 // the main memory. The PPN is used to translate the virtual addresses 
 // into physical addresses.
@@ -61,43 +61,48 @@ function getElementValuesFrom(className: string): string {
 // 6. Lookup in Page table. if VPN exists and valid == 1 -> No page fault -> You are done!
 // 7. if there is a pagefault -> Lookup in Page table. write down the PPN and write the physcial address of that
 
+function createFacitObject(input: InputFields, pageSize: number, TLBSets: number) {
+    const VPO = Math.log2(pageSize)
+    const TLBI = Math.log2(TLBSets)
+
+    const VPO_bits: string = [...input.VirtualAddress].slice(-VPO).join('');
+    const TLBI_bits: string = [...input.VirtualAddress].slice(-VPO - TLBI, TLBI).join('');
+    const TLBT_bits: string = [...input.VirtualAddress].slice(0, -VPO - TLBI).join('');
+    return null
+}
+
 function validateFieldInput(input: InputFields, facit: InputFields): void {
-
-    if (input.virtualAddress === facit.virtualAddress) {
-        console.log("CORRECT    ")
-    }
-
-    if (input.ppn === facit.ppn) {
-
+    if (input === facit) {
+        console.log("CORRECT")
     }
 }
 
-function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize, virtualAddressWidth, physcialAddressWidth }: Input_tableProps): JSX.Element {
+function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, virtualAddressWidth, physcialAddressWidth, facit }: Input_tableProps): JSX.Element {
 
     const [inputFields, setInputFields] = useState<InputFields>({
-        virtualAddress: '',
-        vpn: 0,
-        physicalAddress: '',
-        tlbIndex: 0,
-        tlbTag: 0,
-        tlbHit: false,
-        pageFault: false,
-        ppn: 0
+        VirtualAddress: '',
+        VPN: '',
+        PhysicalAddress: '',
+        TLBI: '',
+        TLBT: '',
+        TLBHIT: false,
+        PageFault: false,
+        PPN: ''
     })
 
     // Converting the input strings to decimal numbers
-    const virtualAddressInput = inputFields.virtualAddress && parseInt(inputFields.virtualAddress, 2); // Convert binary string to decimal number
-    const physAddressInput = inputFields.physicalAddress && parseInt(inputFields.physicalAddress, 2); // Convert binary string to decimal number
+    const virtualAddressInput = inputFields.VirtualAddress && parseInt(inputFields.VirtualAddress, 2); // Convert binary string to decimal number
+    const physAddressInput = inputFields.PhysicalAddress && parseInt(inputFields.PhysicalAddress, 2); // Convert binary string to decimal number
 
 
-/*     // To determine the physical address bits width when it is not explicitly given,
-    // you need to consider the relationship between the virtual address space, 
-    // the page size, and the physical memory size.
-    const numOfPages = (2 ** virtualAddressWidth) / pageSize;
-    const physicalPageMemory = numOfPages * pageSize;
-    const physAddressWidth = Math.floor(Math.log2(physicalPageMemory)); */
+    /*     // To determine the physical address bits width when it is not explicitly given,
+        // you need to consider the relationship between the virtual address space, 
+        // the page size, and the physical memory size.
+        const numOfPages = (2 ** virtualAddressWidth) / pageSize;
+        const physicalPageMemory = numOfPages * pageSize;
+        const physAddressWidth = Math.floor(Math.log2(physicalPageMemory)); */
 
-    
+
 
     useEffect(() => {
         console.log('inputFields', inputFields)
@@ -108,21 +113,22 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize, 
         const regexBits = /^[01]*$/; // regular expression to match only 1's and 0's
         const regexYN = /^[YN]*$/; // regular expression to match only Y AND N
         const regexNumbers = /^[0-9]*$/; // regular expression to match only digits
+        const regexHexChars = /^[0-9a-fA-F]*$/; // regular expression to match only hex characters
         const input = event.target.value;
 
         switch (fieldName) {
 
-            case 'vpn':
-            case 'ppn':
-            case 'tlbIndex':
-            case 'tlbTag':
-                if (!regexNumbers.test(input)) {
+            case 'VPN':
+            case 'PPN':
+            case 'TLBI':
+            case 'TLBT':
+                if (!regexHexChars.test(input)) {
                     event.target.value = '';
                     return;
                 }
-                setInputFields((prevState) => ({ ...prevState, [fieldName]: parseInt(input) }));
+                setInputFields((prevState) => ({ ...prevState, [fieldName]: input }));
                 break;
-            case 'virtualAddress':
+            case 'VirtualAddress':
                 if (!regexBits.test(input)) {
                     event.target.value = '';
                     return;
@@ -136,12 +142,13 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize, 
                 }
                 setInputFields((prevState) => ({ ...prevState, [fieldName]: getElementValuesFrom("pbit-input") }));
                 break;
-            case 'tlbHit':
-            case 'pageFault':
+            case 'TLBHIT':
+            case 'PageFault':
                 if (!regexYN.test(input)) {
                     event.target.value = '';
                     return;
                 }
+                
                 setInputFields((prevState) => ({ ...prevState, [fieldName]: input === 'Y' }));
                 break;
             default:
@@ -152,21 +159,20 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize, 
 
     validateFieldInput(inputFields, {
         // Take the givenVirtualAddress in bits
-        virtualAddress: Number(inputFields.virtualAddress).toString(2),
-        //
-        vpn: 0,
-        physicalAddress: '',
-        tlbIndex: 0,
-        tlbTag: 0,
-        tlbHit: false,
-        pageFault: false,
-        ppn: 0
+        VirtualAddress: Number(inputFields.VirtualAddress).toString(2),
+        VPN: '',
+        PhysicalAddress: '',
+        TLBI: '',
+        TLBT: '',
+        TLBHIT: false,
+        PageFault: false,
+        PPN: ''
     })
 
     return (
         <>
             <div className="input-table">
-                <p><b>Virtual address:</b> {addressPrefix + virtualAddress.toString(baseConversion).toUpperCase()}</p>
+                <p><b>Virtual address:</b> {addressPrefix + VirtualAddress.toString(baseConversion).toUpperCase()}</p>
                 <div className='virtual-wrapper'>
                     <ol>
                         <li>
@@ -179,9 +185,9 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <input
                                                 id='vbit'
                                                 className="vbit-input"
-                                                name='virtualAddress'
+                                                name='VirtualAddress'
                                                 maxLength={1}
-                                                onChange={(ev) => handleInputChange(ev, 'virtualAddress')}
+                                                onChange={(ev) => handleInputChange(ev, 'VirtualAddress')}
                                             />
                                         </div>
                                     ))}
@@ -204,7 +210,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <td>VPN</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'vpn')}
+                                                    onChange={(ev) => handleInputChange(ev, 'VPN')}
                                                 />
                                             </td>
                                         </tr>
@@ -212,7 +218,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <td>TLB index</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'tlbIndex')}
+                                                    onChange={(ev) => handleInputChange(ev, 'TLBI')}
                                                 />
                                             </td>
                                         </tr>
@@ -220,7 +226,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <td>TLB tag</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'tlbTag')}
+                                                    onChange={(ev) => handleInputChange(ev, 'TLBT')}
                                                 />
                                             </td>
                                         </tr>
@@ -228,7 +234,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <td>TLB hit? (Y/N)</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'tlbHit')}
+                                                    onChange={(ev) => handleInputChange(ev, 'TLBHIT')}
                                                 />
                                             </td>
                                         </tr>
@@ -236,7 +242,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <td>Page fault? (Y/N)</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'pageFault')}
+                                                    onChange={(ev) => handleInputChange(ev, 'PageFault')}
                                                 />
                                             </td>
                                         </tr>
@@ -244,7 +250,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <td>PPN</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'ppn')}
+                                                    onChange={(ev) => handleInputChange(ev, 'PPN')}
                                                 />
                                             </td>
                                         </tr>
@@ -262,7 +268,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <input
                                                 className="pbit-input"
                                                 maxLength={1}
-                                                onChange={(ev) => handleInputChange(ev, 'physicalAddress')}
+                                                onChange={(ev) => handleInputChange(ev, 'PhysicalAddress')}
                                             />
                                         </div>
                                     ))}
