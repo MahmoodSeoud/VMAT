@@ -5,6 +5,8 @@ import './Input_table.css'
 
 type Input_tableProps = {
     virtualAddress: number;
+    virtualAddressWidth: number;
+    physcialAddressWidth: number;
     addressPrefix: AddressPrefix;
     baseConversion: BaseConversion;
     pageSize: number;
@@ -51,28 +53,26 @@ function getElementValuesFrom(className: string): string {
 
 // Vi har addresse i hex
 // 1. Convert addresse til bits -  virtualAdressField. Tjek om userinput == addresse converted
-// 2. tag log2(pageSize) og marker TLB Index. Dette skrives i feltet TLB Index
-// 3 Tag log2(#sets) og marker TLB tag. Dette skrives i feltet TLB Tag
+// 2. tag log2(pageSize) og marker VPO 
+// 3 Tag log2(#sets) og marker TLB index. Dette skrives i feltet TLB index
+// .. resten er TLB tag
 // 4. Lookup TLB table. if TLB tag eksistere og valid == 1 -> TLB HIT -> You are done!
 // 5. Lookup TLB table. if TLB tag IKKE eksistere eller valid == 0 -> TLB miss -> Continue
 // 6. Lookup in Page table. if VPN exists and valid == 1 -> No page fault -> You are done!
-// 7. Lookup in Page table. if VPN 
-
-
-
+// 7. if there is a pagefault -> Lookup in Page table. write down the PPN and write the physcial address of that
 
 function validateFieldInput(input: InputFields, facit: InputFields): void {
-    
-    if (input.virtualAddress === facit.virtualAddress)  {
+
+    if (input.virtualAddress === facit.virtualAddress) {
         console.log("CORRECT    ")
-    } 
+    }
 
     if (input.ppn === facit.ppn) {
 
     }
 }
 
-function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }: Input_tableProps): JSX.Element {
+function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize, virtualAddressWidth, physcialAddressWidth }: Input_tableProps): JSX.Element {
 
     const [inputFields, setInputFields] = useState<InputFields>({
         virtualAddress: '',
@@ -90,14 +90,14 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
     const physAddressInput = inputFields.physicalAddress && parseInt(inputFields.physicalAddress, 2); // Convert binary string to decimal number
 
 
-    // To determine the physical address bits width when it is not explicitly given,
+/*     // To determine the physical address bits width when it is not explicitly given,
     // you need to consider the relationship between the virtual address space, 
     // the page size, and the physical memory size.
-    const virtualAddressWidth = virtualAddress.toString(2).length; // Convert address to bits and get width 
     const numOfPages = (2 ** virtualAddressWidth) / pageSize;
     const physicalPageMemory = numOfPages * pageSize;
-    const physAddressWidth = Math.floor(Math.log2(physicalPageMemory));
+    const physAddressWidth = Math.floor(Math.log2(physicalPageMemory)); */
 
+    
 
     useEffect(() => {
         console.log('inputFields', inputFields)
@@ -123,6 +123,10 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
                 setInputFields((prevState) => ({ ...prevState, [fieldName]: parseInt(input) }));
                 break;
             case 'virtualAddress':
+                if (!regexBits.test(input)) {
+                    event.target.value = '';
+                    return;
+                }
                 setInputFields((prevState) => ({ ...prevState, [fieldName]: getElementValuesFrom("vbit-input") }));
                 break;
             case 'physicalAddress':
@@ -147,7 +151,7 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
     };
 
     validateFieldInput(inputFields, {
-        virtualAddress: '1010011100101',
+        virtualAddress: Number(inputFields.virtualAddress).toString(2),
         vpn: 0,
         physicalAddress: '',
         tlbIndex: 0,
@@ -250,9 +254,9 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize }
                             <div className='list-item-wrapper'>
                                 <p>Bits of phys. (if any)</p>
                                 <div className='list-item-bit-input-wrapper'>
-                                    {createNullArr(physAddressWidth).map((_, index) => (
+                                    {createNullArr(physcialAddressWidth).map((_, index) => (
                                         <div className='input-wrapper'>
-                                            <p className="input-text">{physAddressWidth - index - 1}</p>
+                                            <p className="input-text">{physcialAddressWidth - index - 1}</p>
                                             <input
                                                 className="pbit-input"
                                                 maxLength={1}

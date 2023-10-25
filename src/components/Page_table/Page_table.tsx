@@ -1,9 +1,9 @@
-import { AddressPrefix, BaseConversion } from "../../App";
+import { AddressPrefix, BaseConversion, Bit } from "../../App";
 
 export type page_table_entry = {
     vpn: number;
     ppn: number;
-    valid: number;
+    valid: Bit;
 }
 
 type Page_tableProps = {
