@@ -151,7 +151,9 @@ function Input_table({ virtualAddress, addressPrefix, baseConversion, pageSize, 
     };
 
     validateFieldInput(inputFields, {
+        // Take the givenVirtualAddress in bits
         virtualAddress: Number(inputFields.virtualAddress).toString(2),
+        //
         vpn: 0,
         physicalAddress: '',
         tlbIndex: 0,
