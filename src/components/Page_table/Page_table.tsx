@@ -15,7 +15,7 @@ type Page_tableProps = {
 
 function Page_table({ page_table_entries, addressPrefix, baseConversion }: Page_tableProps) {
     return (
-        <>
+        <div>
             <h2>Page table</h2>
             <table className='table-page'>
                 <thead>
@@ -46,7 +46,7 @@ function Page_table({ page_table_entries, addressPrefix, baseConversion }: Page_
 
                 </tbody>
             </table>
-        </>
+        </div>
     );
 }
 

@@ -17,7 +17,7 @@ type Tlb_tableProps = {
 
 function Tlb_table({ tlb_entries, addressPrefix, baseConversion }: Tlb_tableProps) {
     return (
-        <>
+        <div>
             <h2>Tlb</h2>
             <table className='table-tlb'>
                     <th>Set</th>
@@ -48,7 +48,7 @@ function Tlb_table({ tlb_entries, addressPrefix, baseConversion }: Tlb_tableProp
 
                 </tbody>
             </table>
-        </>);
+        </div>);
 }
 
 export default Tlb_table;

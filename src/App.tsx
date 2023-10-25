@@ -4,6 +4,7 @@ import Input_table from './components/Input_table/Input_table';
 import { useEffect } from 'react';
 import Tlb_table, { tlb_entry } from './components/Tlb_table/Tlb_table';
 
+
 // --------- Glossary 
 // VPN : Virtual Page Number (TLB tag + TLB index)
 // PPN : Physical Page Number, PPO : Physical Page Offset
@@ -14,98 +15,111 @@ import Tlb_table, { tlb_entry } from './components/Tlb_table/Tlb_table';
 // VA : Virtual Address
 // ------
 
-// ------ preliminary variables
-const BaseConversions = [2, 10, 16] as const;
-type BaseConversionsArray = typeof BaseConversions;
-export type BaseConversion = BaseConversionsArray[number];
-const ChosenBaseConversion = BaseConversions[2]
+// ------ Types and constants
+const baseConversionMap = {
+  Binary: 2,
+  Decimal: 10,
+  Hexadecimal: 16,
+} as const;
 
-const AddressPrefixes = ['0b', '', '0x'] as const;
-type AddressPrefixesArray = typeof AddressPrefixes;
-export type AddressPrefix = AddressPrefixesArray[number];
-const ChosenAddressPrefix = AddressPrefixes[2]
+const addressPrefixMap = {
+  Binary: '0b',
+  Decimal: '',
+  Hexadecimal: '0x'
+} as const;
 
-const Bits = [0, 1] as const;
-type BitsArray = typeof Bits;
-export type Bit = BitsArray[number];
+const bitMap = {
+  Zero: 0,
+  One: 1
+} as const;
 
-const Results = ['TLB_hit', 'Page_hit', 'Page_miss'] as const;
-type ResultsArray = typeof Results;
-export type Result = ResultsArray[number];
+const resultsMap = {
+  Tlb_hit: 'TLB hit',
+  Page_hit: 'Page hit',
+  Page_fault: 'Page fault'
+}
+
+export type BaseConversion = typeof baseConversionMap[keyof typeof baseConversionMap];
+export type Bit = typeof bitMap[keyof typeof bitMap];
+export type AddressPrefix = typeof addressPrefixMap[keyof typeof addressPrefixMap];
+export type Results = typeof resultsMap[keyof typeof resultsMap];
 // ------
 
 
 // ----- Given parameters for exercis
 const virtualAddressBitWidth = createRandomNumber(10, 14); // VAS
 const physicalAddressBitWidth = createRandomNumber(10, 14); // PAS
-const TLBSets = createRandomNumber(3, 8);
+const TLBSets = 2**createRandomNumber(2, 4);
 const TLBWays = createRandomNumber(3, 5);
 
-// divide by two because we don't want the user to be flooded with information
-const pageSize = createRandomNumber(2, Math.min(virtualAddressBitWidth, physicalAddressBitWidth)/2);
-const PageTableSize = createRandomNumber(3, 5); // PTS
-const ExerciserResult: string = 'TLB_hit'
+// divide by two because we don't want the user to be flooded with information but, 4 -> [4], 3 -> [4,8], 2 -> [4,8,16]
+const pageSize = 2**createRandomNumber(2, Math.min(virtualAddressBitWidth, physicalAddressBitWidth) / 3); 
+const PageTableSize = createRandomNumber(3, 5); // PTS                                              
 // -----------
 
 
+// ----------- Test choices
+const ChosenResult: Results = resultsMap.Tlb_hit;
+const ChosenAddressPrefix: AddressPrefix = addressPrefixMap.Hexadecimal;
+const ChosenBaseConversion: BaseConversion = baseConversionMap.Hexadecimal;
+// ----------- 
 
 // create a random number from bitlength by taking a random number between
 // the previous number of bits and the current max of the bits we want 
-function createRandomNumberWith(bitLength: number) : number {
-  return createRandomNumber(2**(bitLength-1), 2**bitLength)
+function createRandomNumberWith(bitLength: number): number {
+  return createRandomNumber(2 ** (bitLength - 1), 2 ** bitLength)
 }
-
 
 // Create a random number between a and b
 function createRandomNumber(a: number, b: number) {
   return Math.floor(Math.random() * (b - a)) + a;
 }
 
+// Function to create a TLB entry
 function createTLBEntry(
-                        tag : number = createRandomNumber(0, 6666), 
-                        ppn : number = createRandomNumber(0, 6666), 
-                        valid : Bit = Math.floor(Math.random() * 2) as Bit
-                      ) : tlb_entry {
+  tag: number = createRandomNumber(0, 6666),
+  ppn: number = createRandomNumber(0, 6666),
+  valid: Bit = Math.floor(Math.random() * 2) as Bit
+): tlb_entry {
   return {
     tag: tag,
-    ppn : ppn,
+    ppn: ppn,
     valid: valid
   }
 }
 
-function createTLBEntries(numOfWays: number, numOfSets: number) : tlb_entry[][] {
-  const entries: tlb_entry[][] = [];  
- 
+// Function to create a TLB table
+function createTLBEntries(numOfWays: number, numOfSets: number): tlb_entry[][] {
+  const entries: tlb_entry[][] = [];
+
   for (let i = 0; i < numOfSets; i++) {
     const array: tlb_entry[] = [];
 
     for (let j = 0; j < numOfWays; j++) {
       array.push(createTLBEntry());
     }
-
     entries.push(array);
-  } 
-
+  }
   return entries;
 }
 
-function createPageTable(pageTableSize: number, pageSize : number) : page_table_entry[][] {
-  const entries: page_table_entry[][] = [];  
- 
+// Function to create a page table
+function createPageTable(pageTableSize: number, pageSize: number): page_table_entry[][] {
+  const entries: page_table_entry[][] = [];
+
   for (let i = 0; i < pageTableSize; i++) {
     const array: page_table_entry[] = [];
 
     for (let j = 0; j < pageSize; j++) {
       array.push({
         vpn: createRandomNumber(0, 6666),
-        ppn : createRandomNumber(0, 6666),
+        ppn: createRandomNumber(0, 6666),
         valid: Math.floor(Math.random() * 2) as Bit
       });
     }
 
     entries.push(array);
-  } 
-
+  }
 
   return entries;
 }
@@ -115,38 +129,41 @@ const generatedVirtualAddress = createRandomNumberWith(virtualAddressBitWidth)
 
 // TLB  table information
 const NumTlbEntries: number = TLBSets * TLBWays;
-const TLB_TABLE : tlb_entry[][] = createTLBEntries(TLBWays, TLBSets);
+const TLB_TABLE: tlb_entry[][] = createTLBEntries(TLBWays, TLBSets);
 
 // Page table information
-const PAGE_TABLE : page_table_entry[][] = createPageTable(PageTableSize, pageSize)
+const PAGE_TABLE: page_table_entry[][] = createPageTable(PageTableSize, pageSize)
 
 
+switch (ChosenResult) {
+  case resultsMap.Tlb_hit:
+    const VPO = Math.log2(pageSize)
+    const TLBI = Math.log2(TLBSets)
 
-switch (ExerciserResult) {
-  case Results[0]:
-      generatedVirtualAddress
+    const VPO_bits  = ([...generatedVirtualAddress.toString(2)].slice(-VPO).join('')); 
+    const TLBI_bits = ([...generatedVirtualAddress.toString(2)].slice(-VPO - TLBI, TLBI).join(''));
+    const TLBT_bits = Number([...generatedVirtualAddress.toString(2)].slice(0, -VPO - TLBI).join(''));
 
-      const VPO =  Math.log2(pageSize)
-      const VPO_bits = generatedVirtualAddress << VPO
-      const TLBI = Math.log2(TLBSets)
-      const TLBT = Number(String(generatedVirtualAddress).slice(0, TLBI + VPO))
+    console.log("generatedVirtualAddress", generatedVirtualAddress)
+    console.log("VPO_bits", VPO_bits)
+    console.log("TLBI_bits", TLBI_bits)
+    console.log("TLBT_bits", TLBT_bits)
+    console.log("generatedVirtualAddress2", generatedVirtualAddress)
+      
+
+    TLB_TABLE[Math.floor(Math.random() * TLB_TABLE.length)][Math.floor(Math.random() * TLB_TABLE[0].length)].tag = TLBT_bits;
+    TLB_TABLE[0][0].valid = 1;
 
 
-
-      TLB_TABLE[Math.floor(Math.random() * TLB_TABLE.length)][Math.floor(Math.random() * TLB_TABLE[0].length)].tag = TLBT;
-      TLB_TABLE[0][0].valid = 1;
-
-
-      console.log("VPO", VPO)
-      console.log("TLBI", TLBI)
-      console.log("TLBT", TLBT)
+    console.log("VPO", VPO)
+    console.log("TLBI", TLBI)
 
 
     break;
-  case Results[1]:
+  case resultsMap.Page_hit:
     console.log("Page hit")
     break;
-  case Results[2]:
+  case resultsMap.Page_fault:
     console.log("Page fault")
     break;
   default:
@@ -156,9 +173,10 @@ switch (ExerciserResult) {
 
 function App() {
 
-const testing = true;
+  const testing = true;
   useEffect(() => {
     if (testing) {
+      console.log('------------------------------------')
       console.log("virtualAddressBitWidth", virtualAddressBitWidth)
       console.log("physicalAddressBitWidth", physicalAddressBitWidth)
       console.log("pageSize", pageSize)
@@ -166,13 +184,14 @@ const testing = true;
       console.log("TLBWays", TLBWays)
       console.log("PageTableSize", PageTableSize)
     }
-    
-      }, [])
+
+  }, [])
 
   return (
     <>
       <div className='wrapper'>
         <div className='wrapper-tables'>
+          
           <Tlb_table
             tlb_entries={TLB_TABLE}
             addressPrefix={ChosenAddressPrefix}
