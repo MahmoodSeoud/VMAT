@@ -125,16 +125,16 @@ function createTableEntry<TObj extends tlb_entry | page_table_entry>(entry: TObj
 
 // Function to create a geniric table of entries of type tlb_entry or page_table_entry
 function createTableEntries<TObj extends tlb_entry | page_table_entry>(
-  numOfCols: number,
   numOfRows: number,
+  numOfCols: number,
   tableEntry: TObj
 ): TObj[][] {
   const entries: TObj[][] = [];
 
-  for (let i = 0; i < numOfRows; i++) {
+  for (let i = 0; i < numOfCols; i++) {
     const array: TObj[] = [];
 
-    for (let j = 0; j < numOfCols; j++) {
+    for (let j = 0; j < numOfRows; j++) {
       array.push(tableEntry);
     }
     entries.push(array);
@@ -152,7 +152,6 @@ const TLB_TABLE: tlb_entry[][] = createTableEntries<tlb_entry>(
   TLBSets,
   createTableEntry<tlb_entry>({ tag: 0, ppn: 0, valid: 0 })
 );
-
 
 // Page table information
 const PAGE_TABLE: page_table_entry[][] = createTableEntries<page_table_entry>(
