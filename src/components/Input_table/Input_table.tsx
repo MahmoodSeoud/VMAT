@@ -1,7 +1,18 @@
 import { useEffect, useState } from 'react';
-import { AddressPrefix, BaseConversion } from '../../App';
-
+import { AddressPrefix, BaseConversion, InputField, InputFieldsMap } from '../../App';
 import './Input_table.css'
+
+export type InputFields = {
+    VirtualAddress: string;
+    VPN: string;
+    TLBI: string;
+    TLBT: string;
+    TLBHIT: string;
+    PageFault: string;
+    PPN: string;
+    PhysicalAddress: string;
+}
+
 
 type Input_tableProps = {
     VirtualAddress: number;
@@ -13,16 +24,8 @@ type Input_tableProps = {
     facit: InputFields;
 };
 
-export type InputFields = {
-    VirtualAddress: string;
-    VPN: string;
-    TLBI: string;
-    TLBT: string;
-    TLBHIT: boolean;
-    PageFault: boolean;
-    PPN: string;
-    PhysicalAddress: string;
-}
+
+
 
 function createNullArr(addresWidth: number): Array<null> {
     return Array(addresWidth).fill(null);
@@ -61,16 +64,6 @@ function getElementValuesFrom(className: string): string {
 // 6. Lookup in Page table. if VPN exists and valid == 1 -> No page fault -> You are done!
 // 7. if there is a pagefault -> Lookup in Page table. write down the PPN and write the physcial address of that
 
-function createFacitObject(input: InputFields, pageSize: number, TLBSets: number) {
-    const VPO = Math.log2(pageSize)
-    const TLBI = Math.log2(TLBSets)
-
-    const VPO_bits: string = [...input.VirtualAddress].slice(-VPO).join('');
-    const TLBI_bits: string = [...input.VirtualAddress].slice(-VPO - TLBI, TLBI).join('');
-    const TLBT_bits: string = [...input.VirtualAddress].slice(0, -VPO - TLBI).join('');
-    return null
-}
-
 function validateFieldInput(input: InputFields, facit: InputFields): void {
     if (input === facit) {
         console.log("CORRECT")
@@ -85,15 +78,10 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         PhysicalAddress: '',
         TLBI: '',
         TLBT: '',
-        TLBHIT: false,
-        PageFault: false,
+        TLBHIT: '',
+        PageFault: '',
         PPN: ''
     })
-
-    // Converting the input strings to decimal numbers
-    const virtualAddressInput = inputFields.VirtualAddress && parseInt(inputFields.VirtualAddress, 2); // Convert binary string to decimal number
-    const physAddressInput = inputFields.PhysicalAddress && parseInt(inputFields.PhysicalAddress, 2); // Convert binary string to decimal number
-
 
     /*     // To determine the physical address bits width when it is not explicitly given,
         // you need to consider the relationship between the virtual address space, 
@@ -109,48 +97,50 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     }, [inputFields])
 
     // Handle changes in input fields
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: InputField) => {
         const regexBits = /^[01]*$/; // regular expression to match only 1's and 0's
         const regexYN = /^[YN]*$/; // regular expression to match only Y AND N
-        const regexNumbers = /^[0-9]*$/; // regular expression to match only digits
         const regexHexChars = /^[0-9a-fA-F]*$/; // regular expression to match only hex characters
         const input = event.target.value;
 
         switch (fieldName) {
-
-            case 'VPN':
-            case 'PPN':
-            case 'TLBI':
-            case 'TLBT':
-                if (!regexHexChars.test(input)) {
-                    event.target.value = '';
-                    return;
-                }
-                setInputFields((prevState) => ({ ...prevState, [fieldName]: input }));
-                break;
-            case 'VirtualAddress':
+            case InputFieldsMap.VirtualAddress:
                 if (!regexBits.test(input)) {
                     event.target.value = '';
                     return;
                 }
                 setInputFields((prevState) => ({ ...prevState, [fieldName]: getElementValuesFrom("vbit-input") }));
                 break;
-            case 'physicalAddress':
+
+            case InputFieldsMap.VPN:
+            case InputFieldsMap.TLBT:
+            case InputFieldsMap.TLBI:
+            case InputFieldsMap.PPN:
+                if (!regexHexChars.test(input)) {
+                    event.target.value = '';
+                    return;
+                }
+                setInputFields((prevState) => ({ ...prevState, [fieldName]: input }));
+                break;
+
+            case InputFieldsMap.PageFault:
+            case InputFieldsMap.TLBHIT:
+                if (!regexYN.test(input)) {
+                    event.target.value = '';
+                    return;
+                }
+
+                setInputFields((prevState) => ({ ...prevState, [fieldName]: input }));
+                break;
+
+            case InputFieldsMap.PhysicalAddress:
                 if (!regexBits.test(input)) {
                     event.target.value = '';
                     return;
                 }
                 setInputFields((prevState) => ({ ...prevState, [fieldName]: getElementValuesFrom("pbit-input") }));
                 break;
-            case 'TLBHIT':
-            case 'PageFault':
-                if (!regexYN.test(input)) {
-                    event.target.value = '';
-                    return;
-                }
-                
-                setInputFields((prevState) => ({ ...prevState, [fieldName]: input === 'Y' }));
-                break;
+
             default:
                 console.log('idk even know what happened');
                 break;
@@ -164,8 +154,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         PhysicalAddress: '',
         TLBI: '',
         TLBT: '',
-        TLBHIT: false,
-        PageFault: false,
+        TLBHIT: '',
+        PageFault: '',
         PPN: ''
     })
 
@@ -187,7 +177,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                 className="vbit-input"
                                                 name='VirtualAddress'
                                                 maxLength={1}
-                                                onChange={(ev) => handleInputChange(ev, 'VirtualAddress')}
+                                                onChange={(ev) => handleInputChange(ev, InputFieldsMap.VirtualAddress)}
                                             />
                                         </div>
                                     ))}
@@ -210,7 +200,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <td>VPN</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'VPN')}
+                                                    onChange={(ev) => handleInputChange(ev, InputFieldsMap.VPN)}
                                                 />
                                             </td>
                                         </tr>
@@ -218,7 +208,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <td>TLB index</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'TLBI')}
+                                                    onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBI)}
                                                 />
                                             </td>
                                         </tr>
@@ -226,7 +216,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <td>TLB tag</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'TLBT')}
+                                                    onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBT)}
                                                 />
                                             </td>
                                         </tr>
@@ -234,7 +224,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <td>TLB hit? (Y/N)</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'TLBHIT')}
+                                                    maxLength={1}
+                                                    onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBHIT)}
                                                 />
                                             </td>
                                         </tr>
@@ -242,7 +233,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <td>Page fault? (Y/N)</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'PageFault')}
+                                                    maxLength={1}
+                                                    onChange={(ev) => handleInputChange(ev, InputFieldsMap.PageFault)}
                                                 />
                                             </td>
                                         </tr>
@@ -250,7 +242,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <td>PPN</td>
                                             <td>
                                                 <input
-                                                    onChange={(ev) => handleInputChange(ev, 'PPN')}
+                                                    onChange={(ev) => handleInputChange(ev, InputFieldsMap.PPN)}
                                                 />
                                             </td>
                                         </tr>
@@ -268,7 +260,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <input
                                                 className="pbit-input"
                                                 maxLength={1}
-                                                onChange={(ev) => handleInputChange(ev, 'PhysicalAddress')}
+                                                onChange={(ev) => handleInputChange(ev, InputFieldsMap.PhysicalAddress)}
                                             />
                                         </div>
                                     ))}

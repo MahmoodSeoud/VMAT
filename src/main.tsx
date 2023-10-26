@@ -4,7 +4,10 @@ import App from './App.tsx'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+/*
+  I removed StrictMode to avoid the useEffect to be called twice
+<React.StrictMode>
     <App />
-  </React.StrictMode>,
-)
+  </React.StrictMode>, */
+  <App />
+  )
