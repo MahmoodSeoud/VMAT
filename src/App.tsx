@@ -94,63 +94,72 @@ function createRandomNumber(a: number, b: number) {
 }
 
 // Function to create a TLB entry
-function createTLBEntry(
-  tag: number = createRandomNumber(0, 6666),
-  ppn: number = createRandomNumber(0, 6666),
-  valid: Bit = Math.floor(Math.random() * 2) as Bit
-): tlb_entry {
-  return {
-    tag: tag,
-    ppn: ppn,
-    valid: valid
+function createTableEntry<TObj extends tlb_entry | page_table_entry>(entry: TObj): TObj {
+
+  const ppn: number = createRandomNumber(0, 6666);
+  const valid: Bit = Math.floor(Math.random() * 2) as Bit;
+  const tag: number = createRandomNumber(0, 6666);
+  const vpn: number = createRandomNumber(0, 6666);
+
+  for (const key in entry) {
+    switch (key) {
+      case 'vpn':
+        entry[key as keyof TObj] = vpn as TObj[Extract<keyof TObj, number>];
+        break;
+      case 'ppn':
+        entry[key as keyof TObj] = ppn as TObj[Extract<keyof TObj, number>];
+        break;
+      case 'tag':
+        entry[key as keyof TObj] = tag as TObj[Extract<keyof TObj, number>];
+        break;
+      case 'valid':
+        entry[key as keyof TObj] = valid as TObj[Extract<keyof TObj, Bit>];
+        break;
+      default:
+        break;
+    }
   }
+
+  return entry
 }
 
-// Function to create a TLB table
-function createTLBEntries(numOfWays: number, numOfSets: number): tlb_entry[][] {
-  const entries: tlb_entry[][] = [];
+// Function to create a geniric table of entries of type tlb_entry or page_table_entry
+function createTableEntries<TObj extends tlb_entry | page_table_entry>(
+  numOfWays: number,
+  numOfSets: number,
+  tableEntry: TObj
+): TObj[][] {
+  const entries: TObj[][] = [];
 
   for (let i = 0; i < numOfSets; i++) {
-    const array: tlb_entry[] = [];
+    const array: TObj[] = [];
 
     for (let j = 0; j < numOfWays; j++) {
-      array.push(createTLBEntry());
+      array.push(tableEntry);
     }
     entries.push(array);
   }
   return entries;
 }
 
-// Function to create a page table
-function createPageTable(pageTableSize: number, pageSize: number): page_table_entry[][] {
-  const entries: page_table_entry[][] = [];
-
-  for (let i = 0; i < pageTableSize; i++) {
-    const array: page_table_entry[] = [];
-
-    for (let j = 0; j < pageSize; j++) {
-      array.push({
-        vpn: createRandomNumber(0, 6666),
-        ppn: createRandomNumber(0, 6666),
-        valid: Math.floor(Math.random() * 2) as Bit
-      });
-    }
-
-    entries.push(array);
-  }
-
-  return entries;
-}
-
-
-const generatedVirtualAddress = createRandomNumberWith(virtualAddressBitWidth)
+const generatedVirtualAddress = createRandomNumberWith(virtualAddressBitWidth);
 
 // TLB  table information
 const NumTlbEntries: number = TLBSets * TLBWays;
-const TLB_TABLE: tlb_entry[][] = createTLBEntries(TLBWays, TLBSets);
+//const TLB_TABLE: tlb_entry[][] = createTLBEntries(TLBWays, TLBSets);
+const TLB_TABLE: tlb_entry[][] = createTableEntries<tlb_entry>(
+  TLBWays,
+  TLBSets,
+  createTableEntry<tlb_entry>({ tag: 0, ppn: 0, valid: 0 })
+);
+
 
 // Page table information
-const PAGE_TABLE: page_table_entry[][] = createPageTable(PageTableSize, pageSize)
+const PAGE_TABLE: page_table_entry[][] = createTableEntries<page_table_entry>(
+  PageTableSize,
+  pageSize,
+  createTableEntry<page_table_entry>({ vpn: 0, ppn: 0, valid: 0 })
+);
 
 
 
@@ -181,7 +190,7 @@ function App() {
       console.log("PageTableSize", PageTableSize)
       console.log("VPO", VPO)
       console.log("TLBI", TLBI)
-      
+
     }
 
   }, [0])
