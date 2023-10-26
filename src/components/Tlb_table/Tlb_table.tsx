@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { AddressPrefix, BaseConversion, Bit } from '../../App';
 import '../table.css'
 
@@ -20,14 +21,18 @@ function Tlb_table({ tlb_entries, addressPrefix, baseConversion }: Tlb_tableProp
         <div>
             <h2>Tlb</h2>
             <table className='table-tlb'>
-                    <th>Set</th>
-                    {tlb_entries[0].map(_ => (
-                        <>
-                            <th>Tag</th>
-                            <th>PPN</th>
-                            <th>Valid</th>
-                        </>
-                    ))}
+                <thead>
+                    <tr>
+                        <th>Set</th>
+                        {tlb_entries[0].map(_ => (
+                            <>
+                                <th>Tag</th>
+                                <th>PPN</th>
+                                <th>Valid</th>
+                            </>
+                        ))}
+                    </tr>
+                </thead>
                 <tbody>
 
                     {tlb_entries.map((_, i) => {

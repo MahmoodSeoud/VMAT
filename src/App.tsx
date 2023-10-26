@@ -198,11 +198,8 @@ function App() {
     const TLBT_bits: string = addressInBits.join('');     // TLBT_bits = the remaining bits of the address
 
     // Convert the bits to a number
-    const VPO_value: number = Number(addressPrefixMap.Binary + VPO_bits);
     const TLBI_value: number = Number(addressPrefixMap.Binary + TLBI_bits);
     const TLBT_value: number = Number(addressPrefixMap.Binary + TLBT_bits);
-
-
 
     switch (ChosenResult) {
       case InputFieldsMap.TLBHIT:

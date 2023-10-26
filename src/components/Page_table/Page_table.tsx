@@ -19,6 +19,7 @@ function Page_table({ page_table_entries, addressPrefix, baseConversion }: Page_
             <h2>Page table</h2>
             <table className='table-page'>
                 <thead>
+                    <tr>
                     {page_table_entries[0].map(_ => (
                         <>
                             <th>VPN</th>
@@ -26,6 +27,7 @@ function Page_table({ page_table_entries, addressPrefix, baseConversion }: Page_
                             <th>Valid</th>
                         </>
                     ))}
+                    </tr>
                 </thead>
                 <tbody>
 

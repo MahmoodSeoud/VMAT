@@ -191,8 +191,10 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
 
                                 <table className='table'>
                                     <thead>
-                                        <th>Parameter</th>
-                                        <th>Value</th>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th>Value</th>
+                                        </tr>
                                     </thead>
 
                                     <tbody>
