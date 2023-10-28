@@ -65,14 +65,49 @@ function getElementValuesFrom(className: string): string {
 // 7. if there is a pagefault -> Lookup in Page table. write down the PPN and write the physcial address of that
 
 function validateFieldInput(input: InputFields, facit: InputFields): void {
+    // TODO: nice to have (in the settings menu)
+    // incremental correct feedback
+
+    if (input.VirtualAddress === facit.VirtualAddress) {
+        console.log("CORRECT VirtualAddress")
+    }
+
+    if (input.VPN === facit.VPN) {
+        console.log("CORRECT VPN")
+    }
+
+    if (input.TLBI === facit.TLBI) {
+        console.log("CORRECT TLBI")
+    }
+
+    if (input.TLBT === facit.TLBT) {
+        console.log("CORRECT TLBT")
+    }
+
+    if (input.TLBHIT === facit.TLBHIT) {
+        console.log("CORRECT TLBHIT")
+    }
+
+    if (input.PageFault === facit.PageFault) {
+        console.log("CORRECT PageFault")
+    }
+
+    if (input.PPN === facit.PPN) {
+        console.log("CORRECT PPN")
+    }
+
+    if (input.PhysicalAddress === facit.PhysicalAddress) {
+        console.log("CORRECT PhysicalAddress")
+    }
+
     if (input === facit) {
-        console.log("CORRECT")
+        console.log("ALL CORRECT")
     }
 }
 
 function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, virtualAddressWidth, physcialAddressWidth, facit }: Input_tableProps): JSX.Element {
 
-    const [inputFields, setInputFields] = useState<InputFields>({
+    const [input, setInput] = useState<InputFields>({
         VirtualAddress: '',
         VPN: '',
         PhysicalAddress: '',
@@ -93,8 +128,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
 
 
     useEffect(() => {
-        console.log('inputFields', inputFields)
-    }, [inputFields])
+        console.log('input', input)
+    }, [input])
 
     // Handle changes in input fields
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: InputField) => {
@@ -109,7 +144,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                     event.target.value = '';
                     return;
                 }
-                setInputFields((prevState) => ({ ...prevState, [fieldName]: getElementValuesFrom("vbit-input") }));
+                setInput((prevState) => ({ ...prevState, [fieldName]: getElementValuesFrom("vbit-input") }));
                 break;
 
             case InputFieldsMap.VPN:
@@ -120,7 +155,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                     event.target.value = '';
                     return;
                 }
-                setInputFields((prevState) => ({ ...prevState, [fieldName]: input }));
+                setInput((prevState) => ({ ...prevState, [fieldName]: input }));
                 break;
 
             case InputFieldsMap.PageFault:
@@ -130,7 +165,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                     return;
                 }
 
-                setInputFields((prevState) => ({ ...prevState, [fieldName]: input }));
+                setInput((prevState) => ({ ...prevState, [fieldName]: input }));
                 break;
 
             case InputFieldsMap.PhysicalAddress:
@@ -138,7 +173,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                     event.target.value = '';
                     return;
                 }
-                setInputFields((prevState) => ({ ...prevState, [fieldName]: getElementValuesFrom("pbit-input") }));
+                setInput((prevState) => ({ ...prevState, [fieldName]: getElementValuesFrom("pbit-input") }));
                 break;
 
             default:
@@ -147,17 +182,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         }
     };
 
-    validateFieldInput(inputFields, {
-        // Take the givenVirtualAddress in bits
-        VirtualAddress: Number(inputFields.VirtualAddress).toString(2),
-        VPN: '',
-        PhysicalAddress: '',
-        TLBI: '',
-        TLBT: '',
-        TLBHIT: '',
-        PageFault: '',
-        PPN: ''
-    })
+    // TODO if the user has incremental feedback have this in a if statement
+    //validateFieldInput(input, facit)
 
     return (
         <>
@@ -273,6 +299,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
 
                 </div>
             </div>
+        <button onClick={() => validateFieldInput(input, facit)}></button>
         </>
     )
 }

@@ -1,4 +1,3 @@
-import { Fragment } from 'react';
 import { AddressPrefix, BaseConversion, Bit } from '../../App';
 import '../table.css'
 

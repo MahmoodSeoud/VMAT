@@ -1,7 +1,7 @@
 import './App.css'
 import Page_table, { page_table_entry } from './components/Page_table/Page_table';
 import Input_table, { InputFields } from './components/Input_table/Input_table';
-import { useEffect, useState } from 'react';
+import { createFactory, useEffect, useState } from 'react';
 import Tlb_table, { tlb_entry } from './components/Tlb_table/Tlb_table';
 
 
@@ -50,6 +50,7 @@ const bitMap = {
 export type BaseConversion = typeof baseConversionMap[keyof typeof baseConversionMap];
 export type AddressPrefix = typeof addressPrefixMap[keyof typeof addressPrefixMap];
 export type InputField = typeof InputFieldsMap[keyof typeof InputFieldsMap];
+// TODO: add the PageHit case
 export type Result = Pick<typeof InputFieldsMap, 'TLBHIT' | 'PageFault'>[keyof Pick<typeof InputFieldsMap, 'TLBHIT' | 'PageFault'>];
 export type Bit = typeof bitMap[keyof typeof bitMap];
 // ------
@@ -69,6 +70,8 @@ const PageTableSize = createRandomNumber(3, 5); // PTS
 const VPO = Math.log2(pageSize);
 const TLBI = Math.log2(TLBSets);
 
+
+
 // -----------
 
 
@@ -78,9 +81,13 @@ const ChosenAddressPrefix: AddressPrefix = addressPrefixMap.Hexadecimal;
 const ChosenBaseConversion: BaseConversion = baseConversionMap.Hexadecimal;
 // ----------- 
 
+
+// ----------- Helper functions
+
 function reverseString(str: string) {
   str.split("").reverse().join("");
 }
+// ------------
 
 // create a random number from bitlength by taking a random number between
 // the previous number of bits and the current max of the bits we want 
@@ -96,12 +103,12 @@ function createRandomNumber(a: number, b: number) {
 // Function to create a TLB entry
 function createTableEntry<TObj extends tlb_entry | page_table_entry>(entry: TObj): TObj {
 
-  const ppn: number = createRandomNumber(0, 6666);
-  const valid: Bit = Math.floor(Math.random() * 2) as Bit;
-  const tag: number = createRandomNumber(0, 6666);
-  const vpn: number = createRandomNumber(0, 6666);
-
   for (const key in entry) {
+    const valid: Bit = Math.floor(Math.random() * 2) as Bit;
+    const ppn: number = createRandomNumber(0, 6666);
+    const tag: number = createRandomNumber(0, 6666);
+    const vpn: number = createRandomNumber(0, 6666);
+
     switch (key) {
       case 'vpn':
         entry[key as keyof TObj] = vpn as TObj[Extract<keyof TObj, number>];
@@ -124,6 +131,8 @@ function createTableEntry<TObj extends tlb_entry | page_table_entry>(entry: TObj
 }
 
 // Function to create a geniric table of entries of type tlb_entry or page_table_entry
+// tlb_enty = rows = sets | column =  ways
+// page_entry = rows = pageSize | column = pageTableSize ?????
 function createTableEntries<TObj extends tlb_entry | page_table_entry>(
   numOfRows: number,
   numOfCols: number,
@@ -135,7 +144,7 @@ function createTableEntries<TObj extends tlb_entry | page_table_entry>(
     const array: TObj[] = [];
 
     for (let j = 0; j < numOfRows; j++) {
-      array.push(tableEntry);
+      array.push(createTableEntry<TObj>(tableEntry));
     }
     entries.push(array);
   }
@@ -150,33 +159,22 @@ const NumTlbEntries: number = TLBSets * TLBWays;
 const TLB_TABLE: tlb_entry[][] = createTableEntries<tlb_entry>(
   TLBWays,
   TLBSets,
-  createTableEntry<tlb_entry>({ tag: 0, ppn: 0, valid: 0 })
+  { tag: 0, ppn: 0, valid: 0 }
 );
 
 // Page table information
 const PAGE_TABLE: page_table_entry[][] = createTableEntries<page_table_entry>(
   pageSize,
   PageTableSize,
-  createTableEntry<page_table_entry>({ vpn: 0, ppn: 0, valid: 0 })
+  { vpn: 0, ppn: 0, valid: 0 }
 );
 
 
-
-const facitObj: InputFields = {
-  VirtualAddress: '',
-  VPN: '',
-  TLBI: '',
-  TLBT: '',
-  TLBHIT: '',
-  PageFault: '',
-  PPN: '',
-  PhysicalAddress: ''
-}
-
-function App() {
-  const [facit, setFacit] = useState<InputFields>(facitObj);
+function App(): JSX.Element {
+  const [facit, setFacit] = useState<InputFields>(createFacit(ChosenResult));
 
 
+  console.log("facit", facit)
   const testing = true;
   useEffect(() => {
     if (testing) {
@@ -194,20 +192,32 @@ function App() {
 
   }, [0])
 
+
   // TODO : Add the page hit case
   // TODO: Make the facit required and complete this function
-  function createFacit(ChosenResult: Result): void {
+  // POSTCONDITION : sets facit object in the Facit state
+  function createFacit(ChosenResult: Result): InputFields {
 
     const addressInBits = [...generatedVirtualAddress.toString(2)];
-    debugger
 
-    const VPO_bits: string = addressInBits.splice(-VPO).join('');     // VPO_bits = the last VPO bits of the address
-    const TLBI_bits: string = addressInBits.splice(-TLBI).join('');     // TLBI_bits = the next TLBI bits of the address
+    const VPO_bits: string = addressInBits.splice(-VPO).join('');     // VPO_bits = the last VPO bits of the address / log2(pageSize)
+    const TLBI_bits: string = addressInBits.splice(-TLBI).join('');     // TLBI_bits = the next TLBI bits of the address / log2(sets)
     const TLBT_bits: string = addressInBits.join('');     // TLBT_bits = the remaining bits of the address
 
     // Convert the bits to a number
     const TLBI_value: number = Number(addressPrefixMap.Binary + TLBI_bits);
     const TLBT_value: number = Number(addressPrefixMap.Binary + TLBT_bits);
+
+    let facitObj: InputFields = {
+      VirtualAddress: '',
+      VPN: '',
+      TLBI: '',
+      TLBT: '',
+      TLBHIT: '',
+      PageFault: '',
+      PPN: '',
+      PhysicalAddress: ''
+    }
 
     switch (ChosenResult) {
       case InputFieldsMap.TLBHIT:
@@ -215,9 +225,9 @@ function App() {
         const index = TLB_TABLE[TLBI_value][Math.floor(Math.random() * TLB_TABLE[0].length)];
         index.tag = TLBT_value;
         index.valid = 1;
-        const PPN = index.ppn.toString(2);
+        const PPN = index.ppn.toString(16);
 
-        setFacit({
+        facitObj = {
           VirtualAddress: generatedVirtualAddress.toString(2),
           VPN: (TLBT_value + TLBI_value).toString(16),
           TLBI: TLBI_value.toString(16),
@@ -225,19 +235,23 @@ function App() {
           TLBHIT: 'Y',
           PageFault: 'N',
           PPN: PPN,
-          PhysicalAddress: PPN + VPO_bits
-        })
+          PhysicalAddress: index.ppn.toString(2) + VPO_bits
+        }
 
-        console.log("facit", facit)
         break;
       case InputFieldsMap.PageFault:
         console.log("Page hit")
         break;
       // TODO: Add the page hit case
       default:
+        console.log("No case found");
         break;
+
     }
+
+    return facitObj;
   }
+
 
   return (
     <>
@@ -267,8 +281,6 @@ function App() {
           baseConversion={ChosenBaseConversion}
         />
       </div >
-
-      <button onClick={() => createFacit(ChosenResult)}>Check answers</button>
     </>
   )
 }
