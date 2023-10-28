@@ -1,14 +1,14 @@
 import { AddressPrefix, BaseConversion, Bit } from '../../App';
 import '../table.css'
 
-export type tlb_entry = {
+export type TLB_TABLE_ENTRY = {
     tag: number;
     ppn: number;
     valid: Bit;
 };
 
 type Tlb_tableProps = {
-    tlb_entries: Array<tlb_entry>[];
+    tlb_entries: Array<TLB_TABLE_ENTRY>[];
     addressPrefix: AddressPrefix;
     baseConversion: BaseConversion;
 }

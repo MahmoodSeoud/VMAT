@@ -1,8 +1,8 @@
 import './App.css'
-import Page_table, { page_table_entry } from './components/Page_table/Page_table';
+import Page_table, { PAGE_TABLE_ENTRY } from './components/Page_table/Page_table';
 import Input_table, { InputFields } from './components/Input_table/Input_table';
-import { createFactory, useEffect, useState } from 'react';
-import Tlb_table, { tlb_entry } from './components/Tlb_table/Tlb_table';
+import { useEffect, useState } from 'react';
+import Tlb_table, { TLB_TABLE_ENTRY } from './components/Tlb_table/Tlb_table';
 
 
 // --------- Glossary 
@@ -101,39 +101,42 @@ function createRandomNumber(a: number, b: number) {
 }
 
 // Function to create a TLB entry
-function createTableEntry<TObj extends tlb_entry | page_table_entry>(entry: TObj): TObj {
+function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry: TObj): TObj {
 
-  for (const key in entry) {
-    const valid: Bit = Math.floor(Math.random() * 2) as Bit;
-    const ppn: number = createRandomNumber(0, 6666);
-    const tag: number = createRandomNumber(0, 6666);
-    const vpn: number = createRandomNumber(0, 6666);
+  const valid: Bit = Math.floor(Math.random() * 2) as Bit;
+  const ppn: number = createRandomNumber(0, 6666);
+  const tag: number = createRandomNumber(0, 6666);
+  const vpn: number = createRandomNumber(0, 6666);
 
-    switch (key) {
-      case 'vpn':
-        entry[key as keyof TObj] = vpn as TObj[Extract<keyof TObj, number>];
-        break;
-      case 'ppn':
-        entry[key as keyof TObj] = ppn as TObj[Extract<keyof TObj, number>];
-        break;
-      case 'tag':
-        entry[key as keyof TObj] = tag as TObj[Extract<keyof TObj, number>];
-        break;
-      case 'valid':
-        entry[key as keyof TObj] = valid as TObj[Extract<keyof TObj, Bit>];
-        break;
-      default:
-        break;
-    }
+  let newEntry: TObj;
+  if (isPageTableEntry(entry)) {
+    newEntry = {
+      ...entry,
+      vpn,
+      ppn,
+      valid
+    };
+  } else {
+    newEntry = {
+      ...entry,
+      ppn,
+      tag,
+      valid
+    };
   }
 
-  return entry
+
+  return newEntry;
 }
 
-// Function to create a geniric table of entries of type tlb_entry or page_table_entry
+function isPageTableEntry(entry: TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY): entry is PAGE_TABLE_ENTRY {
+  return 'vpn' in entry;
+}
+
+// Function to create a geniric table of entries of type TLB_TABLE_ENTRY or PAGE_TABLE_ENTRY
 // tlb_enty = rows = sets | column =  ways
 // page_entry = rows = pageSize | column = pageTableSize ?????
-function createTableEntries<TObj extends tlb_entry | page_table_entry>(
+function createTableEntries<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(
   numOfRows: number,
   numOfCols: number,
   tableEntry: TObj
@@ -142,9 +145,9 @@ function createTableEntries<TObj extends tlb_entry | page_table_entry>(
 
   for (let i = 0; i < numOfCols; i++) {
     const array: TObj[] = [];
-
     for (let j = 0; j < numOfRows; j++) {
-      array.push(createTableEntry<TObj>(tableEntry));
+      let entry = createTableEntry<TObj>(tableEntry)
+      array.push(entry);
     }
     entries.push(array);
   }
@@ -155,18 +158,20 @@ const generatedVirtualAddress = createRandomNumberWith(virtualAddressBitWidth);
 
 // TLB  table information
 const NumTlbEntries: number = TLBSets * TLBWays;
-//const TLB_TABLE: tlb_entry[][] = createTLBEntries(TLBWays, TLBSets);
-const TLB_TABLE: tlb_entry[][] = createTableEntries<tlb_entry>(
+//const TLB_TABLE: TLB_TABLE_ENTRY[][] = createTLBEntries(TLBWays, TLBSets);
+const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 });
+const TLB_TABLE: TLB_TABLE_ENTRY[][] = createTableEntries<TLB_TABLE_ENTRY>(
   TLBWays,
   TLBSets,
-  { tag: 0, ppn: 0, valid: 0 }
+  tlbTableEntry
 );
 
 // Page table information
-const PAGE_TABLE: page_table_entry[][] = createTableEntries<page_table_entry>(
+const pageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 });
+const PAGE_TABLE: PAGE_TABLE_ENTRY[][] = createTableEntries<PAGE_TABLE_ENTRY>(
   pageSize,
   PageTableSize,
-  { vpn: 0, ppn: 0, valid: 0 }
+  pageTableEntry
 );
 
 

@@ -1,13 +1,13 @@
 import { AddressPrefix, BaseConversion, Bit } from "../../App";
 
-export type page_table_entry = {
+export type PAGE_TABLE_ENTRY = {
     vpn: number;
     ppn: number;
     valid: Bit;
 }
 
 type Page_tableProps = {
-    page_table_entries: Array<page_table_entry>[];
+    page_table_entries: Array<PAGE_TABLE_ENTRY>[];
     addressPrefix: AddressPrefix;
     baseConversion: BaseConversion;
 }
