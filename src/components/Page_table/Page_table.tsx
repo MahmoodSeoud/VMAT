@@ -17,7 +17,7 @@ function Page_table({ page_table_entries, addressPrefix, baseConversion }: Page_
     return (
         <div>
             <h2>Page Table</h2>
-            <p>Page size is {pageSize} bytes and has a total of </p>
+            <p>Page size is {pageSize} bytes and has a total of 12 entries</p>
             <table className='table-page'>
                 <thead>
                     <tr>
