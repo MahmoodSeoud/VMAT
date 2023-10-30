@@ -64,7 +64,8 @@ const TLBSets = 2 ** createRandomNumber(2, 4);
 const TLBWays = createRandomNumber(3, 5);
 
 // divide by two because we don't want the user to be flooded with information but, 4 -> [4], 3 -> [4,8], 2 -> [4,8,16]
-const pageSize = 2 ** createRandomNumber(2, Math.min(virtualAddressBitWidth, physicalAddressBitWidth) / 3);
+const possiblePageSizes = [16, 32, 64] as const;
+const pageSize = possiblePageSizes[Math.floor(Math.random() * possiblePageSizes.length)];
 const PageTableSize = createRandomNumber(3, 5); // PTS                                              
 
 const VPO = Math.log2(pageSize);
@@ -169,8 +170,10 @@ const TLB_TABLE: TLB_TABLE_ENTRY[][] = createTableEntries<TLB_TABLE_ENTRY>(
 // Page table information
 const pageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 });
 const PAGE_TABLE: PAGE_TABLE_ENTRY[][] = createTableEntries<PAGE_TABLE_ENTRY>(
-  pageSize,
-  PageTableSize,
+  4, // I chose 4 because of all the old exams all look like that. 
+  //Be sure to see the page size given in those exams
+  3, // I choose 3 because of all the old exams all look like that. 
+  // Make sure to see the PTE's in the old exams. Hint: they are all 12 entries.
   pageTableEntry
 );
 
