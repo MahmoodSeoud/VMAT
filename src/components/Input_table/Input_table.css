@@ -44,3 +44,8 @@
     padding: .5em;
     font-size: 16px;
 }
+
+
+.correct {
+    background-color: rgb(21, 190, 21);
+}

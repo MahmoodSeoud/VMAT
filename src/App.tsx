@@ -19,14 +19,14 @@ import Tlb_table, { TLB_TABLE_ENTRY } from './components/Tlb_table/Tlb_table';
 // TODO bug, PPN random address må ikke være større the bits af physicalAddressBitWidth
 
 export const InputFieldsMap = {
-  VirtualAddress: 'Virtual address',
+  VirtualAddress: 'VirtualAddress',
   VPN: 'VPN',
   TLBI: 'TLBI',
   TLBT: 'TLBT',
-  TLBHIT: 'TLB hit',
-  PageFault: 'Page fault',
+  TLBHIT: 'TLBHIT',
+  PageFault: 'PageFault',
   PPN: 'PPN',
-  PhysicalAddress: 'Physical address'
+  PhysicalAddress: 'PhysicalAddress'
 } as const;
 
 const baseConversionMap = {

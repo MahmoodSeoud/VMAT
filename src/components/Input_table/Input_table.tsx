@@ -64,46 +64,6 @@ function getElementValuesFrom(className: string): string {
 // 6. Lookup in Page table. if VPN exists and valid == 1 -> No page fault -> You are done!
 // 7. if there is a pagefault -> Lookup in Page table. write down the PPN and write the physcial address of that
 
-function validateFieldInput(input: InputFields, facit: InputFields): void {
-    // TODO: nice to have (in the settings menu)
-    // incremental correct feedback
-
-    if (input.VirtualAddress === facit.VirtualAddress) {
-        console.log("CORRECT VirtualAddress")
-    }
-
-    if (input.VPN === facit.VPN) {
-        console.log("CORRECT VPN")
-    }
-
-    if (input.TLBI === facit.TLBI) {
-        console.log("CORRECT TLBI")
-    }
-
-    if (input.TLBT === facit.TLBT) {
-        console.log("CORRECT TLBT")
-    }
-
-    if (input.TLBHIT === facit.TLBHIT) {
-        console.log("CORRECT TLBHIT")
-    }
-
-    if (input.PageFault === facit.PageFault) {
-        console.log("CORRECT PageFault")
-    }
-
-    if (input.PPN === facit.PPN) {
-        console.log("CORRECT PPN")
-    }
-
-    if (input.PhysicalAddress === facit.PhysicalAddress) {
-        console.log("CORRECT PhysicalAddress")
-    }
-
-    if (input === facit) {
-        console.log("ALL CORRECT")
-    }
-}
 
 function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, virtualAddressWidth, physcialAddressWidth, facit }: Input_tableProps): JSX.Element {
 
@@ -118,6 +78,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         PPN: ''
     })
 
+
+
     /*     // To determine the physical address bits width when it is not explicitly given,
         // you need to consider the relationship between the virtual address space, 
         // the page size, and the physical memory size.
@@ -131,6 +93,11 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         console.log('input', input)
     }, [input])
 
+    function validateFieldInput(inputFieldName: InputField): boolean {
+        // TODO: nice to have (in the settings menu)
+        // incremental correct feedback
+        return input[inputFieldName] == facit[inputFieldName]
+    }
     // Handle changes in input fields
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: InputField) => {
         const regexBits = /^[01]*$/; // regular expression to match only 1's and 0's
@@ -185,6 +152,9 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     // TODO if the user has incremental feedback have this in a if statement
     //validateFieldInput(input, facit)
 
+
+
+
     return (
         <>
             <div className="input-table">
@@ -192,9 +162,9 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                 <div className='virtual-wrapper'>
                     <ol>
                         <li>
-                            <div className='list-item-wrapper'>
+                            <div className={`list-item-wrapper`}>
                                 <p>Bits of virtual address</p>
-                                <div className='list-item-bit-input-wrapper'>
+                                <div className={`list-item-bit-input-wrapper ${validateFieldInput(InputFieldsMap.VirtualAddress) ? 'correct' : ''} `}>
                                     {createNullArr(virtualAddressWidth).map((_, index) => (
                                         <div className='input-wrapper'>
                                             <p className="input-text">{virtualAddressWidth - index - 1}</p>
@@ -224,7 +194,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                     </thead>
 
                                     <tbody>
-                                        <tr>
+                                        <tr className={`${validateFieldInput(InputFieldsMap.VPN) ? ' correct' : ''}`}>
                                             <td>VPN</td>
                                             <td>
                                                 <input
@@ -232,7 +202,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                 />
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr className={`${validateFieldInput(InputFieldsMap.TLBI) ? ' correct' : ''} `}>
                                             <td>TLB index</td>
                                             <td>
                                                 <input
@@ -240,7 +210,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                 />
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr className={`${validateFieldInput(InputFieldsMap.TLBT) ? ' correct' : ''}`}>
                                             <td>TLB tag</td>
                                             <td>
                                                 <input
@@ -248,7 +218,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                 />
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr className={`${validateFieldInput(InputFieldsMap.TLBHIT) ? ' correct' : ''}`}>
                                             <td>TLB hit? (Y/N)</td>
                                             <td>
                                                 <input
@@ -257,7 +227,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                 />
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr className={`${validateFieldInput(InputFieldsMap.PageFault) ? ' correct' : ''}`}>
                                             <td>Page fault? (Y/N)</td>
                                             <td>
                                                 <input
@@ -266,7 +236,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                 />
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}>
                                             <td>PPN</td>
                                             <td>
                                                 <input
@@ -281,7 +251,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                         <li>
                             <div className='list-item-wrapper'>
                                 <p>Bits of phys. (if any)</p>
-                                <div className='list-item-bit-input-wrapper'>
+                                <div className={`list-item-bit-input-wrapper ${validateFieldInput(InputFieldsMap.PhysicalAddress) ? 'correct' : ''}`}>
                                     {createNullArr(physcialAddressWidth).map((_, index) => (
                                         <div className='input-wrapper'>
                                             <p className="input-text">{physcialAddressWidth - index - 1}</p>
@@ -299,7 +269,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
 
                 </div>
             </div>
-        <button onClick={() => validateFieldInput(input, facit)}>Check correct</button>
+{/*             <button onClick={() => validateFieldInput(input)}>Check correct</button> */}
         </>
     )
 }
