@@ -1,4 +1,4 @@
-import { AddressPrefix, BaseConversion, Bit } from "../../App";
+import { AddressPrefix, BaseConversion, Bit, pageSize } from "../../App";
 
 export type PAGE_TABLE_ENTRY = {
     vpn: number;
@@ -16,7 +16,8 @@ type Page_tableProps = {
 function Page_table({ page_table_entries, addressPrefix, baseConversion }: Page_tableProps) {
     return (
         <div>
-            <h2>Page table</h2>
+            <h2>Page Table</h2>
+            <p>Page size is {pageSize} bytes and has a total of </p>
             <table className='table-page'>
                 <thead>
                     <tr>

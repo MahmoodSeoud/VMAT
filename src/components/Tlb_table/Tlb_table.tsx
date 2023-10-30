@@ -1,4 +1,4 @@
-import { AddressPrefix, BaseConversion, Bit } from '../../App';
+import { AddressPrefix, BaseConversion, Bit, TLBSets, TLBWays } from '../../App';
 import '../table.css'
 
 export type TLB_TABLE_ENTRY = {
@@ -18,7 +18,8 @@ type Tlb_tableProps = {
 function Tlb_table({ tlb_entries, addressPrefix, baseConversion }: Tlb_tableProps) {
     return (
         <div>
-            <h2>Tlb</h2>
+            <h2>TLB</h2>
+            <p>The TLB is {TLBWays}-way set associative with {TLBSets} sets, totaling {TLBWays * TLBSets} entries</p>
             <table className='table-tlb'>
                 <thead>
                     <tr>

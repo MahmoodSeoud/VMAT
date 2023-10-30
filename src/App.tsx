@@ -16,7 +16,7 @@ import Tlb_table, { TLB_TABLE_ENTRY } from './components/Tlb_table/Tlb_table';
 // ------
 
 // ------ Types and constants
-
+// TODO bug, PPN random address må ikke være større the bits af physicalAddressBitWidth
 
 export const InputFieldsMap = {
   VirtualAddress: 'Virtual address',
@@ -60,15 +60,16 @@ export type Bit = typeof bitMap[keyof typeof bitMap];
 // ----- Given parameters for exercis
 const virtualAddressBitWidth = createRandomNumber(10, 14); // VAS
 const physicalAddressBitWidth = createRandomNumber(10, 14); // PAS
-const TLBSets = 2 ** createRandomNumber(2, 4);
-const TLBWays = createRandomNumber(3, 5);
+export const TLBSets = 2 ** createRandomNumber(2, 4);
+export const TLBWays = createRandomNumber(3, 5);
 
 // divide by two because we don't want the user to be flooded with information but, 4 -> [4], 3 -> [4,8], 2 -> [4,8,16]
 const possiblePageSizes = [16, 32, 64] as const;
-const pageSize = possiblePageSizes[Math.floor(Math.random() * possiblePageSizes.length)];
-const PageTableSize = createRandomNumber(3, 5); // PTS                                              
+export const pageSize = possiblePageSizes[Math.floor(Math.random() * possiblePageSizes.length)];
+export const PageTableSize = createRandomNumber(3, 5); // PTS                                              
 
 const VPO = Math.log2(pageSize);
+console.log("VPO", VPO)
 const TLBI = Math.log2(TLBSets);
 
 
@@ -243,7 +244,7 @@ function App(): JSX.Element {
           TLBHIT: 'Y',
           PageFault: 'N',
           PPN: PPN,
-          PhysicalAddress: index.ppn.toString(2) + VPO_bits
+          PhysicalAddress: index.ppn.toString(2) + VPO_bits // TODO bug : this becomes much longer than the random physical address in bits
         }
 
         break;

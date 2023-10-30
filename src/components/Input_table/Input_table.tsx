@@ -299,7 +299,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
 
                 </div>
             </div>
-        <button onClick={() => validateFieldInput(input, facit)}></button>
+        <button onClick={() => validateFieldInput(input, facit)}>Check correct</button>
         </>
     )
 }
