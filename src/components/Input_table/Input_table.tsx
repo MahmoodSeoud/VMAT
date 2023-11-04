@@ -26,7 +26,6 @@ type Input_tableProps = {
 
 
 
-
 function createNullArr(addresWidth: number): Array<null> {
     return Array(addresWidth).fill(null);
 }
@@ -34,15 +33,18 @@ function createNullArr(addresWidth: number): Array<null> {
 // Brabs the input element based on the classname of the input fields.
 // Appends the value together into one string
 function getElementValuesFrom(className: string): string {
-    let address = ""
-    const container = document.getElementsByClassName(className)
+    let address = "";
+    const container = document.getElementsByClassName(className);
 
+    document.getElementById('vbit')
     for (let i = 0; i < container.length; i++) {
-        address += (container[i] as HTMLInputElement).value
+        address += (container[i] as HTMLInputElement).value;
     }
 
-    return address
+    return address;
 }
+
+
 
 // PPN = Physical Page Number
 // It refers to the identification number assigned to a physical page in
@@ -78,7 +80,32 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         PPN: ''
     })
 
+    // Insert the facit incase the user does not know the answer
+    function insertFacit(inputFieldName: InputField, e: React.BaseSyntheticEvent): void {
 
+        const containerElement = (e.target.parentElement as HTMLBodyElement)
+        switch (inputFieldName) {
+            case InputFieldsMap.VirtualAddress:
+            case InputFieldsMap.PhysicalAddress:
+
+                const classForBits = "list-item-bit-input-wrapper" as const;
+
+                const elements = containerElement.getElementsByClassName(classForBits);
+
+                for (let i = 0; i < elements[0].children.length; i++) {
+                    // there is a <p> before the input element hence the 1
+                    const inputElement = elements[0].children[i].children[1] as HTMLInputElement
+                    inputElement.value = facit[inputFieldName][i] || '';
+                }
+                break;
+            default:
+                const inputElement_2 = (containerElement.children[1].children[0] as HTMLInputElement);
+
+                inputElement_2.value = facit[inputFieldName] || '';
+                break;
+        }
+                setInput((prevState) => ({ ...prevState, [inputFieldName]: facit[inputFieldName] }));
+    }
 
     /*     // To determine the physical address bits width when it is not explicitly given,
         // you need to consider the relationship between the virtual address space, 
@@ -98,6 +125,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         // incremental correct feedback
         return input[inputFieldName] == facit[inputFieldName]
     }
+
     // Handle changes in input fields
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: InputField) => {
         const regexBits = /^[01]*$/; // regular expression to match only 1's and 0's
@@ -178,6 +206,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                         </div>
                                     ))}
                                 </div>
+                                <button onClick={(ev) => insertFacit(InputFieldsMap.VirtualAddress, ev)}>Insert facit</button>
                             </div>
                         </li>
 
@@ -201,6 +230,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.VPN)}
                                                 />
                                             </td>
+                                            <button onClick={(ev) => insertFacit(InputFieldsMap.VPN, ev)}>Insert facit</button>
                                         </tr>
                                         <tr className={`${validateFieldInput(InputFieldsMap.TLBI) ? ' correct' : ''} `}>
                                             <td>TLB index</td>
@@ -209,6 +239,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBI)}
                                                 />
                                             </td>
+                                            <button onClick={(ev) => insertFacit(InputFieldsMap.TLBI, ev)}>Insert facit</button>
                                         </tr>
                                         <tr className={`${validateFieldInput(InputFieldsMap.TLBT) ? ' correct' : ''}`}>
                                             <td>TLB tag</td>
@@ -217,6 +248,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBT)}
                                                 />
                                             </td>
+                                            <button onClick={(ev) => insertFacit(InputFieldsMap.TLBT, ev)}>Insert facit</button>
                                         </tr>
                                         <tr className={`${validateFieldInput(InputFieldsMap.TLBHIT) ? ' correct' : ''}`}>
                                             <td>TLB hit? (Y/N)</td>
@@ -226,6 +258,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBHIT)}
                                                 />
                                             </td>
+                                            <button onClick={(ev) => insertFacit(InputFieldsMap.TLBHIT, ev)}>Insert facit</button>
                                         </tr>
                                         <tr className={`${validateFieldInput(InputFieldsMap.PageFault) ? ' correct' : ''}`}>
                                             <td>Page fault? (Y/N)</td>
@@ -235,6 +268,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.PageFault)}
                                                 />
                                             </td>
+                                            <button onClick={(ev) => insertFacit(InputFieldsMap.PageFault, ev)}>Insert facit</button>
                                         </tr>
                                         <tr className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}>
                                             <td>PPN</td>
@@ -243,6 +277,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.PPN)}
                                                 />
                                             </td>
+                                            <button onClick={(ev) => insertFacit(InputFieldsMap.PPN, ev)}>Insert facit</button>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -263,13 +298,14 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                         </div>
                                     ))}
                                 </div>
+                                <button onClick={(ev) => insertFacit(InputFieldsMap.PhysicalAddress, ev)}>Insert Facit</button>
                             </div>
                         </li>
                     </ol>
 
                 </div>
             </div>
-{/*             <button onClick={() => validateFieldInput(input)}>Check correct</button> */}
+            {/*             <button onClick={() => validateFieldInput(input)}>Check correct</button> */}
         </>
     )
 }

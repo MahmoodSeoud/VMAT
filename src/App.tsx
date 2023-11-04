@@ -204,7 +204,7 @@ function App(): JSX.Element {
 
   console.log("facit", facit)
   const testing = true;
-  // Tes
+  // Testing console logs
   useEffect(() => {
     if (testing) {
       console.log('------------------------------------')
@@ -224,7 +224,7 @@ function App(): JSX.Element {
 
   }, [0])
 
-
+  // Setting the facit to the correct result
   useEffect(() => {
     setFacit(createFacit(ChosenResult));
   }, [0])
