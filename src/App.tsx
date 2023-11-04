@@ -58,8 +58,8 @@ export type Bit = typeof bitMap[keyof typeof bitMap];
 
 
 // ----- Given parameters for exercis
-const virtualAddressBitWidth = createRandomNumber(10, 14); // VAS
-const physicalAddressBitWidth = createRandomNumber(10, 14); // PAS
+// PPN bit size + log2(pagesize) 
+
 export const TLBSets = 2 ** createRandomNumber(2, 4);
 export const TLBWays = createRandomNumber(3, 5);
 
@@ -69,9 +69,11 @@ export const pageSize = possiblePageSizes[Math.floor(Math.random() * possiblePag
 export const PageTableSize = createRandomNumber(3, 5); // PTS                                              
 
 const VPO = Math.log2(pageSize);
-console.log("VPO", VPO)
 const TLBI = Math.log2(TLBSets);
+const PPN = createRandomNumberWith(8);
 
+const virtualAddressBitWidth = createRandomNumber(10, 14); // VAS
+const physicalAddressBitWidth = PPN.toString(2).length + VPO;
 
 
 // -----------
@@ -97,6 +99,13 @@ function createRandomNumberWith(bitLength: number): number {
   return createRandomNumber(2 ** (bitLength - 1), 2 ** bitLength)
 }
 
+console.log("suppoed to be 8", createRandomNumberWith(8));
+console.log("suppoed to be 8", createRandomNumberWith(8));
+console.log("suppoed to be 8", createRandomNumberWith(8));
+console.log("suppoed to be 8", createRandomNumberWith(8));
+console.log("suppoed to be 8", createRandomNumberWith(8));
+
+
 // Create a random number between a and b
 function createRandomNumber(a: number, b: number) {
   return Math.floor(Math.random() * (b - a)) + a;
@@ -106,7 +115,7 @@ function createRandomNumber(a: number, b: number) {
 function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry: TObj): TObj {
 
   const valid: Bit = Math.floor(Math.random() * 2) as Bit;
-  const ppn: number = createRandomNumber(0, 6666);
+  const ppn: number = createRandomNumberWith(8);
   const tag: number = createRandomNumber(0, 6666);
   const vpn: number = createRandomNumber(0, 6666);
 
@@ -190,6 +199,9 @@ function App(): JSX.Element {
       console.log('------------------------------------')
       console.log("virtualAddressBitWidth", virtualAddressBitWidth)
       console.log("physicalAddressBitWidth", physicalAddressBitWidth)
+      console.log("PPN", PPN)
+      console.log("PPN (hex)", PPN.toString(16))
+      console.log("PPN (bin)", PPN.toString(2))
       console.log("pageSize", pageSize)
       console.log("TLBSets", TLBSets)
       console.log("TLBWays", TLBWays)
@@ -234,17 +246,21 @@ function App(): JSX.Element {
         const index = TLB_TABLE[TLBI_value][Math.floor(Math.random() * TLB_TABLE[0].length)];
         index.tag = TLBT_value;
         index.valid = 1;
-        const PPN = index.ppn.toString(16);
+        index.ppn = PPN;  
+
+        //const PPN = index.ppn.toString(16);
+
+        const VPN = Number("0b"+TLBT_bits + TLBI_bits).toString(16);
 
         facitObj = {
           VirtualAddress: generatedVirtualAddress.toString(2),
-          VPN: (TLBT_value + TLBI_value).toString(16),
+          VPN: VPN,
           TLBI: TLBI_value.toString(16),
           TLBT: TLBT_value.toString(16),
           TLBHIT: 'Y',
           PageFault: 'N',
-          PPN: PPN,
-          PhysicalAddress: index.ppn.toString(2) + VPO_bits // TODO bug : this becomes much longer than the random physical address in bits
+          PPN: index.ppn.toString(16),
+          PhysicalAddress: index.ppn.toString(2) + VPO_bits 
         }
 
         break;
