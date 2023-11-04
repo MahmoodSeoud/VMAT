@@ -46,6 +46,20 @@
 }
 
 
+.highlight {
+    background-color: rgb(118, 118, 31);
+}
+
 .correct {
     background-color: rgb(21, 190, 21);
+}
+
+button {
+    margin: 1em;
+    padding: .5em;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid white;
+    background-color: rgb(31, 31, 31);
+    color: white;
 }

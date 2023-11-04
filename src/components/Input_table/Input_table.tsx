@@ -80,13 +80,29 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         PPN: ''
     })
 
-    const [isDragging, setIsDragging] = useState(false);
+    const [isMouseDown, setIsMouseDown] = useState(false);
+
+    const handleMouseDown = (e: React.MouseEvent) => {
+        setIsMouseDown(true);
+    };
+
+    const handleMouseUp = (e: React.MouseEvent) => {
+        setIsMouseDown(false);
+    };
+
+    const handleMouseEnter = (e: React.MouseEvent) => {
+        if (isMouseDown) {
+            // Apply highlight to the current div
+            e.currentTarget.classList.add('highlight');
+        }
+    };
+
 
     // Insert the facit incase the user does not know the answer
     function insertFacit(inputFieldName: InputField, e: React.BaseSyntheticEvent): void {
 
         const containerElement = (e.target.parentElement as HTMLBodyElement)
-  
+
         switch (inputFieldName) {
             case InputFieldsMap.VirtualAddress:
             case InputFieldsMap.PhysicalAddress:
@@ -182,21 +198,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     // TODO if the user has incremental feedback have this in a if statement
     //validateFieldInput(input, facit)
 
-    function handleMouseDown(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-        setIsDragging(true);
-        //inputElement.current.classList.add('colored');
-        //e.target.classList.add('colored');
-    };
-
-    function handleMouseUp() {
-        setIsDragging(false);
-    };
-
-    function handleMouseEnter(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-        if (isDragging) {
-            //e.target.classList.add('colored');
-        }
-    };
 
 
     return (
@@ -212,7 +213,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                     {createNullArr(virtualAddressWidth).map((_, index) => (
                                         <div
                                             className='input-wrapper'
-                                            onMouseDown={(e) => handleMouseDown(e)}
+                                            onMouseDown={handleMouseDown}
                                             onMouseUp={handleMouseUp}
                                             onMouseEnter={handleMouseEnter}
                                         >
@@ -229,8 +230,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                 </div>
                                 <button
                                     onClick={(ev) => insertFacit(InputFieldsMap.VirtualAddress, ev)}
-                                    
-                                    >
+
+                                >
 
                                     Insert facit
                                 </button>
