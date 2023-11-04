@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AddressPrefix, BaseConversion, InputField, InputFieldsMap } from '../../App';
 import './Input_table.css'
 
@@ -80,16 +80,18 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         PPN: ''
     })
 
+    const [isDragging, setIsDragging] = useState(false);
+
     // Insert the facit incase the user does not know the answer
     function insertFacit(inputFieldName: InputField, e: React.BaseSyntheticEvent): void {
 
         const containerElement = (e.target.parentElement as HTMLBodyElement)
+  
         switch (inputFieldName) {
             case InputFieldsMap.VirtualAddress:
             case InputFieldsMap.PhysicalAddress:
 
                 const classForBits = "list-item-bit-input-wrapper" as const;
-
                 const elements = containerElement.getElementsByClassName(classForBits);
 
                 for (let i = 0; i < elements[0].children.length; i++) {
@@ -100,11 +102,11 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                 break;
             default:
                 const inputElement_2 = (containerElement.children[1].children[0] as HTMLInputElement);
-
                 inputElement_2.value = facit[inputFieldName] || '';
                 break;
         }
-                setInput((prevState) => ({ ...prevState, [inputFieldName]: facit[inputFieldName] }));
+
+        setInput((prevState) => ({ ...prevState, [inputFieldName]: facit[inputFieldName] }));
     }
 
     /*     // To determine the physical address bits width when it is not explicitly given,
@@ -180,7 +182,21 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     // TODO if the user has incremental feedback have this in a if statement
     //validateFieldInput(input, facit)
 
+    function handleMouseDown(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+        setIsDragging(true);
+        //inputElement.current.classList.add('colored');
+        //e.target.classList.add('colored');
+    };
 
+    function handleMouseUp() {
+        setIsDragging(false);
+    };
+
+    function handleMouseEnter(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+        if (isDragging) {
+            //e.target.classList.add('colored');
+        }
+    };
 
 
     return (
@@ -194,7 +210,12 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                 <p>Bits of virtual address</p>
                                 <div className={`list-item-bit-input-wrapper ${validateFieldInput(InputFieldsMap.VirtualAddress) ? 'correct' : ''} `}>
                                     {createNullArr(virtualAddressWidth).map((_, index) => (
-                                        <div className='input-wrapper'>
+                                        <div
+                                            className='input-wrapper'
+                                            onMouseDown={(e) => handleMouseDown(e)}
+                                            onMouseUp={handleMouseUp}
+                                            onMouseEnter={handleMouseEnter}
+                                        >
                                             <p className="input-text">{virtualAddressWidth - index - 1}</p>
                                             <input
                                                 id='vbit'
@@ -206,7 +227,13 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                         </div>
                                     ))}
                                 </div>
-                                <button onClick={(ev) => insertFacit(InputFieldsMap.VirtualAddress, ev)}>Insert facit</button>
+                                <button
+                                    onClick={(ev) => insertFacit(InputFieldsMap.VirtualAddress, ev)}
+                                    
+                                    >
+
+                                    Insert facit
+                                </button>
                             </div>
                         </li>
 
@@ -302,10 +329,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                             </div>
                         </li>
                     </ol>
-
                 </div>
             </div>
-            {/*             <button onClick={() => validateFieldInput(input)}>Check correct</button> */}
         </>
     )
 }

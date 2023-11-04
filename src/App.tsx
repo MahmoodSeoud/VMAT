@@ -110,22 +110,26 @@ function createRandomNumber(a: number, b: number) {
   return Math.floor(Math.random() * (b - a)) + a;
 }
 
-
+function createUniqe(num : number) : number{
+  // A random address is able to be created to be the actual tag of the virtual
+  // address, We have to check for that.
+  let unique = createRandomNumber(0, createRandomNumberWith(4*2))
+  // Check if the tag already exists in the TLB table
+  while (unique === num) {
+    unique = createRandomNumber(0, createRandomNumberWith(4*2))
+  }
+  
+  return unique;
+}
 
 // Function to create a TLB entry
 function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry: TObj): TObj {
 
   const valid: Bit = Math.floor(Math.random() * 2) as Bit;
   const ppn: number = createRandomNumberWith(8);
-
-  // A random address is able to be created to be the actual tag of the virtual
-  // address, We have to check for that.
-  let dupTLBT = ""
-  let tag : number  = 0
-  while (String(tag) === dupTLBT) {
-    tag = createRandomNumber(0, createRandomNumberWith(4*2));
-    dupTLBT = String(Number("0b" + TLBT_bits))
-  }
+                      // create unique TLBT address
+  const tag : number = createUniqe(Number('0b' + TLBT_bits))
+  
   const vpn: number = createRandomNumber(0, createRandomNumberWith(4*2));
 
   let newEntry: TObj;
