@@ -78,6 +78,12 @@ const physicalAddressBitWidth = PPN.toString(2).length + VPO;
 
 // -----------
 
+const generatedVirtualAddress = createRandomNumberWith(virtualAddressBitWidth);
+const addressInBits = [...generatedVirtualAddress.toString(2)];
+
+const VPO_bits: string = addressInBits.splice(-VPO).join('');     // VPO_bits = the last VPO bits of the address / log2(pageSize)
+const TLBI_bits: string = addressInBits.splice(-TLBI).join('');     // TLBI_bits = the next TLBI bits of the address / log2(sets)
+const TLBT_bits: string = addressInBits.join('');     // TLBT_bits = the remaining bits of the address
 
 // ----------- Test choices
 const ChosenResult: Result = InputFieldsMap.TLBHIT;
@@ -99,25 +105,28 @@ function createRandomNumberWith(bitLength: number): number {
   return createRandomNumber(2 ** (bitLength - 1), 2 ** bitLength)
 }
 
-console.log("suppoed to be 8", createRandomNumberWith(8));
-console.log("suppoed to be 8", createRandomNumberWith(8));
-console.log("suppoed to be 8", createRandomNumberWith(8));
-console.log("suppoed to be 8", createRandomNumberWith(8));
-console.log("suppoed to be 8", createRandomNumberWith(8));
-
-
 // Create a random number between a and b
 function createRandomNumber(a: number, b: number) {
   return Math.floor(Math.random() * (b - a)) + a;
 }
+
+
 
 // Function to create a TLB entry
 function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry: TObj): TObj {
 
   const valid: Bit = Math.floor(Math.random() * 2) as Bit;
   const ppn: number = createRandomNumberWith(8);
-  const tag: number = createRandomNumber(0, 6666);
-  const vpn: number = createRandomNumber(0, 6666);
+
+  // A random address is able to be created to be the actual tag of the virtual
+  // address, We have to check for that.
+  let dupTLBT = ""
+  let tag : number  = 0
+  while (String(tag) === dupTLBT) {
+    tag = createRandomNumber(0, createRandomNumberWith(4*2));
+    dupTLBT = String(Number("0b" + TLBT_bits))
+  }
+  const vpn: number = createRandomNumber(0, createRandomNumberWith(4*2));
 
   let newEntry: TObj;
   if (isPageTableEntry(entry)) {
@@ -165,7 +174,7 @@ function createTableEntries<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(
   return entries;
 }
 
-const generatedVirtualAddress = createRandomNumberWith(virtualAddressBitWidth);
+
 
 // TLB  table information
 const NumTlbEntries: number = TLBSets * TLBWays;
@@ -234,11 +243,7 @@ function App(): JSX.Element {
   // POSTCONDITION : sets facit object in the Facit state
   function createFacit(ChosenResult: Result): InputFields {
 
-    const addressInBits = [...generatedVirtualAddress.toString(2)];
 
-    const VPO_bits: string = addressInBits.splice(-VPO).join('');     // VPO_bits = the last VPO bits of the address / log2(pageSize)
-    const TLBI_bits: string = addressInBits.splice(-TLBI).join('');     // TLBI_bits = the next TLBI bits of the address / log2(sets)
-    const TLBT_bits: string = addressInBits.join('');     // TLBT_bits = the remaining bits of the address
 
     // Convert the bits to a number
     const TLBI_value: number = Number(addressPrefixMap.Binary + TLBI_bits);
@@ -257,7 +262,7 @@ function App(): JSX.Element {
 
     switch (ChosenResult) {
       case InputFieldsMap.TLBHIT:
-
+        
         const index = TLB_TABLE[TLBI_value][Math.floor(Math.random() * TLB_TABLE[0].length)];
         index.tag = TLBT_value;
         index.valid = 1;
