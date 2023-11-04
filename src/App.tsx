@@ -187,13 +187,24 @@ const PAGE_TABLE: PAGE_TABLE_ENTRY[][] = createTableEntries<PAGE_TABLE_ENTRY>(
   pageTableEntry
 );
 
+let empty: InputFields = {
+  VirtualAddress: '',
+  VPN: '',
+  TLBI: '',
+  TLBT: '',
+  TLBHIT: '',
+  PageFault: '',
+  PPN: '',
+  PhysicalAddress: ''
+}
 
 function App(): JSX.Element {
-  const [facit, setFacit] = useState<InputFields>(createFacit(ChosenResult));
+  const [facit, setFacit] = useState<InputFields>(empty);
 
 
   console.log("facit", facit)
   const testing = true;
+  // Tes
   useEffect(() => {
     if (testing) {
       console.log('------------------------------------')
@@ -213,6 +224,10 @@ function App(): JSX.Element {
 
   }, [0])
 
+
+  useEffect(() => {
+    setFacit(createFacit(ChosenResult));
+  }, [0])
 
   // TODO : Add the page hit case
   // TODO: Make the facit required and complete this function
@@ -246,11 +261,11 @@ function App(): JSX.Element {
         const index = TLB_TABLE[TLBI_value][Math.floor(Math.random() * TLB_TABLE[0].length)];
         index.tag = TLBT_value;
         index.valid = 1;
-        index.ppn = PPN;  
+        index.ppn = PPN;
 
         //const PPN = index.ppn.toString(16);
 
-        const VPN = Number("0b"+TLBT_bits + TLBI_bits).toString(16);
+        const VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(16);
 
         facitObj = {
           VirtualAddress: generatedVirtualAddress.toString(2),
@@ -260,7 +275,7 @@ function App(): JSX.Element {
           TLBHIT: 'Y',
           PageFault: 'N',
           PPN: index.ppn.toString(16),
-          PhysicalAddress: index.ppn.toString(2) + VPO_bits 
+          PhysicalAddress: index.ppn.toString(2) + VPO_bits
         }
 
         break;
