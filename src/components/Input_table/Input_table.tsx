@@ -316,7 +316,12 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                 <p>Bits of phys. (if any)</p>
                                 <div className={`list-item-bit-input-wrapper ${validateFieldInput(InputFieldsMap.PhysicalAddress) ? 'correct' : ''}`}>
                                     {createNullArr(physcialAddressWidth).map((_, index) => (
-                                        <div className='input-wrapper'>
+                                        <div
+                                            className='input-wrapper'
+                                            onMouseDown={handleMouseDown}
+                                            onMouseUp={handleMouseUp}
+                                            onMouseEnter={handleMouseEnter}
+                                        >
                                             <p className="input-text">{physcialAddressWidth - index - 1}</p>
                                             <input
                                                 className="pbit-input"
