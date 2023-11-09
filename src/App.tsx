@@ -4,13 +4,16 @@ import Input_table, { InputFields } from './components/Input_table/Input_table';
 import { useEffect, useState } from 'react';
 import Tlb_table, { TLB_TABLE_ENTRY } from './components/Tlb_table/Tlb_table';
 
+import 'primeicons/primeicons.css';
+        
+
 
 // --------- Glossary 
-// VPN : Virtual Page Number (TLB tag + TLB index)
+// VPN : Virtual Page Number (TLB tag + TLB correctIndex)
 // PPN : Physical Page Number, PPO : Physical Page Offset
 // TLB : Translation Lookaside Buffer
 // VPT : Virtual Page Table , VPI : Virtual Page Index, VPO : Virtual Page Offset
-// TLBI : TLB index
+// TLBI : TLB correctIndex
 // TLBT : TLB tag
 // VA : Virtual Address
 // ------
@@ -110,15 +113,15 @@ function createRandomNumber(a: number, b: number) {
   return Math.floor(Math.random() * (b - a)) + a;
 }
 
-function createUniqe(num : number) : number{
+function createUniqe(num: number): number {
   // A random address is able to be created to be the actual tag of the virtual
   // address, We have to check for that.
-  let unique = createRandomNumber(0, createRandomNumberWith(4*2))
+  let unique = createRandomNumber(0, createRandomNumberWith(4 * 2))
   // Check if the tag already exists in the TLB table
   while (unique === num) {
-    unique = createRandomNumber(0, createRandomNumberWith(4*2))
+    unique = createRandomNumber(0, createRandomNumberWith(4 * 2))
   }
-  
+
   return unique;
 }
 
@@ -127,10 +130,10 @@ function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry
 
   const valid: Bit = Math.floor(Math.random() * 2) as Bit;
   const ppn: number = createRandomNumberWith(8);
-                      // create unique TLBT address
-  const tag : number = createUniqe(Number('0b' + TLBT_bits))
-  
-  const vpn: number = createRandomNumber(0, createRandomNumberWith(4*2));
+  // create unique TLBT address
+  const tag: number = createUniqe(Number('0b' + TLBT_bits))
+
+  const vpn: number = createRandomNumber(0, createRandomNumberWith(4 * 2));
 
   let newEntry: TObj;
   if (isPageTableEntry(entry)) {
@@ -213,7 +216,7 @@ let empty: InputFields = {
 
 function App(): JSX.Element {
   const [facit, setFacit] = useState<InputFields>(empty);
-
+  const [showSettings, setShowSettings] = useState<boolean>(false);
 
   console.log("facit", facit)
   const testing = true;
@@ -266,16 +269,22 @@ function App(): JSX.Element {
 
     switch (ChosenResult) {
       case InputFieldsMap.TLBHIT:
-        
-        const index = TLB_TABLE[TLBI_value][Math.floor(Math.random() * TLB_TABLE[0].length)];
-        index.tag = TLBT_value;
-        index.valid = 1;
-        index.ppn = PPN;
 
-        //const PPN = index.ppn.toString(16);
+        // The correctIndex is a random number between 0 and the length of the ways
+        // This correctIndex is where we insert the CORRECT tag and PPN
+        const correctIndex = TLB_TABLE[TLBI_value][Math.floor(Math.random() * TLB_TABLE[0].length)];
+        correctIndex.tag = TLBT_value;
+        correctIndex.valid = 1;
+        correctIndex.ppn = PPN;
+
+        // This correctIndex is where we insert the DUMMY tag and PPN
+        const dummyIndex = TLB_TABLE[TLBI_value][Math.floor(Math.random() * TLB_TABLE[0].length)];
+        dummyIndex.tag = TLBT_value;
+        dummyIndex.valid = 0;
+        dummyIndex.ppn = PPN;
+
 
         const VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(16);
-
         facitObj = {
           VirtualAddress: generatedVirtualAddress.toString(2),
           VPN: VPN,
@@ -283,9 +292,10 @@ function App(): JSX.Element {
           TLBT: TLBT_value.toString(16),
           TLBHIT: 'Y',
           PageFault: 'N',
-          PPN: index.ppn.toString(16),
-          PhysicalAddress: index.ppn.toString(2) + VPO_bits
+          PPN: correctIndex.ppn.toString(16),
+          PhysicalAddress: correctIndex.ppn.toString(2) + VPO_bits
         }
+
 
         break;
       case InputFieldsMap.PageFault:
@@ -304,7 +314,27 @@ function App(): JSX.Element {
 
   return (
     <>
+
+{/*       <AiFillSetting
+        size={24}
+        onClick={() => setShowSettings(!showSettings)}
+      /> */}
+
+<i
+
+className="pi pi-cog" 
+style={{fontSize: '2em', cursor: 'pointer'}}
+/>
+
+
+      <div 
+        className=''
+      >
+
+      </div>
       <div className='wrapper'>
+
+
         <div className='wrapper-tables'>
 
           <Tlb_table
