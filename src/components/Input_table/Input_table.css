@@ -1,7 +1,9 @@
 .input-table {
     border: 1px white solid;
-    min-width: 50em;
+    min-width: 60em;
+    padding: 2em;
     margin: 2em;
+
     /* height: 40em; */
 }
 
@@ -17,8 +19,6 @@
     border: solid white .1em;
     padding: .3em;
     font-size: 20px;
-    
-
 }
 
 .input-text {
@@ -30,6 +30,8 @@
     justify-content: space-between;
     align-items: center;
     user-select: none;
+    width: 100%;
+    white-space: nowrap;
 }
 
 .list-item-bit-input-wrapper {
@@ -65,7 +67,7 @@
 
 
 button {
-    margin: 1em;
+    margin: .5em;
     padding: .5em;
     font-size: 16px;
     border-radius: 5px;
@@ -74,3 +76,6 @@ button {
     color: white;
 }
 
+.list-item-wrapper> p {
+    margin-right: 1em;
+}
