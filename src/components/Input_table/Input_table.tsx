@@ -85,15 +85,15 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     const [color, setColor] = useState<string>('#ff0000');
 
 
-    const handleMouseDown = (e: React.MouseEvent) => {
+    function handleMouseDown(e: React.MouseEvent) {
         setIsMouseDown(true);
     };
 
-    const handleMouseUp = (e: React.MouseEvent) => {
+    function handleMouseUp(e: React.MouseEvent) {
         setIsMouseDown(false);
     };
 
-    const handleMouseEnter = (e: React.MouseEvent) => {
+    function handleMouseEnter(e: React.MouseEvent) {
         if (isMouseDown) {
             // Apply highlight to the current div
             const pTagWithIndex = e.currentTarget.firstChild as HTMLElement;
@@ -104,6 +104,18 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         }
     };
 
+    function resetColors() {
+        const elements = document.getElementsByClassName('input-text') as HTMLCollectionOf<HTMLElement>;
+
+        for (let i = 0; i < elements.length; i++) {
+            const isHighligted = elements[i].classList.contains('highlight');
+
+            if (isHighligted) {
+                elements[i].classList.remove('highlight');
+                elements[i].style.backgroundColor = '';
+            }
+        }
+    }
 
     // Insert the facit incase the user does not know the answer
     function insertFacit(inputFieldName: InputField, e: React.BaseSyntheticEvent): void {
@@ -140,17 +152,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         const physAddressWidth = Math.floor(Math.log2(physicalPageMemory)); */
 
 
-
-    useEffect(() => {
-        console.log('input', input)
-
-    }, [input])
-
-
-    useEffect(() => {
-        console.log("coloorr.::", color)
-
-    }, [color])
 
     function validateFieldInput(inputFieldName: InputField): boolean {
         // TODO: nice to have (in the settings menu)
@@ -214,20 +215,21 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         setColor(color.hex)
     }
 
-    // TODO if the user has incremental feedback have this in a if statement
-    //validateFieldInput(input, facit)
-
-
 
     return (
         <>
             <div className="input-table">
 
                 <div className='input-header'>
+                    <button
+                        className='reset-color-btn'
+                        onClick={resetColors}
+                    >
+                        Reset the colors
+                    </button>
 
                     <h2>Virtual address: {addressPrefix + VirtualAddress.toString(baseConversion).toUpperCase()}</h2>
                     <HuePicker
-                        
                         width={'200px'}
                         color={color}
                         onChange={handleColorChange}
@@ -259,7 +261,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                         </div>
                                     ))}
                                 </div>
-                                <button
+                                <button className={'insert-facit-btn'}
                                     onClick={(ev) => insertFacit(InputFieldsMap.VirtualAddress, ev)}
 
                                 >
@@ -290,7 +292,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.VPN)}
                                                 />
                                             </td>
-                                            <button onClick={(ev) => insertFacit(InputFieldsMap.VPN, ev)}>Insert facit</button>
+                                            <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.VPN, ev)}>Insert facit</button>
                                         </tr>
                                         <tr>
                                             <td>TLB index</td>
@@ -300,7 +302,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBI)}
                                                 />
                                             </td>
-                                            <button onClick={(ev) => insertFacit(InputFieldsMap.TLBI, ev)}>Insert facit</button>
+                                            <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.TLBI, ev)}>Insert facit</button>
                                         </tr>
                                         <tr >
                                             <td>TLB tag</td>
@@ -310,7 +312,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBT)}
                                                 />
                                             </td>
-                                            <button onClick={(ev) => insertFacit(InputFieldsMap.TLBT, ev)}>Insert facit</button>
+                                            <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.TLBT, ev)}>Insert facit</button>
                                         </tr>
                                         <tr >
                                             <td>TLB hit? (Y/N)</td>
@@ -321,7 +323,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBHIT)}
                                                 />
                                             </td>
-                                            <button onClick={(ev) => insertFacit(InputFieldsMap.TLBHIT, ev)}>Insert facit</button>
+                                            <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.TLBHIT, ev)}>Insert facit</button>
                                         </tr>
                                         <tr className={`${validateFieldInput(InputFieldsMap.PageFault) ? ' correct' : ''}`}>
                                             <td>Page fault? (Y/N)</td>
@@ -332,7 +334,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.PageFault)}
                                                 />
                                             </td>
-                                            <button onClick={(ev) => insertFacit(InputFieldsMap.PageFault, ev)}>Insert facit</button>
+                                            <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.PageFault, ev)}>Insert facit</button>
                                         </tr>
                                         <tr className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}>
                                             <td>PPN</td>
@@ -342,7 +344,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.PPN)}
                                                 />
                                             </td>
-                                            <button onClick={(ev) => insertFacit(InputFieldsMap.PPN, ev)}>Insert facit</button>
+                                            <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.PPN, ev)}>Insert facit</button>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -368,7 +370,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                         </div>
                                     ))}
                                 </div>
-                                <button onClick={(ev) => insertFacit(InputFieldsMap.PhysicalAddress, ev)}>Insert Facit</button>
+                                <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.PhysicalAddress, ev)}>Insert Facit</button>
                             </div>
                         </li>
                     </ol>
