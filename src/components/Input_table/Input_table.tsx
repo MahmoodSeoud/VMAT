@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AddressPrefix, BaseConversion, InputField, InputFieldsMap } from '../../App';
 import './Input_table.css'
+import { ColorResult, HuePicker } from 'react-color';
 
 export type InputFields = {
     VirtualAddress: string;
@@ -81,6 +82,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     })
 
     const [isMouseDown, setIsMouseDown] = useState(false);
+    const [color, setColor] = useState<string>('#ff0000');
+
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setIsMouseDown(true);
@@ -95,6 +98,9 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
             // Apply highlight to the current div
             const pTagWithIndex = e.currentTarget.firstChild as HTMLElement;
             pTagWithIndex.classList.add('highlight');
+
+            // Setting the color the the one selected in the color picker
+            pTagWithIndex.style.backgroundColor = color;
         }
     };
 
@@ -137,7 +143,14 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
 
     useEffect(() => {
         console.log('input', input)
+
     }, [input])
+
+
+    useEffect(() => {
+        console.log("coloorr.::", color)
+
+    }, [color])
 
     function validateFieldInput(inputFieldName: InputField): boolean {
         // TODO: nice to have (in the settings menu)
@@ -196,6 +209,11 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         }
     };
 
+    // Handle changes in color
+    function handleColorChange(color: ColorResult): void {
+        setColor(color.hex)
+    }
+
     // TODO if the user has incremental feedback have this in a if statement
     //validateFieldInput(input, facit)
 
@@ -204,7 +222,19 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     return (
         <>
             <div className="input-table">
-                <p><b>Virtual address:</b> {addressPrefix + VirtualAddress.toString(baseConversion).toUpperCase()}</p>
+
+                <div className='input-header'>
+
+                    <h2>Virtual address: {addressPrefix + VirtualAddress.toString(baseConversion).toUpperCase()}</h2>
+                    <HuePicker
+                        
+                        width={'200px'}
+                        color={color}
+                        onChange={handleColorChange}
+                    />
+
+                    <h3>Pick a color for the bits!</h3>
+                </div>
                 <div className='virtual-wrapper'>
                     <ol>
                         <li>
