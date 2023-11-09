@@ -82,11 +82,17 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     })
 
     const [isMouseDown, setIsMouseDown] = useState(false);
-    const [color, setColor] = useState<string>('#ff0000');
+    const [color, setColor] = useState<string>('green');
 
 
     function handleMouseDown(e: React.MouseEvent) {
+
         setIsMouseDown(true);
+        // Apply highlight to the current div
+        const pTagWithIndex = e.currentTarget.firstChild as HTMLElement;
+        pTagWithIndex.classList.add('highlight');
+        // Setting the color the the one selected in the color picker
+        pTagWithIndex.style.backgroundColor = color;
     };
 
     function handleMouseUp(e: React.MouseEvent) {
@@ -105,17 +111,32 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     };
 
     function resetColors() {
-        const elements = document.getElementsByClassName('input-text') as HTMLCollectionOf<HTMLElement>;
+        const bitElements = document.getElementsByClassName('input-text') as HTMLCollectionOf<HTMLElement>;
+        const textElements = document.getElementsByClassName('exercise-label') as HTMLCollectionOf<HTMLElement>;
 
-        for (let i = 0; i < elements.length; i++) {
-            const isHighligted = elements[i].classList.contains('highlight');
+        for (let i = 0; i < bitElements.length; i++) {
+            const isHighligted = bitElements[i].classList.contains('highlight');
 
             if (isHighligted) {
-                elements[i].classList.remove('highlight');
-                elements[i].style.backgroundColor = '';
+                bitElements[i].classList.remove('highlight');
+                bitElements[i].style.backgroundColor = '';
             }
         }
+
+
+
+        for (let i = 0; i < bitElements.length; i++) {
+            const isHighligted = textElements[i].classList.contains('highlight');
+
+            if (isHighligted) {
+                textElements[i].classList.remove('highlight');
+                textElements[i].style.backgroundColor = '';
+            }
+        }
+
+
     }
+
 
     // Insert the facit incase the user does not know the answer
     function insertFacit(inputFieldName: InputField, e: React.BaseSyntheticEvent): void {
@@ -127,17 +148,17 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
             case InputFieldsMap.PhysicalAddress:
 
                 const classForBits = "list-item-bit-input-wrapper" as const;
-                const elements = containerElement.getElementsByClassName(classForBits);
+                const bitElements = containerElement.getElementsByClassName(classForBits);
 
-                for (let i = 0; i < elements[0].children.length; i++) {
+                for (let i = 0; i < bitElements[0].children.length; i++) {
                     // there is a <p> before the input element hence the 1
-                    const inputElement = elements[0].children[i].children[1] as HTMLInputElement
+                    const inputElement = bitElements[0].children[i].children[1] as HTMLInputElement
                     inputElement.value = facit[inputFieldName][i] || '';
                 }
                 break;
             default:
-                const inputElement_2 = (containerElement.children[1].children[0] as HTMLInputElement);
-                inputElement_2.value = facit[inputFieldName] || '';
+                const textElement = (containerElement.children[1].children[0] as HTMLInputElement);
+                textElement.value = facit[inputFieldName] || '';
                 break;
         }
 
@@ -265,7 +286,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                     onClick={(ev) => insertFacit(InputFieldsMap.VirtualAddress, ev)}
 
                                 >
-
                                     Insert facit
                                 </button>
                             </div>
@@ -285,7 +305,18 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
 
                                     <tbody>
                                         <tr >
-                                            <td>VPN</td>
+                                            <td
+                                                onMouseDown={handleMouseDown}
+                                                onMouseUp={handleMouseUp}
+                                                onMouseEnter={handleMouseEnter}
+                                            >
+                                                <p
+                                                    className={'exercise-label'}
+                                                >
+                                                    VPN
+                                                </p>
+                                            </td>
+
                                             <td>
                                                 <input
                                                     className={`${validateFieldInput(InputFieldsMap.VPN) ? ' correct' : ''}`}
@@ -295,7 +326,17 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.VPN, ev)}>Insert facit</button>
                                         </tr>
                                         <tr>
-                                            <td>TLB index</td>
+                                            <td
+                                                onMouseDown={handleMouseDown}
+                                                onMouseUp={handleMouseUp}
+                                                onMouseEnter={handleMouseEnter}
+                                            >
+                                                <p
+                                                    className={'exercise-label'}
+                                                >
+                                                    TLB index
+                                                </p>
+                                            </td>
                                             <td>
                                                 <input
                                                     className={`${validateFieldInput(InputFieldsMap.TLBI) ? ' correct' : ''} `}
@@ -305,7 +346,17 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.TLBI, ev)}>Insert facit</button>
                                         </tr>
                                         <tr >
-                                            <td>TLB tag</td>
+                                            <td
+                                                onMouseDown={handleMouseDown}
+                                                onMouseUp={handleMouseUp}
+                                                onMouseEnter={handleMouseEnter}
+                                            >
+                                                <p
+                                                    className={'exercise-label'}
+                                                >
+                                                    TLB tag
+                                                </p>
+                                            </td>
                                             <td>
                                                 <input
                                                     className={`${validateFieldInput(InputFieldsMap.TLBT) ? ' correct' : ''}`}
@@ -315,7 +366,17 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.TLBT, ev)}>Insert facit</button>
                                         </tr>
                                         <tr >
-                                            <td>TLB hit? (Y/N)</td>
+                                            <td
+                                                onMouseDown={handleMouseDown}
+                                                onMouseUp={handleMouseUp}
+                                                onMouseEnter={handleMouseEnter}
+                                            >
+                                                <p
+                                                    className={'exercise-label'}
+                                                >
+                                                    TLB hit? (Y/N)
+                                                </p>
+                                            </td>
                                             <td>
                                                 <input
                                                     className={`${validateFieldInput(InputFieldsMap.TLBHIT) ? ' correct' : ''}`}
@@ -326,7 +387,17 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.TLBHIT, ev)}>Insert facit</button>
                                         </tr>
                                         <tr className={`${validateFieldInput(InputFieldsMap.PageFault) ? ' correct' : ''}`}>
-                                            <td>Page fault? (Y/N)</td>
+                                            <td
+                                                onMouseDown={handleMouseDown}
+                                                onMouseUp={handleMouseUp}
+                                                onMouseEnter={handleMouseEnter}
+                                            >
+                                                <p
+                                                    className={'exercise-label'}
+                                                >
+                                                    Page fault? (Y/N)
+                                                </p>
+                                            </td>
                                             <td>
                                                 <input
                                                     className={`${validateFieldInput(InputFieldsMap.PageFault) ? ' correct' : ''}`}
@@ -337,7 +408,17 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.PageFault, ev)}>Insert facit</button>
                                         </tr>
                                         <tr className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}>
-                                            <td>PPN</td>
+                                            <td
+                                                onMouseDown={handleMouseDown}
+                                                onMouseUp={handleMouseUp}
+                                                onMouseEnter={handleMouseEnter}
+                                            >
+                                                <p
+                                                    className={'exercise-label'}
+                                                >
+                                                    PPN
+                                                </p>
+                                            </td>
                                             <td>
                                                 <input
                                                     className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}

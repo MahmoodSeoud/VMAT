@@ -96,9 +96,19 @@
 
 .reset-color-btn {
     background-color: rgb(37, 66, 231);
-    border: 1px solid white;
+    border: 1px solid rgb(128, 22, 138);
     border-radius: 5px;
     padding: .5em;
     font-size: 16px;
     margin: .5em;
+}
+
+.reset-color-btn:hover {
+    background-color: rgb(70, 86, 175);
+    border-color: rgb(25, 154, 111);
+}
+
+.reset-color-btn:hover:hover:hover:focus,
+.reset-color-btn:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
 }
