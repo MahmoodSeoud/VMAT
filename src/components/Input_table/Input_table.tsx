@@ -93,7 +93,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     const handleMouseEnter = (e: React.MouseEvent) => {
         if (isMouseDown) {
             // Apply highlight to the current div
-            e.currentTarget.classList.add('highlight');
+            const pTagWithIndex = e.currentTarget.firstChild as HTMLElement;
+            pTagWithIndex.classList.add('highlight');
         }
     };
 
@@ -209,7 +210,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                         <li>
                             <div className={`list-item-wrapper`}>
                                 <p>Bits of virtual address</p>
-                                <div className={`list-item-bit-input-wrapper ${validateFieldInput(InputFieldsMap.VirtualAddress) ? 'correct' : ''} `}>
+                                <div className={`list-item-bit-input-wrapper `}>
                                     {createNullArr(virtualAddressWidth).map((_, index) => (
                                         <div
                                             className='input-wrapper'
@@ -220,7 +221,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <p className="input-text">{virtualAddressWidth - index - 1}</p>
                                             <input
                                                 id='vbit'
-                                                className="vbit-input"
+                                                className={`vbit-input ${validateFieldInput(InputFieldsMap.VirtualAddress) ? 'correct' : ''}`}
                                                 name='VirtualAddress'
                                                 maxLength={1}
                                                 onChange={(ev) => handleInputChange(ev, InputFieldsMap.VirtualAddress)}
@@ -251,37 +252,41 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                     </thead>
 
                                     <tbody>
-                                        <tr className={`${validateFieldInput(InputFieldsMap.VPN) ? ' correct' : ''}`}>
+                                        <tr >
                                             <td>VPN</td>
                                             <td>
                                                 <input
+                                                    className={`${validateFieldInput(InputFieldsMap.VPN) ? ' correct' : ''}`}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.VPN)}
                                                 />
                                             </td>
                                             <button onClick={(ev) => insertFacit(InputFieldsMap.VPN, ev)}>Insert facit</button>
                                         </tr>
-                                        <tr className={`${validateFieldInput(InputFieldsMap.TLBI) ? ' correct' : ''} `}>
+                                        <tr>
                                             <td>TLB index</td>
                                             <td>
                                                 <input
+                                                    className={`${validateFieldInput(InputFieldsMap.TLBI) ? ' correct' : ''} `}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBI)}
                                                 />
                                             </td>
                                             <button onClick={(ev) => insertFacit(InputFieldsMap.TLBI, ev)}>Insert facit</button>
                                         </tr>
-                                        <tr className={`${validateFieldInput(InputFieldsMap.TLBT) ? ' correct' : ''}`}>
+                                        <tr >
                                             <td>TLB tag</td>
                                             <td>
                                                 <input
+                                                    className={`${validateFieldInput(InputFieldsMap.TLBT) ? ' correct' : ''}`}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBT)}
                                                 />
                                             </td>
                                             <button onClick={(ev) => insertFacit(InputFieldsMap.TLBT, ev)}>Insert facit</button>
                                         </tr>
-                                        <tr className={`${validateFieldInput(InputFieldsMap.TLBHIT) ? ' correct' : ''}`}>
+                                        <tr >
                                             <td>TLB hit? (Y/N)</td>
                                             <td>
                                                 <input
+                                                    className={`${validateFieldInput(InputFieldsMap.TLBHIT) ? ' correct' : ''}`}
                                                     maxLength={1}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBHIT)}
                                                 />
@@ -292,6 +297,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <td>Page fault? (Y/N)</td>
                                             <td>
                                                 <input
+                                                    className={`${validateFieldInput(InputFieldsMap.PageFault) ? ' correct' : ''}`}
                                                     maxLength={1}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.PageFault)}
                                                 />
@@ -302,6 +308,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                             <td>PPN</td>
                                             <td>
                                                 <input
+                                                    className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.PPN)}
                                                 />
                                             </td>
@@ -314,7 +321,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                         <li>
                             <div className='list-item-wrapper'>
                                 <p>Bits of phys. (if any)</p>
-                                <div className={`list-item-bit-input-wrapper ${validateFieldInput(InputFieldsMap.PhysicalAddress) ? 'correct' : ''}`}>
+                                <div className={`list-item-bit-input-wrapper`}>
                                     {createNullArr(physcialAddressWidth).map((_, index) => (
                                         <div
                                             className='input-wrapper'
@@ -324,7 +331,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                         >
                                             <p className="input-text">{physcialAddressWidth - index - 1}</p>
                                             <input
-                                                className="pbit-input"
+                                                className={`pbit-input ${validateFieldInput(InputFieldsMap.PhysicalAddress) ? 'correct' : ''}`}
                                                 maxLength={1}
                                                 onChange={(ev) => handleInputChange(ev, InputFieldsMap.PhysicalAddress)}
                                             />

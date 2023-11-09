@@ -10,7 +10,8 @@
     padding: .4em;
 }
 
-.vbit-input, .pbit-input {
+.vbit-input,
+.pbit-input {
     width: 10px;
     padding: .2em;
     border: solid white 1px;
@@ -27,7 +28,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-
+    user-select: none;
 }
 
 .list-item-bit-input-wrapper {
@@ -51,7 +52,7 @@
 }
 
 .correct {
-    background-color: rgb(21, 190, 21);
+    border-color: rgb(21, 190, 21);
 }
 
 button {
