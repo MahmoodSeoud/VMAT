@@ -255,8 +255,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                         color={color}
                         onChange={handleColorChange}
                     />
+                    <h4>Click and drag to highlight bits or labels <br/> </h4>
 
-                    <h3>Pick a color for the bits!</h3>
                 </div>
                 <div className='virtual-wrapper'>
                     <ol>
