@@ -97,7 +97,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
 
     const [isMouseDown, setIsMouseDown] = useState(false);
     const [color, setColor] = useState<string>('green');
-    const [isFocused, setIsFocused] = useState(false);
+    const [isPPNFocused, setIsPPNFocused] = useState(false);
+    const [isPhysAddFocused, setIsPhysAddFocused] = useState(false);
 
     const ppnRef = useRef<HTMLInputElement>(null);
 
@@ -126,8 +127,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
 
     // Check if the user has clicked on the input field
     useEffect(() => {
-        console.log('isFocused: ', isFocused);
-    }, [isFocused]);
+        console.log('isPPNFocused: ', isPPNFocused);
+    }, [isPPNFocused]);
 
 
     function handleMouseDown(e: React.MouseEvent) {
@@ -245,6 +246,13 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     function validateFieldInput(inputFieldName: InputField): boolean {
         // TODO: nice to have (in the settings menu)
         // incremental correct feedback
+        if (!isPPNFocused && inputFieldName === "PPN") {
+            return false
+        } 
+
+        if (!isPhysAddFocused && inputFieldName === "PhysicalAddress") {
+            return false
+        }
 
         // If PPN eller phys og at ev ikke findes, så skal den return false;
         //ppnRef.current?.onfocus
@@ -501,8 +509,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                 <input
                                                     className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.PPN)}
-                                                    onFocus={() => setIsFocused(true)}
-                                                    onBlur={() => setIsFocused(false)}
+                                                    onFocus={() => setIsPPNFocused(true)}
+                                                    // onBlur={() => setIsPPNFocused(false)}
                                                 />
                                             </td>
                                             <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.PPN, ev)}>Insert facit</button>
@@ -527,6 +535,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                 className={`pbit-input ${validateFieldInput(InputFieldsMap.PhysicalAddress) ? 'correct' : ''}`}
                                                 maxLength={1}
                                                 onChange={(ev) => handleInputChange(ev, InputFieldsMap.PhysicalAddress)}
+                                                onFocus={() => setIsPhysAddFocused(true)}
                                             />
                                         </div>
                                     ))}
