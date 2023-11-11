@@ -3,17 +3,20 @@ import Page_table, { PAGE_TABLE_ENTRY } from './components/Page_table/Page_table
 import Input_table, { InputFields } from './components/Input_table/Input_table';
 import { useEffect, useState } from 'react';
 import Tlb_table, { TLB_TABLE_ENTRY } from './components/Tlb_table/Tlb_table';
+import { Dropdown } from 'primereact/dropdown';
+
 
 import 'primeicons/primeicons.css';
-        
+import { SelectItemOptionsType } from 'primereact/selectitem';
+
 
 
 // --------- Glossary 
-// VPN : Virtual Page Number (TLB tag + TLB correctIndex)
+// VPN : Virtual Page Number (TLB tag + TLB Index)
 // PPN : Physical Page Number, PPO : Physical Page Offset
 // TLB : Translation Lookaside Buffer
 // VPT : Virtual Page Table , VPI : Virtual Page Index, VPO : Virtual Page Offset
-// TLBI : TLB correctIndex
+// TLBI : TLB Index
 // TLBT : TLB tag
 // VA : Virtual Address
 // ------
@@ -54,7 +57,7 @@ export type BaseConversion = typeof baseConversionMap[keyof typeof baseConversio
 export type AddressPrefix = typeof addressPrefixMap[keyof typeof addressPrefixMap];
 export type InputField = typeof InputFieldsMap[keyof typeof InputFieldsMap];
 // TODO: add the PageHit case
-export type Result = Pick<typeof InputFieldsMap, 'TLBHIT' | 'PageFault'>[keyof Pick<typeof InputFieldsMap, 'TLBHIT' | 'PageFault'>];
+export type Result = Pick<typeof InputFieldsMap, 'TLBHIT' | 'PageFault'>[keyof Pick<typeof InputFieldsMap, 'TLBHIT' | 'PageFault'>] | 'PageHit';
 export type Bit = typeof bitMap[keyof typeof bitMap];
 // ------
 
@@ -75,6 +78,7 @@ const VPO = Math.log2(pageSize);
 const TLBI = Math.log2(TLBSets);
 const PPN = createRandomNumberWith(8);
 
+
 const virtualAddressBitWidth = createRandomNumber(10, 14); // VAS
 const physicalAddressBitWidth = PPN.toString(2).length + VPO;
 
@@ -87,20 +91,12 @@ const addressInBits = [...generatedVirtualAddress.toString(2)];
 const VPO_bits: string = addressInBits.splice(-VPO).join('');     // VPO_bits = the last VPO bits of the address / log2(pageSize)
 const TLBI_bits: string = addressInBits.splice(-TLBI).join('');     // TLBI_bits = the next TLBI bits of the address / log2(sets)
 const TLBT_bits: string = addressInBits.join('');     // TLBT_bits = the remaining bits of the address
+const VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(16);
 
 // ----------- Test choices
-const ChosenResult: Result = InputFieldsMap.TLBHIT;
 const ChosenAddressPrefix: AddressPrefix = addressPrefixMap.Hexadecimal;
 const ChosenBaseConversion: BaseConversion = baseConversionMap.Hexadecimal;
 // ----------- 
-
-
-// ----------- Helper functions
-
-function reverseString(str: string) {
-  str.split("").reverse().join("");
-}
-// ------------
 
 // create a random number from bitlength by taking a random number between
 // the previous number of bits and the current max of the bits we want 
@@ -131,9 +127,8 @@ function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry
   const valid: Bit = Math.floor(Math.random() * 2) as Bit;
   const ppn: number = createRandomNumberWith(8);
   // create unique TLBT address
-  const tag: number = createUniqe(Number('0b' + TLBT_bits))
-
-  const vpn: number = createRandomNumber(0, createRandomNumberWith(4 * 2));
+  const tag: number = createUniqe(Number('0b' + TLBT_bits)) 
+  const vpn: number = createUniqe(Number(VPN))
 
   let newEntry: TObj;
   if (isPageTableEntry(entry)) {
@@ -184,7 +179,7 @@ function createTableEntries<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(
 
 
 // TLB  table information
-const NumTlbEntries: number = TLBSets * TLBWays;
+// const NumTlbEntries: number = TLBSets * TLBWays;
 //const TLB_TABLE: TLB_TABLE_ENTRY[][] = createTLBEntries(TLBWays, TLBSets);
 const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 });
 const TLB_TABLE: TLB_TABLE_ENTRY[][] = createTableEntries<TLB_TABLE_ENTRY>(
@@ -217,6 +212,7 @@ let empty: InputFields = {
 function App(): JSX.Element {
   const [facit, setFacit] = useState<InputFields>(empty);
   const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [ChosenResult, setChosenResult] = useState<Result>(InputFieldsMap.PageFault);
 
   console.log("facit", facit)
   const testing = true;
@@ -243,14 +239,12 @@ function App(): JSX.Element {
   // Setting the facit to the correct result
   useEffect(() => {
     setFacit(createFacit(ChosenResult));
-  }, [0])
+  }, [ChosenResult])
 
   // TODO : Add the page hit case
   // TODO: Make the facit required and complete this function
   // POSTCONDITION : sets facit object in the Facit state
   function createFacit(ChosenResult: Result): InputFields {
-
-
 
     // Convert the bits to a number
     const TLBI_value: number = Number(addressPrefixMap.Binary + TLBI_bits);
@@ -266,6 +260,7 @@ function App(): JSX.Element {
       PPN: '',
       PhysicalAddress: ''
     }
+    
 
     switch (ChosenResult) {
       case InputFieldsMap.TLBHIT:
@@ -284,7 +279,6 @@ function App(): JSX.Element {
         dummyIndex.ppn = createRandomNumberWith(8);
 
 
-        const VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(16);
         facitObj = {
           VirtualAddress: generatedVirtualAddress.toString(2),
           VPN: VPN,
@@ -299,9 +293,33 @@ function App(): JSX.Element {
 
         break;
       case InputFieldsMap.PageFault:
-        console.log("Page hit")
+
+        //  Case 1: VPN DOES NOT exists in Page Tables 
+
+        // Case 2: VPN EXISTS and VALID bit is 0
+
+        // 50% 50% of having a VPN address, but with valid bit 0
+        if (Math.random() > 0.5) {
+          const dummy = PAGE_TABLE[Math.floor(Math.random() * PAGE_TABLE.length)][Math.floor(Math.random() * PAGE_TABLE[0].length)];
+          dummy.vpn = Number("0x" + VPN)
+          dummy.valid = 0
+        }
+
+        facitObj = {
+          VirtualAddress: generatedVirtualAddress.toString(2),
+          VPN: VPN,
+          TLBI: TLBI_value.toString(16),
+          TLBT: TLBT_value.toString(16),
+          TLBHIT: 'N',
+          PageFault: 'Y',
+          PPN: '',
+          PhysicalAddress: ''
+        }
+        console.log("Page Fault")
         break;
       // TODO: Add the page hit case
+      case "PageHit":
+        break;
       default:
         console.log("No case found");
         break;
@@ -311,23 +329,47 @@ function App(): JSX.Element {
     return facitObj;
   }
 
+  // TODO: Add the third chosen result case
+  const chosenResultsItemArr: SelectItemOptionsType = [
+    {
+      name: InputFieldsMap.TLBHIT,
+      code: InputFieldsMap.TLBHIT
+    },
+    {
+      name: InputFieldsMap.PageFault,
+      code: InputFieldsMap.PageFault
+    }
+  ]
+
 
   return (
     <>
 
-{/*       <AiFillSetting
-        size={24}
+      <i
+        className="pi pi-cog"
+        style={{ fontSize: '2em', cursor: 'pointer' }}
         onClick={() => setShowSettings(!showSettings)}
-      /> */}
+      />
 
-<i
+      {showSettings && (
+        <>
+          <div className='settings-wrapper'>
+            <h3>Settings</h3>
+            <Dropdown
+              value={ChosenResult}
+              onChange={(e) => setChosenResult(e.value)}
+              optionLabel="name"
+              options={chosenResultsItemArr}
+              showClear
+              placeholder="Select a chosen result"
+              className="w-full md:w-14rem"
+            />
+          </div>
+        </>
+      )}
 
-className="pi pi-cog" 
-style={{fontSize: '2em', cursor: 'pointer'}}
-/>
 
-
-      <div 
+      <div
         className=''
       >
 

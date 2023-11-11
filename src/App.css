@@ -18,6 +18,16 @@
   align-items: center;
 }
 
+.settings-wrapper {
+  background-color: grey;
+  padding: 1rem;
+  margin: 1rem;
+  border-radius: 0.5rem;
+  width: 50em;
+  z-index: 1;
+  border: 1px solid white;
+
+}
 
 
 @media only screen and (max-width: 1550px) {

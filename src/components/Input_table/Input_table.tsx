@@ -55,7 +55,7 @@ function getElementValuesFrom(className: string): string {
 // the main memory. The PPN is used to translate the virtual addresses 
 // into physical addresses.
 
-// vpm = Virtual Page Number
+// vpn = Virtual Page Number
 // It refers to the identification number assigned to a virtual page in 
 // the virtual memory space. The VPN is used for addressing and managing pages 
 // in the virtual memory, allowing the mapping of virtual addresses to physical addresses.
@@ -82,6 +82,7 @@ let emptyInput: InputFields = {
     PPN: ''
 }
 function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, virtualAddressWidth, physcialAddressWidth, facit }: Input_tableProps): JSX.Element {
+    pageSize
 
     const [input, setInput] = useState<InputFields>({
         VirtualAddress: '',
@@ -96,6 +97,10 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
 
     const [isMouseDown, setIsMouseDown] = useState(false);
     const [color, setColor] = useState<string>('green');
+    const [isFocused, setIsFocused] = useState(false);
+
+    const ppnRef = useRef<HTMLInputElement>(null);
+
     const toast = useRef<Toast>(null);
 
     function showSuccess() {
@@ -108,7 +113,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     }
 
 
-
     useEffect(() => {
         console.log('inputField changed', input);
 
@@ -117,6 +121,14 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
             showSuccess();
         }
     }, [input])
+
+
+
+    // Check if the user has clicked on the input field
+    useEffect(() => {
+        console.log('isFocused: ', isFocused);
+    }, [isFocused]);
+
 
     function handleMouseDown(e: React.MouseEvent) {
 
@@ -156,8 +168,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
             }
         }
 
-
-
         for (let i = 0; i < bitElements.length; i++) {
             const isHighligted = textElements[i].classList.contains('highlight');
 
@@ -166,8 +176,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                 textElements[i].style.backgroundColor = '';
             }
         }
-
-
     }
 
     // TODO: Please fix all the any's
@@ -226,17 +234,20 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     }
 
     /*     // To determine the physical address bits width when it is not explicitly given,
-        // you need to consider the relationship between the virtual address space, 
-        // the page size, and the physical memory size.
-        const numOfPages = (2 ** virtualAddressWidth) / pageSize;
-        const physicalPageMemory = numOfPages * pageSize;
-        const physAddressWidth = Math.floor(Math.log2(physicalPageMemory)); */
+         // you need to consider the relationship between the virtual address space, 
+         // the page size, and the physical memory size.
+         const numOfPages = (2 ** virtualAddressWidth) / pageSize;
+         const physicalPageMemory = numOfPages * pageSize;
+         const physAddressWidth = Math.floor(Math.log2(physicalPageMemory)); */
 
 
 
     function validateFieldInput(inputFieldName: InputField): boolean {
         // TODO: nice to have (in the settings menu)
         // incremental correct feedback
+
+        // If PPN eller phys og at ev ikke findes, så skal den return false;
+        //ppnRef.current?.onfocus
         return input[inputFieldName] == facit[inputFieldName]
     }
 
@@ -490,6 +501,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                 <input
                                                     className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.PPN)}
+                                                    onFocus={() => setIsFocused(true)}
+                                                    onBlur={() => setIsFocused(false)}
                                                 />
                                             </td>
                                             <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.PPN, ev)}>Insert facit</button>
