@@ -14,8 +14,7 @@
 
 .vbit-input,
 .pbit-input {
-    width: 10px;
-    padding: .2em;
+    width: 1.5em;
     border: solid white .1em;
     padding: .3em;
     font-size: 20px;
@@ -46,9 +45,12 @@
 .table th {
     border-bottom: 1px solid white;
     padding: .5em;
-    font-size: 16px;
+    font-size: 26px;
 }
 
+tr td input {
+    font-size: 1.4em;
+}
 
 .highlight {
     background-color: rgb(118, 118, 31);
