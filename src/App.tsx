@@ -62,7 +62,10 @@ export type Result = Pick<typeof InputFieldsMap, 'TLBHIT' | 'PageFault' | 'PageH
 export type Bit = typeof bitMap[keyof typeof bitMap];
 // ------
 
-
+// ----------- Test choices
+const ChosenAddressPrefix: AddressPrefix = addressPrefixMap.Hexadecimal;
+const ChosenBaseConversion: BaseConversion = baseConversionMap.Hexadecimal;
+// ----------- 
 
 // ----- Given parameters for exercis
 // PPN bit size + log2(pagesize) 
@@ -70,19 +73,18 @@ export type Bit = typeof bitMap[keyof typeof bitMap];
 export const TLBSets = 2 ** createRandomNumber(2, 4);
 export const TLBWays = createRandomNumber(3, 5);
 
-// divide by two because we don't want the user to be flooded with information but, 4 -> [4], 3 -> [4,8], 2 -> [4,8,16]
 const possiblePageSizes = [16, 32, 64] as const;
 export const pageSize = possiblePageSizes[Math.floor(Math.random() * possiblePageSizes.length)];
 export const PageTableSize = createRandomNumber(3, 5); // PTS                                              
 
 const VPO = Math.log2(pageSize);
 const TLBI = Math.log2(TLBSets);
-const PPN = createRandomNumberWith(8);
+const TLB_PPN = createRandomNumberWith(8);
+const Page_PPN = createUniqe(TLB_PPN, 8)
 
 
 const virtualAddressBitWidth = createRandomNumber(10, 14); // VAS
-const physicalAddressBitWidth = PPN.toString(2).length + VPO;
-
+const physicalAddressBitWidth = TLB_PPN.toString(2).length + VPO;
 
 // -----------
 
@@ -92,12 +94,9 @@ const addressInBits = [...generatedVirtualAddress.toString(2)];
 const VPO_bits: string = addressInBits.splice(-VPO).join('');     // VPO_bits = the last VPO bits of the address / log2(pageSize)
 const TLBI_bits: string = addressInBits.splice(-TLBI).join('');     // TLBI_bits = the next TLBI bits of the address / log2(sets)
 const TLBT_bits: string = addressInBits.join('');     // TLBT_bits = the remaining bits of the address
-const VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(16);
+const VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(ChosenBaseConversion);
 
-// ----------- Test choices
-const ChosenAddressPrefix: AddressPrefix = addressPrefixMap.Hexadecimal;
-const ChosenBaseConversion: BaseConversion = baseConversionMap.Hexadecimal;
-// ----------- 
+
 
 // create a random number from bitlength by taking a random number between
 // the previous number of bits and the current max of the bits we want 
@@ -110,13 +109,13 @@ function createRandomNumber(a: number, b: number) {
   return Math.floor(Math.random() * (b - a)) + a;
 }
 
-function createUniqe(num: number): number {
+function createUniqe(fromNum: number, size: number): number {
   // A random address is able to be created to be the actual tag of the virtual
   // address, We have to check for that.
-  let unique = createRandomNumber(0, createRandomNumberWith(4 * 2))
+  let unique = createRandomNumber(0, createRandomNumberWith(size))
   // Check if the tag already exists in the TLB table
-  while (unique === num) {
-    unique = createRandomNumber(0, createRandomNumberWith(4 * 2))
+  while (unique === fromNum) {
+    unique = createRandomNumber(0, createRandomNumberWith(size))
   }
 
   return unique;
@@ -128,8 +127,8 @@ function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry
   const valid: Bit = Math.floor(Math.random() * 2) as Bit;
   const ppn: number = createRandomNumberWith(8);
   // create unique TLBT address
-  const tag: number = createUniqe(Number('0b' + TLBT_bits)) 
-  const vpn: number = createUniqe(Number(VPN))
+  const tag: number = createUniqe(Number('0b' + TLBT_bits), 4 * 2) 
+  const vpn: number = createUniqe(Number(VPN), 4 * 2)
 
   let newEntry: TObj;
   if (isPageTableEntry(entry)) {
@@ -214,7 +213,7 @@ let empty: InputFields = {
 function App(): JSX.Element {
   const [facit, setFacit] = useState<InputFields>(empty);
   const [showSettings, setShowSettings] = useState<boolean>(false);
-  const [ChosenResult, setChosenResult] = useState<Result>(InputFieldsMap.PageFault);
+  const [assignmentType, setAssignmentType] = useState<Result>(InputFieldsMap.PageHit);
 
   console.log("facit", facit)
   const testing = true;
@@ -224,29 +223,31 @@ function App(): JSX.Element {
       console.log('------------------------------------')
       console.log("virtualAddressBitWidth", virtualAddressBitWidth)
       console.log("physicalAddressBitWidth", physicalAddressBitWidth)
-      console.log("PPN", PPN)
-      console.log("PPN (hex)", PPN.toString(16))
-      console.log("PPN (bin)", PPN.toString(2))
+      console.log("TLB_PPN", TLB_PPN)
+      console.log("TLB_PPN (hex)", TLB_PPN.toString(16))
+      console.log("TLB_PPN (bin)", TLB_PPN.toString(2))
       console.log("pageSize", pageSize)
       console.log("TLBSets", TLBSets)
       console.log("TLBWays", TLBWays)
       console.log("PageTableSize", PageTableSize)
       console.log("VPO", VPO)
       console.log("TLBI", TLBI)
+      console.log("Assignment type: ", assignmentType)
 
     }
 
-  }, [0])
+  }, [assignmentType])
 
   // Setting the facit to the correct result
   useEffect(() => {
-    setFacit(createFacit(ChosenResult));
-  }, [ChosenResult])
+    setFacit(createFacit(assignmentType));
+    console.log("HFLKJALÆKFJÆDLKFJEALÆKj")
+  }, [assignmentType])
 
   // TODO : Add the page hit case
   // TODO: Make the facit required and complete this function
   // POSTCONDITION : sets facit object in the Facit state
-  function createFacit(ChosenResult: Result): InputFields {
+  function createFacit(assignmentType: Result): InputFields {
 
     // Convert the bits to a number
     const TLBI_value: number = Number(addressPrefixMap.Binary + TLBI_bits);
@@ -265,7 +266,7 @@ function App(): JSX.Element {
     }
     
 
-    switch (ChosenResult) {
+    switch (assignmentType) {
       case InputFieldsMap.TLBHIT:
 
         // The correctIndex is a random number between 0 and the length of the ways
@@ -273,23 +274,23 @@ function App(): JSX.Element {
         const correctIndex = TLB_TABLE[TLBI_value][Math.floor(Math.random() * TLB_TABLE[0].length)];
         correctIndex.tag = TLBT_value;
         correctIndex.valid = 1;
-        correctIndex.ppn = PPN;
+        correctIndex.ppn = TLB_PPN;
 
         // This correctIndex is where we insert the DUMMY tag and PPN
         const dummyIndex = TLB_TABLE[TLBI_value][Math.floor(Math.random() * TLB_TABLE[0].length)];
         dummyIndex.tag = TLBT_value;
         dummyIndex.valid = 0;
-        dummyIndex.ppn = createRandomNumberWith(8);
+        dummyIndex.ppn = createUniqe(TLB_PPN, 4*2);
 
 
         facitObj = {
           VirtualAddress: generatedVirtualAddress.toString(2),
           VPN: VPN,
-          TLBI: TLBI_value.toString(16),
-          TLBT: TLBT_value.toString(16),
+          TLBI: TLBI_value.toString(ChosenBaseConversion),
+          TLBT: TLBT_value.toString(ChosenBaseConversion),
           TLBHIT: 'Y',
           PageFault: 'N',
-          PPN: correctIndex.ppn.toString(16),
+          PPN: correctIndex.ppn.toString(ChosenBaseConversion),
           PhysicalAddress: correctIndex.ppn.toString(2) + VPO_bits,
           PageHit: ''
         }
@@ -312,22 +313,37 @@ function App(): JSX.Element {
         facitObj = {
           VirtualAddress: generatedVirtualAddress.toString(2),
           VPN: VPN,
-          TLBI: TLBI_value.toString(16),
-          TLBT: TLBT_value.toString(16),
+          TLBI: TLBI_value.toString(ChosenBaseConversion),
+          TLBT: TLBT_value.toString(ChosenBaseConversion),
           TLBHIT: 'N',
           PageFault: 'Y',
           PPN: '',
           PhysicalAddress: '',
           PageHit: ''
         }
-        console.log("Page Fault")
         break;
       case InputFieldsMap.PageHit:
         // CASE 1: An address in the pagetable with a valid bit 1
         // CASE 2: There is a VPN with a valid bit 0 and a the same address next
         // to the first address with a valid bit 1 ( both different PPNs )
 
-        
+        const Page_entry = PAGE_TABLE[Math.floor(Math.random() * PAGE_TABLE.length)][Math.floor(Math.random() * PAGE_TABLE[0].length)];
+        Page_entry.ppn = Page_PPN
+        Page_entry.vpn = Number("0x" + VPN)
+        Page_entry.valid = 1
+
+
+        facitObj = {
+          VirtualAddress: generatedVirtualAddress.toString(2),
+          VPN: VPN,
+          TLBI: TLBI_value.toString(ChosenBaseConversion),
+          TLBT: TLBT_value.toString(ChosenBaseConversion),
+          TLBHIT: 'N',
+          PageFault: 'N',
+          PPN: Page_PPN.toString(ChosenBaseConversion),
+          PhysicalAddress: Page_PPN.toString(2) + VPO_bits,
+          PageHit: ''
+        }
         break;
       default:
         console.log("No case found");
@@ -365,8 +381,8 @@ function App(): JSX.Element {
           <div className='settings-wrapper'>
             <h3>Settings</h3>
             <Dropdown
-              value={ChosenResult}
-              onChange={(e) => setChosenResult(e.value)}
+              value={assignmentType}
+              onChange={(e) => setAssignmentType(e.value.name)}
               optionLabel="name"
               options={chosenResultsItemArr}
               showClear
