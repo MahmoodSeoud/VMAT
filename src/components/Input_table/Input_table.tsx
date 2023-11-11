@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AddressPrefix, BaseConversion, InputField, InputFieldsMap } from '../../App';
+import { AddressPrefix, BaseConversion, InputField, InputFieldsMap, createRandomNumberWith } from '../../App';
 import './Input_table.css'
 import { ColorResult, HuePicker } from 'react-color';
 import { Toast } from 'primereact/toast';
@@ -15,6 +15,7 @@ export type InputFields = {
     PageFault: string;
     PPN: string;
     PhysicalAddress: string;
+    PageHit: string;
 }
 
 
@@ -79,7 +80,8 @@ let emptyInput: InputFields = {
     TLBT: '',
     TLBHIT: '',
     PageFault: '',
-    PPN: ''
+    PPN: '',
+    PageHit: ''
 }
 function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, virtualAddressWidth, physcialAddressWidth, facit }: Input_tableProps): JSX.Element {
     pageSize
@@ -92,11 +94,13 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         TLBT: '',
         TLBHIT: '',
         PageFault: '',
-        PPN: ''
+        PPN: '',
+        PageHit: ''
     })
 
     const [isMouseDown, setIsMouseDown] = useState(false);
-    const [color, setColor] = useState<string>('green');
+    // creating a random hex address per refresh 4 * 6 bits all converted to hex
+    const [color, setColor] = useState<string>("#"+createRandomNumberWith(4*6).toString(16));
     const [isPPNFocused, setIsPPNFocused] = useState(false);
     const [isPhysAddFocused, setIsPhysAddFocused] = useState(false);
 
@@ -314,6 +318,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
 
     // Handle changes in color
     function handleColorChange(color: ColorResult): void {
+        console.log("color: ", color.hex)
+        console.log("color: ", color)
         setColor(color.hex)
     }
 

@@ -32,7 +32,8 @@ export const InputFieldsMap = {
   TLBHIT: 'TLBHIT',
   PageFault: 'PageFault',
   PPN: 'PPN',
-  PhysicalAddress: 'PhysicalAddress'
+  PhysicalAddress: 'PhysicalAddress',
+  PageHit: 'PageHit'
 } as const;
 
 const baseConversionMap = {
@@ -52,12 +53,12 @@ const bitMap = {
   One: 1
 } as const;
 
-
 export type BaseConversion = typeof baseConversionMap[keyof typeof baseConversionMap];
 export type AddressPrefix = typeof addressPrefixMap[keyof typeof addressPrefixMap];
 export type InputField = typeof InputFieldsMap[keyof typeof InputFieldsMap];
 // TODO: add the PageHit case
-export type Result = Pick<typeof InputFieldsMap, 'TLBHIT' | 'PageFault'>[keyof Pick<typeof InputFieldsMap, 'TLBHIT' | 'PageFault'>] | 'PageHit';
+
+export type Result = Pick<typeof InputFieldsMap, 'TLBHIT' | 'PageFault' | 'PageHit'>[keyof Pick<typeof InputFieldsMap, 'TLBHIT' | 'PageFault' | 'PageHit'>];
 export type Bit = typeof bitMap[keyof typeof bitMap];
 // ------
 
@@ -100,7 +101,7 @@ const ChosenBaseConversion: BaseConversion = baseConversionMap.Hexadecimal;
 
 // create a random number from bitlength by taking a random number between
 // the previous number of bits and the current max of the bits we want 
-function createRandomNumberWith(bitLength: number): number {
+export function createRandomNumberWith(bitLength: number): number {
   return createRandomNumber(2 ** (bitLength - 1), 2 ** bitLength)
 }
 
@@ -206,7 +207,8 @@ let empty: InputFields = {
   TLBHIT: '',
   PageFault: '',
   PPN: '',
-  PhysicalAddress: ''
+  PhysicalAddress: '',
+  PageHit: ''
 }
 
 function App(): JSX.Element {
@@ -258,7 +260,8 @@ function App(): JSX.Element {
       TLBHIT: '',
       PageFault: '',
       PPN: '',
-      PhysicalAddress: ''
+      PhysicalAddress: '',
+      PageHit: ''
     }
     
 
@@ -287,7 +290,8 @@ function App(): JSX.Element {
           TLBHIT: 'Y',
           PageFault: 'N',
           PPN: correctIndex.ppn.toString(16),
-          PhysicalAddress: correctIndex.ppn.toString(2) + VPO_bits
+          PhysicalAddress: correctIndex.ppn.toString(2) + VPO_bits,
+          PageHit: ''
         }
 
 
@@ -313,12 +317,17 @@ function App(): JSX.Element {
           TLBHIT: 'N',
           PageFault: 'Y',
           PPN: '',
-          PhysicalAddress: ''
+          PhysicalAddress: '',
+          PageHit: ''
         }
         console.log("Page Fault")
         break;
-      // TODO: Add the page hit case
-      case "PageHit":
+      case InputFieldsMap.PageHit:
+        // CASE 1: An address in the pagetable with a valid bit 1
+        // CASE 2: There is a VPN with a valid bit 0 and a the same address next
+        // to the first address with a valid bit 1 ( both different PPNs )
+
+        
         break;
       default:
         console.log("No case found");
