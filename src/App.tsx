@@ -281,7 +281,7 @@ function App(): JSX.Element {
         const dummyIndex = TLB_TABLE[TLBI_value][Math.floor(Math.random() * TLB_TABLE[0].length)];
         dummyIndex.tag = TLBT_value;
         dummyIndex.valid = 0;
-        dummyIndex.ppn = PPN;
+        dummyIndex.ppn = createRandomNumberWith(8);
 
 
         const VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(16);
