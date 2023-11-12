@@ -65,6 +65,7 @@ export type Bit = typeof bitMap[keyof typeof bitMap];
 // ----------- Test choices
 const ChosenAddressPrefix: AddressPrefix = addressPrefixMap.Hexadecimal;
 const ChosenBaseConversion: BaseConversion = baseConversionMap.Hexadecimal;
+const testing = true;
 // ----------- 
 
 // ----- Given parameters for exercis
@@ -96,7 +97,7 @@ const TLBI_bits: string = addressInBits.splice(-TLBI).join('');     // TLBI_bits
 const TLBT_bits: string = addressInBits.join('');     // TLBT_bits = the remaining bits of the address
 const VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(ChosenBaseConversion);
 
-
+// ------ -Helper functions
 
 // create a random number from bitlength by taking a random number between
 // the previous number of bits and the current max of the bits we want 
@@ -121,13 +122,15 @@ function createUniqe(fromNum: number, size: number): number {
   return unique;
 }
 
+// -----------------
+
 // Function to create a TLB entry
 function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry: TObj): TObj {
 
   const valid: Bit = Math.floor(Math.random() * 2) as Bit;
   const ppn: number = createRandomNumberWith(8);
   // create unique TLBT address
-  const tag: number = createUniqe(Number('0b' + TLBT_bits), 4 * 2) 
+  const tag: number = createUniqe(Number('0b' + TLBT_bits), 4 * 2)
   const vpn: number = createUniqe(Number(VPN), 4 * 2)
 
   let newEntry: TObj;
@@ -178,25 +181,6 @@ function createTableEntries<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(
 
 
 
-// TLB  table information
-// const NumTlbEntries: number = TLBSets * TLBWays;
-//const TLB_TABLE: TLB_TABLE_ENTRY[][] = createTLBEntries(TLBWays, TLBSets);
-const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 });
-const TLB_TABLE: TLB_TABLE_ENTRY[][] = createTableEntries<TLB_TABLE_ENTRY>(
-  TLBWays,
-  TLBSets,
-  tlbTableEntry
-);
-
-// Page table information
-const pageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 });
-const PAGE_TABLE: PAGE_TABLE_ENTRY[][] = createTableEntries<PAGE_TABLE_ENTRY>(
-  4, // I chose 4 because of all the old exams all look like that. 
-  //Be sure to see the page size given in those exams
-  3, // I choose 3 because of all the old exams all look like that. 
-  // Make sure to see the PTE's in the old exams. Hint: they are all 12 entries.
-  pageTableEntry
-);
 
 let empty: InputFields = {
   VirtualAddress: '',
@@ -213,11 +197,29 @@ let empty: InputFields = {
 function App(): JSX.Element {
   const [facit, setFacit] = useState<InputFields>(empty);
   const [showSettings, setShowSettings] = useState<boolean>(false);
-  const [assignmentType, setAssignmentType] = useState<Result>(InputFieldsMap.PageHit);
+  const randomAssignmentType = [InputFieldsMap.PageHit, InputFieldsMap.TLBHIT, InputFieldsMap.PageFault]
+  // Sorting randomized https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+  randomAssignmentType.sort(() => (Math.random() > .5) ? 1 : -1);
+  const [assignmentType, setAssignmentType] = useState<Result>(randomAssignmentType[1]);
 
-  console.log("facit", facit)
-  const testing = true;
-  // Testing console logs
+  // TLB  table information
+  const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 });
+  const [TLB_TABLE, setTLB_TABLE] = useState<TLB_TABLE_ENTRY[][]>(createTableEntries<TLB_TABLE_ENTRY>(
+    TLBWays,
+    TLBSets,
+    tlbTableEntry
+  ));
+
+  const pageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 });
+  const PageTableEntries: PAGE_TABLE_ENTRY[][] = createTableEntries<PAGE_TABLE_ENTRY>(
+    4, // I chose 4 because of all the old exams all look like that. 
+    //Be sure to see the page size given in those exams
+    3, // I choose 3 because of all the old exams all look like that. 
+    // Make sure to see the PTE's in the old exams. Hint: they are all 12 entries.
+    pageTableEntry
+  );
+  const [PAGE_TABLE, setPAGE_TABLE] = useState<PAGE_TABLE_ENTRY[][]>(PageTableEntries);
+
   useEffect(() => {
     if (testing) {
       console.log('------------------------------------')
@@ -233,15 +235,17 @@ function App(): JSX.Element {
       console.log("VPO", VPO)
       console.log("TLBI", TLBI)
       console.log("Assignment type: ", assignmentType)
+      console.log("facit", facit)
 
     }
+
+
 
   }, [assignmentType])
 
   // Setting the facit to the correct result
   useEffect(() => {
     setFacit(createFacit(assignmentType));
-    console.log("HFLKJALÆKFJÆDLKFJEALÆKj")
   }, [assignmentType])
 
   // TODO : Add the page hit case
@@ -264,24 +268,35 @@ function App(): JSX.Element {
       PhysicalAddress: '',
       PageHit: ''
     }
-    
+
 
     switch (assignmentType) {
       case InputFieldsMap.TLBHIT:
+        // The correctTagIndex is a random number between 0 and the length of the ways
+        // This correctTagIndex is where we insert the CORRECT tag and PPN
 
-        // The correctIndex is a random number between 0 and the length of the ways
-        // This correctIndex is where we insert the CORRECT tag and PPN
-        const correctIndex = TLB_TABLE[TLBI_value][Math.floor(Math.random() * TLB_TABLE[0].length)];
-        correctIndex.tag = TLBT_value;
-        correctIndex.valid = 1;
-        correctIndex.ppn = TLB_PPN;
+        // Step 1: Create a deep copy of the TLB table
+        const deepCopy = JSON.parse(JSON.stringify(TLB_TABLE));
 
-        // This correctIndex is where we insert the DUMMY tag and PPN
-        const dummyIndex = TLB_TABLE[TLBI_value][Math.floor(Math.random() * TLB_TABLE[0].length)];
-        dummyIndex.tag = TLBT_value;
-        dummyIndex.valid = 0;
-        dummyIndex.ppn = createUniqe(TLB_PPN, 4*2);
+        // Step 2: Generate the correctIndex and dummyIndex
+        const correctTagIndex = Math.floor(Math.random() * deepCopy[0].length);
+        const dummyTagIndex = Math.floor(Math.random() * deepCopy[0].length);
 
+        // Step 3: Update the correctIndex and dummyIndex in the deep copy of the TLB table
+        deepCopy[TLBI_value][correctTagIndex] = {
+          tag: TLBT_value,
+          valid: 1,
+          ppn: TLB_PPN
+        };
+
+        deepCopy[TLBI_value][dummyTagIndex] = {
+          tag: TLBT_value,
+          valid: 0,
+          ppn: createUniqe(TLB_PPN, 4 * 2)
+        };
+
+
+        setTLB_TABLE(deepCopy);
 
         facitObj = {
           VirtualAddress: generatedVirtualAddress.toString(2),
@@ -290,16 +305,15 @@ function App(): JSX.Element {
           TLBT: TLBT_value.toString(ChosenBaseConversion),
           TLBHIT: 'Y',
           PageFault: 'N',
-          PPN: correctIndex.ppn.toString(ChosenBaseConversion),
-          PhysicalAddress: correctIndex.ppn.toString(2) + VPO_bits,
+          PPN: deepCopy[TLBI_value][correctTagIndex].ppn.toString(ChosenBaseConversion),
+          PhysicalAddress: deepCopy[TLBI_value][correctTagIndex].ppn.toString(2) + VPO_bits,
           PageHit: ''
         }
 
 
         break;
       case InputFieldsMap.PageFault:
-
-        //  Case 1: VPN DOES NOT exists in Page Tables 
+        // Case 1: VPN DOES NOT exists in Page Tables 
 
         // Case 2: VPN EXISTS and VALID bit is 0
 
@@ -309,6 +323,8 @@ function App(): JSX.Element {
           dummy.vpn = Number("0x" + VPN)
           dummy.valid = 0
         }
+
+        setPAGE_TABLE(PAGE_TABLE)
 
         facitObj = {
           VirtualAddress: generatedVirtualAddress.toString(2),
@@ -328,10 +344,11 @@ function App(): JSX.Element {
         // to the first address with a valid bit 1 ( both different PPNs )
 
         const Page_entry = PAGE_TABLE[Math.floor(Math.random() * PAGE_TABLE.length)][Math.floor(Math.random() * PAGE_TABLE[0].length)];
-        Page_entry.ppn = Page_PPN
-        Page_entry.vpn = Number("0x" + VPN)
-        Page_entry.valid = 1
+        Page_entry.ppn = Page_PPN;
+        Page_entry.vpn = Number("0x" + VPN);
+        Page_entry.valid = 1;
 
+        setPAGE_TABLE(PAGE_TABLE)
 
         facitObj = {
           VirtualAddress: generatedVirtualAddress.toString(2),
@@ -363,6 +380,10 @@ function App(): JSX.Element {
     {
       name: InputFieldsMap.PageFault,
       code: InputFieldsMap.PageFault
+    },
+    {
+      name: InputFieldsMap.PageHit,
+      code: InputFieldsMap.PageHit
     }
   ]
 
@@ -386,7 +407,7 @@ function App(): JSX.Element {
               optionLabel="name"
               options={chosenResultsItemArr}
               showClear
-              placeholder="Select a chosen result"
+              placeholder="Select Assignment Type"
               className="w-full md:w-14rem"
             />
           </div>

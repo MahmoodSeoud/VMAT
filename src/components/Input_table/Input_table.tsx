@@ -104,8 +104,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     const [isPPNFocused, setIsPPNFocused] = useState(false);
     const [isPhysAddFocused, setIsPhysAddFocused] = useState(false);
 
-    const ppnRef = useRef<HTMLInputElement>(null);
-
     const toast = useRef<Toast>(null);
 
     function showSuccess() {
