@@ -71,8 +71,16 @@ const testing = true;
 // ----- Given parameters for exercis
 // PPN bit size + log2(pagesize) 
 
-export const TLBSets = 2 ** createRandomNumber(2, 4);
-export const TLBWays = createRandomNumber(3, 5);
+function generateTLBSets(): number {
+  return 2 ** createRandomNumber(2, 4);
+}
+
+function generateTLBWays(): number {
+  return createRandomNumber(2, 4);
+}
+
+export const TLBSets = generateTLBSets();
+export const TLBWays = generateTLBWays();
 
 const possiblePageSizes = [16, 32, 64] as const;
 export const pageSize = possiblePageSizes[Math.floor(Math.random() * possiblePageSizes.length)];
@@ -159,7 +167,7 @@ function isPageTableEntry(entry: TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY): entry is P
 }
 
 // Function to create a geniric table of entries of type TLB_TABLE_ENTRY or PAGE_TABLE_ENTRY
-// tlb_enty = rows = sets | column =  ways
+// tlb_enty = rows = sets | column = ways
 // page_entry = rows = pageSize | column = pageTableSize ?????
 function createTableEntries<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(
   numOfRows: number,
@@ -275,8 +283,12 @@ function App(): JSX.Element {
         // The correctTagIndex is a random number between 0 and the length of the ways
         // This correctTagIndex is where we insert the CORRECT tag and PPN
 
+        const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 });
+
+        let deepCopy = createTableEntries<TLB_TABLE_ENTRY>(TLBSets, TLBWays, tlbTableEntry);
+
         // Step 1: Create a deep copy of the TLB table
-        const deepCopy = JSON.parse(JSON.stringify(TLB_TABLE));
+
 
         // Step 2: Generate the correctIndex and dummyIndex
         const correctTagIndex = Math.floor(Math.random() * deepCopy[0].length);
@@ -294,6 +306,7 @@ function App(): JSX.Element {
           valid: 0,
           ppn: createUniqe(TLB_PPN, 4 * 2)
         };
+
 
 
         setTLB_TABLE(deepCopy);
