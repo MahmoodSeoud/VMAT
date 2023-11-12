@@ -100,7 +100,6 @@ let VPO_bits: string = addressInBits.splice(-VPO).join('');     // VPO_bits = th
 let TLBI_bits: string = addressInBits.splice(-TLBI).join('');     // TLBI_bits = the next TLBI bits of the address / log2(sets)
 let TLBT_bits: string = addressInBits.join('');     // TLBT_bits = the remaining bits of the address
 let VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(ChosenBaseConversion);
-
 // ------ -Helper functions
 
 // create a random number from bitlength by taking a random number between
@@ -156,20 +155,21 @@ let empty: InputFields = {
 
 function App(): JSX.Element {
 
-
-
   const [facit, setFacit] = useState<InputFields>(empty);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [assignmentType, setAssignmentType] = useState<Result>(randomAssignmentType);
   const [hasClearedInput, setHasClearedInput] = useState<boolean>(false);
+  const [dropdownValue, setDropdownValue] = useState<SelectItemOptionsType>();
+
 
   // TLB  table information
   const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 });
-  const [TLB_TABLE, setTLB_TABLE] = useState<TLB_TABLE_ENTRY[][]>(createTableEntries<TLB_TABLE_ENTRY>(
+  const tlbTableEntries = createTableEntries<TLB_TABLE_ENTRY>(
     TLBSets,
     TLBWays,
     tlbTableEntry
-  ));
+  );
+  const [TLB_TABLE, setTLB_TABLE] = useState<TLB_TABLE_ENTRY[][]>(tlbTableEntries);
 
   const pageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 });
   const PageTableEntries: PAGE_TABLE_ENTRY[][] = createTableEntries<PAGE_TABLE_ENTRY>(
@@ -185,23 +185,6 @@ function App(): JSX.Element {
 
   // Setting the facit to the correct result
   useEffect(() => {
-    if (testing) {
-      console.log('------------------------------------')
-      console.log("virtualAddressBitWidth", virtualAddressBitWidth)
-      console.log("physicalAddressBitWidth", physicalAddressBitWidth)
-      console.log("TLB_PPN", TLB_PPN)
-      console.log("TLB_PPN (hex)", TLB_PPN.toString(16))
-      console.log("TLB_PPN (bin)", TLB_PPN.toString(2))
-      console.log("pageSize", pageSize)
-      console.log("TLBSets", TLBSets)
-      console.log("TLBWays", TLBWays)
-      console.log("PageTableSize", PageTableSize)
-      console.log("VPO", VPO)
-      console.log("TLBI", TLBI)
-      console.log("Assignment type: ", assignmentType)
-      console.log("facit", facit)
-
-    }
     TLBSets = generateTLBSets();
     TLBWays = generateTLBWays();
 
@@ -226,8 +209,30 @@ function App(): JSX.Element {
     TLBT_bits = addressInBits.join('');     // TLBT_bits = the remaining bits of the address
     VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(ChosenBaseConversion);
 
-    setFacit(createFacit(assignmentType));
+    //createFacit(assignmentType)
+
   }, [assignmentType])
+
+
+  useEffect(() => {
+    if (testing) {
+      console.log('------------------------------------')
+      console.log("virtualAddressBitWidth", virtualAddressBitWidth)
+      console.log("physicalAddressBitWidth", physicalAddressBitWidth)
+      console.log("TLB_PPN", TLB_PPN)
+      console.log("TLB_PPN (hex)", TLB_PPN.toString(16))
+      console.log("TLB_PPN (bin)", TLB_PPN.toString(2))
+      console.log("pageSize", pageSize)
+      console.log("TLBSets", TLBSets)
+      console.log("TLBWays", TLBWays)
+      console.log("PageTableSize", PageTableSize)
+      console.log("VPO", VPO)
+      console.log("TLBI", TLBI)
+      console.log("Assignment type: ", assignmentType)
+      console.log("facit", facit)
+
+    }
+  }, [])
 
   // Function to create a TLB entry
   function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry: TObj): TObj {
@@ -285,7 +290,7 @@ function App(): JSX.Element {
   // TODO : Add the page hit case
   // TODO: Make the facit required and complete this function
   // POSTCONDITION : sets facit object in the Facit state
-  function createFacit(assignmentType: Result): InputFields {
+  function createFacit(assignmentType: Result): void {
     // Reset the user input
 
     // Convert the bits to a number
@@ -304,7 +309,7 @@ function App(): JSX.Element {
       PageHit: ''
     }
 
-
+    debugger
     switch (assignmentType) {
       case InputFieldsMap.TLBHIT:
 
@@ -375,6 +380,7 @@ function App(): JSX.Element {
           PhysicalAddress: '',
           PageHit: ''
         }
+
         break;
       case InputFieldsMap.PageHit:
         // CASE 1: An address in the pagetable with a valid bit 1
@@ -405,11 +411,11 @@ function App(): JSX.Element {
         break;
 
     }
-    return facitObj;
+    setFacit(facitObj)
   }
 
   // TODO: Add the third chosen result case
-  const chosenResultsItemArr: SelectItemOptionsType = [
+  const assignmentTypeOptions: SelectItemOptionsType = [
     {
       name: InputFieldsMap.TLBHIT,
       code: InputFieldsMap.TLBHIT
@@ -424,6 +430,13 @@ function App(): JSX.Element {
     }
   ]
 
+
+  function handleDropdownChange(value: any) {
+    console.log(value)
+    debugger
+    setDropdownValue(value)
+    setAssignmentType(value.name)
+  }
 
   return (
     <>
@@ -440,12 +453,10 @@ function App(): JSX.Element {
             onMouseLeave={() => setShowSettings(false)}>
             <h3>Settings</h3>
             <Dropdown
-              value={assignmentType}
-              onChange={(e) => {
-                setAssignmentType(e.value.name)
-              }}
+              value={dropdownValue}
+              onChange={(e) => handleDropdownChange(e.value)}
               optionLabel="name"
-              options={chosenResultsItemArr}
+              options={assignmentTypeOptions}
               showClear
               placeholder="Select Assignment Type"
               className="w-full md:w-14rem"

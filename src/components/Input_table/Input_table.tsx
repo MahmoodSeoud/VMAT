@@ -110,12 +110,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
 
     const toast = useRef<Toast>(null);
 
-    let arrOfRefs: RefObject<HTMLInputElement>[] = [];
-    for (let i = 0; i < virtualAddressWidth; i++) {
-        const inputElementRef = useRef<HTMLInputElement>(null)
-        arrOfRefs.push(inputElementRef);
-    }
-
 
     function showSuccess() {
         toast.current?.show({
@@ -173,16 +167,16 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         const textElements = document.getElementsByClassName('exercise-label') as HTMLCollectionOf<HTMLElement>;
 
         for (let i = 0; i < bitElements.length; i++) {
-            const isHighligted = bitElements[i].classList.contains('highlight');
+            const isHighligted = bitElements && bitElements[i] && bitElements[i].classList.contains('highlight');
 
-            if (isHighligted) {
+            if (isHighligted ) {
                 bitElements[i].classList.remove('highlight');
                 bitElements[i].style.backgroundColor = '';
             }
         }
 
         for (let i = 0; i < bitElements.length; i++) {
-            const isHighligted = textElements[i].classList.contains('highlight');
+            const isHighligted = textElements && textElements[i] && textElements[i].classList.contains('highlight');
 
             if (isHighligted) {
                 textElements[i].classList.remove('highlight');
@@ -328,8 +322,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
 
     // Handle changes in color
     function handleColorChange(color: ColorResult): void {
-        console.log("color: ", color.hex)
-        console.log("color: ", color)
         setColor(color.hex)
     }
 
