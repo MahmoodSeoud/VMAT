@@ -304,15 +304,15 @@ function App(): JSX.Element {
 
         // Step 1: Create a deep copy of the TLB table
         const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 });
-        let tlbTableEntries = createTableEntries<TLB_TABLE_ENTRY>(TLBSets, TLBWays, tlbTableEntry);
+        const tlbTableEntries = createTableEntries<TLB_TABLE_ENTRY>(TLBSets, TLBWays, tlbTableEntry);
 
         try {
 
           // Step 2: Generate the correctIndex and dummyIndex
           // The correctTagIndex is a random number between 0 and the length of the ways
           // This correctTagIndex is where we insert the CORRECT tag and PPN
-          const dummyTagIndex = Math.floor(Math.random() * tlbTableEntries[0].length);
           const correctTagIndex = Math.floor(Math.random() * tlbTableEntries[0].length);
+          const dummyTagIndex = createUniqe(correctTagIndex, Math.floor(Math.random() * tlbTableEntries[0].length));
 
           // case 1 correct presetn, dummy preset
           // case 2 dummy pressent 
