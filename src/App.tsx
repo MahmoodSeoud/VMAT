@@ -66,20 +66,40 @@ export type Bit = typeof bitMap[keyof typeof bitMap];
 const ChosenAddressPrefix: AddressPrefix = addressPrefixMap.Hexadecimal;
 const ChosenBaseConversion: BaseConversion = baseConversionMap.Hexadecimal;
 const testing = true;
+
+// Sorting randomized https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+const randomAssignmentType = [
+    InputFieldsMap.PageHit, 
+    InputFieldsMap.TLBHIT, 
+    InputFieldsMap.PageFault
+  ]
+  .sort(() => (Math.random() > .5) ? 1 : -1)[0];
 // ----------- 
 
 // ----- Given parameters for exercis
-// PPN bit size + log2(pagesize) 
 
-function generateTLBSets(): number {
-  return 2 ** createRandomNumber(2, 4);
-}
+let TLBSets = generateTLBSets();
+let TLBWays = generateTLBWays();
 
-function generateTLBWays(): number {
-  return createRandomNumber(3, 5);
-}
+const possiblePageSizes = [16, 32, 64] as const;
+let pageSize = possiblePageSizes[Math.floor(Math.random() * possiblePageSizes.length)];
+let PageTableSize = createRandomNumber(3, 5); // PTS                                              
 
+let VPO = Math.log2(pageSize);
+let TLBI = Math.log2(TLBSets);
+let TLB_PPN = createRandomNumberWith(8);
+let Page_PPN = createUniqe(TLB_PPN, 8)
 
+let virtualAddressBitWidth = createRandomNumber(10, 14); // VAS
+let physicalAddressBitWidth = TLB_PPN.toString(2).length + VPO;
+
+let generatedVirtualAddress = createRandomNumberWith(virtualAddressBitWidth);
+let addressInBits = [...generatedVirtualAddress.toString(2)];
+
+let VPO_bits: string = addressInBits.splice(-VPO).join('');     // VPO_bits = the last VPO bits of the address / log2(pageSize)
+let TLBI_bits: string = addressInBits.splice(-TLBI).join('');     // TLBI_bits = the next TLBI bits of the address / log2(sets)
+let TLBT_bits: string = addressInBits.join('');     // TLBT_bits = the remaining bits of the address
+let VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(ChosenBaseConversion);
 
 // ------ -Helper functions
 
@@ -106,14 +126,20 @@ function createUniqe(fromNum: number, size: number): number {
   return unique;
 }
 
+function generateTLBSets(): number {
+  return 2 ** createRandomNumber(2, 4);
+}
+
+function generateTLBWays(): number {
+  return createRandomNumber(3, 5);
+}
+
 // -----------------
 
 
 function isPageTableEntry(entry: TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY): entry is PAGE_TABLE_ENTRY {
   return 'vpn' in entry;
 }
-
-
 
 let empty: InputFields = {
   VirtualAddress: '',
@@ -127,42 +153,12 @@ let empty: InputFields = {
   PageHit: ''
 }
 
-let TLBSets = generateTLBSets();
-let TLBWays = generateTLBWays();
-
-const possiblePageSizes = [16, 32, 64] as const;
-let pageSize = possiblePageSizes[Math.floor(Math.random() * possiblePageSizes.length)];
-let PageTableSize = createRandomNumber(3, 5); // PTS                                              
-
-let VPO = Math.log2(pageSize);
-let TLBI = Math.log2(TLBSets);
-let TLB_PPN = createRandomNumberWith(8);
-let Page_PPN = createUniqe(TLB_PPN, 8)
-
-let virtualAddressBitWidth = createRandomNumber(10, 14); // VAS
-let physicalAddressBitWidth = TLB_PPN.toString(2).length + VPO;
-
-let generatedVirtualAddress = createRandomNumberWith(virtualAddressBitWidth);
-let addressInBits = [...generatedVirtualAddress.toString(2)];
-
-let VPO_bits: string = addressInBits.splice(-VPO).join('');     // VPO_bits = the last VPO bits of the address / log2(pageSize)
-let TLBI_bits: string = addressInBits.splice(-TLBI).join('');     // TLBI_bits = the next TLBI bits of the address / log2(sets)
-let TLBT_bits: string = addressInBits.join('');     // TLBT_bits = the remaining bits of the address
-let VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(ChosenBaseConversion);
 
 function App(): JSX.Element {
 
-
-
   const [facit, setFacit] = useState<InputFields>(empty);
   const [showSettings, setShowSettings] = useState<boolean>(false);
-  const randomAssignmentType = [InputFieldsMap.PageHit, InputFieldsMap.TLBHIT, InputFieldsMap.PageFault]
-  // Sorting randomized https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-  randomAssignmentType.sort(() => (Math.random() > .5) ? 1 : -1);
-  const [assignmentType, setAssignmentType] = useState<Result>(randomAssignmentType[1]);
-
-
-
+  const [assignmentType, setAssignmentType] = useState<Result>(randomAssignmentType);
 
   // TLB  table information
   const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 });
@@ -315,9 +311,11 @@ function App(): JSX.Element {
           // Step 2: Generate the correctIndex and dummyIndex
           // The correctTagIndex is a random number between 0 and the length of the ways
           // This correctTagIndex is where we insert the CORRECT tag and PPN
+          const dummyTagIndex = Math.floor(Math.random() * tlbTableEntries[0].length);
           const correctTagIndex = Math.floor(Math.random() * tlbTableEntries[0].length);
-          const dummyTagIndex = createUniqe(correctTagIndex, Math.floor(Math.random() * tlbTableEntries[0].length))
 
+          // case 1 correct presetn, dummy preset
+          // case 2 dummy pressent 
           console.log("VALUE OF OUT OF BOUNCE MAY BE", TLBI_value)
           console.log("Correct tag index OF OUT OF BOUNCE MAY BE", correctTagIndex)
           console.log("Dummy index out of bounce", dummyTagIndex)
@@ -387,27 +385,24 @@ function App(): JSX.Element {
         // CASE 2: There is a VPN with a valid bit 0 and a the same address next
         // to the first address with a valid bit 1 ( both different PPNs )
 
-
-
-        // TODO: Uncomment this when you have the TLB_HIT working
-        /*      const Page_entry = PAGE_TABLE[Math.floor(Math.random() * PAGE_TABLE.length)][Math.floor(Math.random() * PAGE_TABLE[0].length)];
-             Page_entry.ppn = Page_PPN;
-             Page_entry.vpn = Number("0x" + VPN);
-             Page_entry.valid = 1;
+        const Page_entry = PAGE_TABLE[Math.floor(Math.random() * PAGE_TABLE.length)][Math.floor(Math.random() * PAGE_TABLE[0].length)];
+        Page_entry.ppn = Page_PPN;
+        Page_entry.vpn = Number("0x" + VPN);
+        Page_entry.valid = 1;
      
-             setPAGE_TABLE(PAGE_TABLE)
+        setPAGE_TABLE(PAGE_TABLE)
      
-             facitObj = {
-               VirtualAddress: generatedVirtualAddress.toString(2),
-               VPN: VPN,
-               TLBI: TLBI_value.toString(ChosenBaseConversion),
-               TLBT: TLBT_value.toString(ChosenBaseConversion),
-               TLBHIT: 'N',
-               PageFault: 'N',
-               PPN: Page_PPN.toString(ChosenBaseConversion),
-               PhysicalAddress: Page_PPN.toString(2) + VPO_bits,
-               PageHit: ''
-             } */
+        facitObj = {
+          VirtualAddress: generatedVirtualAddress.toString(2),
+          VPN: VPN,
+          TLBI: TLBI_value.toString(ChosenBaseConversion),
+          TLBT: TLBT_value.toString(ChosenBaseConversion),
+          TLBHIT: 'N',
+          PageFault: 'N',
+          PPN: Page_PPN.toString(ChosenBaseConversion),
+          PhysicalAddress: Page_PPN.toString(2) + VPO_bits,
+          PageHit: ''
+        } 
         console.log("Not implemented yet");
         break;
       default:

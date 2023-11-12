@@ -99,7 +99,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
 
     const [isMouseDown, setIsMouseDown] = useState(false);
     // creating a random hex address per refresh 4 * 6 bits all converted to hex
-    const [color, setColor] = useState<string>("#"+createRandomNumberWith(4*6).toString(16));
+    const [color, setColor] = useState<string>("#" + createRandomNumberWith(4 * 6).toString(16));
     const [isPPNFocused, setIsPPNFocused] = useState(false);
     const [isPhysAddFocused, setIsPhysAddFocused] = useState(false);
 
@@ -249,7 +249,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         // incremental correct feedback
         if (!isPPNFocused && inputFieldName === "PPN") {
             return false
-        } 
+        }
 
         if (!isPhysAddFocused && inputFieldName === "PhysicalAddress") {
             return false
@@ -513,10 +513,15 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                                     className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.PPN)}
                                                     onFocus={() => setIsPPNFocused(true)}
-                                                    // onBlur={() => setIsPPNFocused(false)}
+                                                //onBlur={() => setIsPPNFocused(false)}
                                                 />
                                             </td>
-                                            <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.PPN, ev)}>Insert facit</button>
+                                            <button className={'insert-facit-btn'} onClick={(ev) => {
+                                                insertFacit(InputFieldsMap.PPN, ev);
+                                                setIsPPNFocused(true);
+                                            }}>
+                                                Insert facit
+                                            </button>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -543,7 +548,15 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                         </div>
                                     ))}
                                 </div>
-                                <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.PhysicalAddress, ev)}>Insert Facit</button>
+                                <button
+                                 className={'insert-facit-btn'}
+                                  onClick={(ev) => {
+                                    insertFacit(InputFieldsMap.PhysicalAddress, ev)
+                                    setIsPhysAddFocused(true);
+                                }}
+                                >
+                                    Insert Facit
+                                    </button>
                             </div>
                         </li>
                     </ol>
