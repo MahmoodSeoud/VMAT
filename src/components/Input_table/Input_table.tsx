@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AddressPrefix, BaseConversion, InputField, InputFieldsMap, createRandomNumberWith } from '../../App';
 import './Input_table.css'
 import { ColorResult, HuePicker } from 'react-color';
@@ -25,9 +25,7 @@ type Input_tableProps = {
     physcialAddressWidth: number;
     addressPrefix: AddressPrefix;
     baseConversion: BaseConversion;
-    pageSize: number;
     facit: InputFields;
-    hasClearedInput: boolean;
 };
 
 
@@ -85,7 +83,62 @@ let emptyInput: InputFields = {
     PageHit: ''
 }
 
-function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, virtualAddressWidth, physcialAddressWidth, facit, hasClearedInput }: Input_tableProps): JSX.Element {
+
+function resetColors() {
+    const bitElements = document.getElementsByClassName('input-text') as HTMLCollectionOf<HTMLElement>;
+    const textElements = document.getElementsByClassName('exercise-label') as HTMLCollectionOf<HTMLElement>;
+
+    for (let i = 0; i < bitElements.length; i++) {
+        const isHighligted = bitElements && bitElements[i] && bitElements[i].classList.contains('highlight');
+
+        if (isHighligted) {
+            bitElements[i].classList.remove('highlight');
+            bitElements[i].style.backgroundColor = '';
+        }
+    }
+
+    for (let i = 0; i < bitElements.length; i++) {
+        const isHighligted = textElements && textElements[i] && textElements[i].classList.contains('highlight');
+
+        if (isHighligted) {
+            textElements[i].classList.remove('highlight');
+            textElements[i].style.backgroundColor = '';
+        }
+    }
+}
+
+    // TODO: Please fix all the any's
+    function deepEqual(object1: any, object2: any) {
+        const keys1 = Object.keys(object1);
+        const keys2 = Object.keys(object2);
+
+        if (keys1.length !== keys2.length) {
+            return false;
+        }
+
+        for (const key of keys1) {
+            const val1: any = object1[key];
+            const val2: any = object2[key];
+            const areObjects = isObject(val1) && isObject(val2);
+            if (
+                areObjects && !deepEqual(val1, val2) ||
+                !areObjects && val1 !== val2
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function isObject(object: InputFields) {
+        return object != null && typeof object === 'object';
+    }
+
+
+
+
+function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAddressWidth, physcialAddressWidth, facit }: Input_tableProps): JSX.Element {
 
 
     const [input, setInput] = useState<InputFields>({
@@ -131,11 +184,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     }, [input])
 
 
-    // Check if the user has clicked on the input field
-    useEffect(() => {
-        console.log('isPPNFocused: ', isPPNFocused);
-    }, [isPPNFocused]);
-
 
     function handleMouseDown(e: React.MouseEvent) {
 
@@ -161,58 +209,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
             pTagWithIndex.style.backgroundColor = color;
         }
     };
-
-    function resetColors() {
-        const bitElements = document.getElementsByClassName('input-text') as HTMLCollectionOf<HTMLElement>;
-        const textElements = document.getElementsByClassName('exercise-label') as HTMLCollectionOf<HTMLElement>;
-
-        for (let i = 0; i < bitElements.length; i++) {
-            const isHighligted = bitElements && bitElements[i] && bitElements[i].classList.contains('highlight');
-
-            if (isHighligted ) {
-                bitElements[i].classList.remove('highlight');
-                bitElements[i].style.backgroundColor = '';
-            }
-        }
-
-        for (let i = 0; i < bitElements.length; i++) {
-            const isHighligted = textElements && textElements[i] && textElements[i].classList.contains('highlight');
-
-            if (isHighligted) {
-                textElements[i].classList.remove('highlight');
-                textElements[i].style.backgroundColor = '';
-            }
-        }
-    }
-
-    // TODO: Please fix all the any's
-    function deepEqual(object1: any, object2: any) {
-        const keys1 = Object.keys(object1);
-        const keys2 = Object.keys(object2);
-
-        if (keys1.length !== keys2.length) {
-            return false;
-        }
-
-        for (const key of keys1) {
-            const val1: any = object1[key];
-            const val2: any = object2[key];
-            const areObjects = isObject(val1) && isObject(val2);
-            if (
-                areObjects && !deepEqual(val1, val2) ||
-                !areObjects && val1 !== val2
-            ) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    function isObject(object: InputFields) {
-        return object != null && typeof object === 'object';
-    }
-
 
 
     // Insert the facit incase the user does not know the answer
