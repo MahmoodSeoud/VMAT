@@ -1,7 +1,7 @@
 import './App.css'
 import Page_table, { PAGE_TABLE_ENTRY } from './components/Page_table/Page_table';
 import Input_table, { InputFields } from './components/Input_table/Input_table';
-import { useEffect, useState } from 'react';
+import { RefObject, useEffect, useState } from 'react';
 import Tlb_table, { TLB_TABLE_ENTRY } from './components/Tlb_table/Tlb_table';
 import { Dropdown } from 'primereact/dropdown';
 
@@ -69,10 +69,10 @@ const testing = true;
 
 // Sorting randomized https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 const randomAssignmentType = [
-    InputFieldsMap.PageHit, 
-    InputFieldsMap.TLBHIT, 
-    InputFieldsMap.PageFault
-  ]
+  // InputFieldsMap.PageHit,
+  InputFieldsMap.TLBHIT,
+  // InputFieldsMap.PageFault
+]
   .sort(() => (Math.random() > .5) ? 1 : -1)[0];
 // ----------- 
 
@@ -156,9 +156,12 @@ let empty: InputFields = {
 
 function App(): JSX.Element {
 
+
+
   const [facit, setFacit] = useState<InputFields>(empty);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [assignmentType, setAssignmentType] = useState<Result>(randomAssignmentType);
+  const [hasClearedInput, setHasClearedInput] = useState<boolean>(false);
 
   // TLB  table information
   const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 });
@@ -256,6 +259,7 @@ function App(): JSX.Element {
     return newEntry;
   }
 
+
   // Function to create a geniric table of entries of type TLB_TABLE_ENTRY or PAGE_TABLE_ENTRY
   // tlb_enty = rows = sets | column = ways
   // page_entry = rows = pageSize | column = pageTableSize ?????
@@ -282,6 +286,8 @@ function App(): JSX.Element {
   // TODO: Make the facit required and complete this function
   // POSTCONDITION : sets facit object in the Facit state
   function createFacit(assignmentType: Result): InputFields {
+    // Reset the user input
+
     // Convert the bits to a number
     const TLBI_value: number = Number(addressPrefixMap.Binary + TLBI_bits);
     const TLBT_value: number = Number(addressPrefixMap.Binary + TLBT_bits);
@@ -305,52 +311,42 @@ function App(): JSX.Element {
         // Step 1: Create a deep copy of the TLB table
         const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 });
         const tlbTableEntries = createTableEntries<TLB_TABLE_ENTRY>(TLBSets, TLBWays, tlbTableEntry);
+        // Step 2: Generate the correctIndex and dummyIndex
+        // The correctTagIndex is a random number between 0 and the length of the ways
+        // This correctTagIndex is where we insert the CORRECT tag and PPN
+        const correctTagIndex = Math.floor(Math.random() * tlbTableEntries[0].length);
+        const dummyTagIndex = createUniqe(correctTagIndex, Math.floor(Math.random() * tlbTableEntries[0].length));
 
-        try {
+        // case 1 correct presetn, dummy preset
+        // case 2 dummy pressent 
+        // Step 3: Update the correctIndex and dummyIndex in the deep copy of the TLB table
+        tlbTableEntries[TLBI_value][correctTagIndex] = {
+          tag: TLBT_value,
+          valid: 1,
+          ppn: TLB_PPN
+        };
 
-          // Step 2: Generate the correctIndex and dummyIndex
-          // The correctTagIndex is a random number between 0 and the length of the ways
-          // This correctTagIndex is where we insert the CORRECT tag and PPN
-          const correctTagIndex = Math.floor(Math.random() * tlbTableEntries[0].length);
-          const dummyTagIndex = createUniqe(correctTagIndex, Math.floor(Math.random() * tlbTableEntries[0].length));
-
-          // case 1 correct presetn, dummy preset
-          // case 2 dummy pressent 
-          console.log("VALUE OF OUT OF BOUNCE MAY BE", TLBI_value)
-          console.log("Correct tag index OF OUT OF BOUNCE MAY BE", correctTagIndex)
-          console.log("Dummy index out of bounce", dummyTagIndex)
-          // Step 3: Update the correctIndex and dummyIndex in the deep copy of the TLB table
-          tlbTableEntries[TLBI_value][correctTagIndex] = {
-            tag: TLBT_value,
-            valid: 1,
-            ppn: TLB_PPN
-          };
-
-          tlbTableEntries[TLBI_value][dummyTagIndex] = {
-            tag: TLBT_value,
-            valid: 0,
-            ppn: createUniqe(TLB_PPN, 4 * 2)
-          };
+        tlbTableEntries[TLBI_value][dummyTagIndex] = {
+          tag: TLBT_value,
+          valid: 0,
+          ppn: createUniqe(TLB_PPN, 4 * 2)
+        };
 
 
 
-          setTLB_TABLE(tlbTableEntries);
+        setTLB_TABLE(tlbTableEntries);
 
-          facitObj = {
-            VirtualAddress: generatedVirtualAddress.toString(2),
-            VPN: VPN,
-            TLBI: TLBI_value.toString(ChosenBaseConversion),
-            TLBT: TLBT_value.toString(ChosenBaseConversion),
-            TLBHIT: 'Y',
-            PageFault: 'N',
-            PPN: tlbTableEntries[TLBI_value][correctTagIndex].ppn.toString(ChosenBaseConversion),
-            PhysicalAddress: tlbTableEntries[TLBI_value][correctTagIndex].ppn.toString(2) + VPO_bits,
-            PageHit: ''
-          }
-        } catch (error) {
-          console.error("tlbTableEntries" + tlbTableEntries[0] + error)
+        facitObj = {
+          VirtualAddress: generatedVirtualAddress.toString(2),
+          VPN: VPN,
+          TLBI: TLBI_value.toString(ChosenBaseConversion),
+          TLBT: TLBT_value.toString(ChosenBaseConversion),
+          TLBHIT: 'Y',
+          PageFault: 'N',
+          PPN: tlbTableEntries[TLBI_value][correctTagIndex].ppn.toString(ChosenBaseConversion),
+          PhysicalAddress: tlbTableEntries[TLBI_value][correctTagIndex].ppn.toString(2) + VPO_bits,
+          PageHit: ''
         }
-
 
 
         break;
@@ -389,9 +385,9 @@ function App(): JSX.Element {
         Page_entry.ppn = Page_PPN;
         Page_entry.vpn = Number("0x" + VPN);
         Page_entry.valid = 1;
-     
+
         setPAGE_TABLE(PAGE_TABLE)
-     
+
         facitObj = {
           VirtualAddress: generatedVirtualAddress.toString(2),
           VPN: VPN,
@@ -402,15 +398,13 @@ function App(): JSX.Element {
           PPN: Page_PPN.toString(ChosenBaseConversion),
           PhysicalAddress: Page_PPN.toString(2) + VPO_bits,
           PageHit: ''
-        } 
-        console.log("Not implemented yet");
+        }
         break;
       default:
         console.log("No case found");
         break;
 
     }
-
     return facitObj;
   }
 
@@ -442,17 +436,24 @@ function App(): JSX.Element {
 
       {showSettings && (
         <>
-          <div className='settings-wrapper'>
+          <div className='settings-wrapper'
+            onMouseLeave={() => setShowSettings(false)}>
             <h3>Settings</h3>
             <Dropdown
               value={assignmentType}
-              onChange={(e) => setAssignmentType(e.value.name)}
+              onChange={(e) => {
+                setAssignmentType(e.value.name)
+              }}
               optionLabel="name"
               options={chosenResultsItemArr}
               showClear
               placeholder="Select Assignment Type"
               className="w-full md:w-14rem"
             />
+            <p>TLB-Ways:</p>
+            <p>TLB Sets</p>
+            <p>Page size</p>
+            <p>Virtual Address bit length</p>
           </div>
         </>
       )}
@@ -492,6 +493,7 @@ function App(): JSX.Element {
           facit={facit}
           addressPrefix={ChosenAddressPrefix}
           baseConversion={ChosenBaseConversion}
+          hasClearedInput={hasClearedInput}
         />
       </div >
     </>

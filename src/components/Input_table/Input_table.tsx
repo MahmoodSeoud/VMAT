@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { RefObject, useEffect, useRef, useState } from 'react';
 import { AddressPrefix, BaseConversion, InputField, InputFieldsMap, createRandomNumberWith } from '../../App';
 import './Input_table.css'
 import { ColorResult, HuePicker } from 'react-color';
@@ -27,6 +27,7 @@ type Input_tableProps = {
     baseConversion: BaseConversion;
     pageSize: number;
     facit: InputFields;
+    hasClearedInput: boolean;
 };
 
 
@@ -83,7 +84,9 @@ let emptyInput: InputFields = {
     PPN: '',
     PageHit: ''
 }
-function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, virtualAddressWidth, physcialAddressWidth, facit }: Input_tableProps): JSX.Element {
+
+function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, virtualAddressWidth, physcialAddressWidth, facit, hasClearedInput }: Input_tableProps): JSX.Element {
+
 
     const [input, setInput] = useState<InputFields>({
         VirtualAddress: '',
@@ -97,6 +100,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         PageHit: ''
     })
 
+
+
     const [isMouseDown, setIsMouseDown] = useState(false);
     // creating a random hex address per refresh 4 * 6 bits all converted to hex
     const [color, setColor] = useState<string>("#" + createRandomNumberWith(4 * 6).toString(16));
@@ -104,6 +109,13 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
     const [isPhysAddFocused, setIsPhysAddFocused] = useState(false);
 
     const toast = useRef<Toast>(null);
+
+    let arrOfRefs: RefObject<HTMLInputElement>[] = [];
+    for (let i = 0; i < virtualAddressWidth; i++) {
+        const inputElementRef = useRef<HTMLInputElement>(null)
+        arrOfRefs.push(inputElementRef);
+    }
+
 
     function showSuccess() {
         toast.current?.show({
@@ -123,7 +135,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
             showSuccess();
         }
     }, [input])
-
 
 
     // Check if the user has clicked on the input field
@@ -208,6 +219,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
         return object != null && typeof object === 'object';
     }
 
+
+
     // Insert the facit incase the user does not know the answer
     function insertFacit(inputFieldName: InputField, e: React.BaseSyntheticEvent): void {
 
@@ -232,7 +245,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                 break;
         }
 
-        setInput((prevState) => ({ ...prevState, [inputFieldName]: facit[inputFieldName] }));
+        setInput((prevState: InputFields) => ({ ...prevState, [inputFieldName]: facit[inputFieldName] }));
     }
 
     /*     // To determine the physical address bits width when it is not explicitly given,
@@ -275,7 +288,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                     event.target.value = '';
                     return;
                 }
-                setInput((prevState) => ({ ...prevState, [fieldName]: getElementValuesFrom("vbit-input") }));
+                setInput((prevState: InputFields) => ({ ...prevState, [fieldName]: getElementValuesFrom("vbit-input") }));
                 break;
 
             case InputFieldsMap.VPN:
@@ -286,7 +299,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                     event.target.value = '';
                     return;
                 }
-                setInput((prevState) => ({ ...prevState, [fieldName]: input }));
+                setInput((prevState: InputFields) => ({ ...prevState, [fieldName]: input }));
                 break;
 
             case InputFieldsMap.PageFault:
@@ -296,7 +309,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                     return;
                 }
 
-                setInput((prevState) => ({ ...prevState, [fieldName]: input }));
+                setInput((prevState: InputFields) => ({ ...prevState, [fieldName]: input }));
                 break;
 
             case InputFieldsMap.PhysicalAddress:
@@ -304,7 +317,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                     event.target.value = '';
                     return;
                 }
-                setInput((prevState) => ({ ...prevState, [fieldName]: getElementValuesFrom("pbit-input") }));
+                setInput((prevState: InputFields) => ({ ...prevState, [fieldName]: getElementValuesFrom("pbit-input") }));
                 break;
 
             default:
@@ -373,7 +386,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                 </div>
                                 <button className={'insert-facit-btn'}
                                     onClick={(ev) => insertFacit(InputFieldsMap.VirtualAddress, ev)}
-
                                 >
                                     Insert facit
                                 </button>
@@ -549,14 +561,14 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, 
                                     ))}
                                 </div>
                                 <button
-                                 className={'insert-facit-btn'}
-                                  onClick={(ev) => {
-                                    insertFacit(InputFieldsMap.PhysicalAddress, ev)
-                                    setIsPhysAddFocused(true);
-                                }}
+                                    className={'insert-facit-btn'}
+                                    onClick={(ev) => {
+                                        insertFacit(InputFieldsMap.PhysicalAddress, ev)
+                                        setIsPhysAddFocused(true);
+                                    }}
                                 >
                                     Insert Facit
-                                    </button>
+                                </button>
                             </div>
                         </li>
                     </ol>

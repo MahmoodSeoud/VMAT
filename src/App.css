@@ -1,6 +1,6 @@
 #root {
   max-width: 1920px;
-  margin: 5em auto;
+  /* margin: 5em auto; */
   padding: 2rem;
   text-align: center;
 }
@@ -19,6 +19,9 @@
 }
 
 .settings-wrapper {
+  position: absolute;
+  top: 5em;
+  float: left;
   background-color: grey;
   padding: 1rem;
   margin: 1rem;
@@ -26,9 +29,17 @@
   width: 50em;
   z-index: 1;
   border: 1px solid white;
-
+  display: flex;
+  flex-direction: column;
 }
 
+
+.pi.pi-cog {
+  position: sticky;
+  top: 0;
+  padding: .6em;
+  float: left;
+}
 
 @media only screen and (max-width: 1550px) {
   #root {
