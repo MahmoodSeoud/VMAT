@@ -84,7 +84,6 @@ let emptyInput: InputFields = {
     PageHit: ''
 }
 function Input_table({ VirtualAddress, addressPrefix, baseConversion, pageSize, virtualAddressWidth, physcialAddressWidth, facit }: Input_tableProps): JSX.Element {
-    pageSize
 
     const [input, setInput] = useState<InputFields>({
         VirtualAddress: '',

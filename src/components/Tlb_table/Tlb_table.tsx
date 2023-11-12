@@ -1,4 +1,4 @@
-import { AddressPrefix, BaseConversion, Bit, TLBSets, TLBWays } from '../../App';
+import { AddressPrefix, BaseConversion, Bit } from '../../App';
 import '../table.css'
 
 export type TLB_TABLE_ENTRY = {
@@ -11,11 +11,13 @@ type Tlb_tableProps = {
     tlb_entries: Array<TLB_TABLE_ENTRY>[];
     addressPrefix: AddressPrefix;
     baseConversion: BaseConversion;
+    TLBSets: number;
+    TLBWays: number;
 }
 
 
 
-function Tlb_table({ tlb_entries, addressPrefix, baseConversion }: Tlb_tableProps) {
+function Tlb_table({ tlb_entries, addressPrefix, baseConversion, TLBSets, TLBWays }: Tlb_tableProps) {
     return (
         <div>
             <h2>TLB</h2>

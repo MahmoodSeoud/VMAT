@@ -76,34 +76,10 @@ function generateTLBSets(): number {
 }
 
 function generateTLBWays(): number {
-  return createRandomNumber(2, 4);
+  return createRandomNumber(3, 5);
 }
 
-export const TLBSets = generateTLBSets();
-export const TLBWays = generateTLBWays();
 
-const possiblePageSizes = [16, 32, 64] as const;
-export const pageSize = possiblePageSizes[Math.floor(Math.random() * possiblePageSizes.length)];
-export const PageTableSize = createRandomNumber(3, 5); // PTS                                              
-
-const VPO = Math.log2(pageSize);
-const TLBI = Math.log2(TLBSets);
-const TLB_PPN = createRandomNumberWith(8);
-const Page_PPN = createUniqe(TLB_PPN, 8)
-
-
-const virtualAddressBitWidth = createRandomNumber(10, 14); // VAS
-const physicalAddressBitWidth = TLB_PPN.toString(2).length + VPO;
-
-// -----------
-
-const generatedVirtualAddress = createRandomNumberWith(virtualAddressBitWidth);
-const addressInBits = [...generatedVirtualAddress.toString(2)];
-
-const VPO_bits: string = addressInBits.splice(-VPO).join('');     // VPO_bits = the last VPO bits of the address / log2(pageSize)
-const TLBI_bits: string = addressInBits.splice(-TLBI).join('');     // TLBI_bits = the next TLBI bits of the address / log2(sets)
-const TLBT_bits: string = addressInBits.join('');     // TLBT_bits = the remaining bits of the address
-const VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(ChosenBaseConversion);
 
 // ------ -Helper functions
 
@@ -132,61 +108,10 @@ function createUniqe(fromNum: number, size: number): number {
 
 // -----------------
 
-// Function to create a TLB entry
-function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry: TObj): TObj {
-
-  const valid: Bit = Math.floor(Math.random() * 2) as Bit;
-  const ppn: number = createRandomNumberWith(8);
-  // create unique TLBT address
-  const tag: number = createUniqe(Number('0b' + TLBT_bits), 4 * 2)
-  const vpn: number = createUniqe(Number(VPN), 4 * 2)
-
-  let newEntry: TObj;
-  if (isPageTableEntry(entry)) {
-    newEntry = {
-      ...entry,
-      vpn,
-      ppn,
-      valid
-    };
-  } else {
-    newEntry = {
-      ...entry,
-      ppn,
-      tag,
-      valid
-    };
-  }
-
-
-  return newEntry;
-}
 
 function isPageTableEntry(entry: TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY): entry is PAGE_TABLE_ENTRY {
   return 'vpn' in entry;
 }
-
-// Function to create a geniric table of entries of type TLB_TABLE_ENTRY or PAGE_TABLE_ENTRY
-// tlb_enty = rows = sets | column = ways
-// page_entry = rows = pageSize | column = pageTableSize ?????
-function createTableEntries<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(
-  numOfRows: number,
-  numOfCols: number,
-  tableEntry: TObj
-): TObj[][] {
-  const entries: TObj[][] = [];
-
-  for (let i = 0; i < numOfCols; i++) {
-    const array: TObj[] = [];
-    for (let j = 0; j < numOfRows; j++) {
-      let entry = createTableEntry<TObj>(tableEntry)
-      array.push(entry);
-    }
-    entries.push(array);
-  }
-  return entries;
-}
-
 
 
 
@@ -202,7 +127,33 @@ let empty: InputFields = {
   PageHit: ''
 }
 
+let TLBSets = generateTLBSets();
+let TLBWays = generateTLBWays();
+
+const possiblePageSizes = [16, 32, 64] as const;
+let pageSize = possiblePageSizes[Math.floor(Math.random() * possiblePageSizes.length)];
+let PageTableSize = createRandomNumber(3, 5); // PTS                                              
+
+let VPO = Math.log2(pageSize);
+let TLBI = Math.log2(TLBSets);
+let TLB_PPN = createRandomNumberWith(8);
+let Page_PPN = createUniqe(TLB_PPN, 8)
+
+let virtualAddressBitWidth = createRandomNumber(10, 14); // VAS
+let physicalAddressBitWidth = TLB_PPN.toString(2).length + VPO;
+
+let generatedVirtualAddress = createRandomNumberWith(virtualAddressBitWidth);
+let addressInBits = [...generatedVirtualAddress.toString(2)];
+
+let VPO_bits: string = addressInBits.splice(-VPO).join('');     // VPO_bits = the last VPO bits of the address / log2(pageSize)
+let TLBI_bits: string = addressInBits.splice(-TLBI).join('');     // TLBI_bits = the next TLBI bits of the address / log2(sets)
+let TLBT_bits: string = addressInBits.join('');     // TLBT_bits = the remaining bits of the address
+let VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(ChosenBaseConversion);
+
 function App(): JSX.Element {
+
+
+
   const [facit, setFacit] = useState<InputFields>(empty);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const randomAssignmentType = [InputFieldsMap.PageHit, InputFieldsMap.TLBHIT, InputFieldsMap.PageFault]
@@ -210,24 +161,30 @@ function App(): JSX.Element {
   randomAssignmentType.sort(() => (Math.random() > .5) ? 1 : -1);
   const [assignmentType, setAssignmentType] = useState<Result>(randomAssignmentType[1]);
 
+
+
+
   // TLB  table information
   const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 });
   const [TLB_TABLE, setTLB_TABLE] = useState<TLB_TABLE_ENTRY[][]>(createTableEntries<TLB_TABLE_ENTRY>(
-    TLBWays,
     TLBSets,
+    TLBWays,
     tlbTableEntry
   ));
 
   const pageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 });
   const PageTableEntries: PAGE_TABLE_ENTRY[][] = createTableEntries<PAGE_TABLE_ENTRY>(
-    4, // I chose 4 because of all the old exams all look like that. 
-    //Be sure to see the page size given in those exams
     3, // I choose 3 because of all the old exams all look like that. 
     // Make sure to see the PTE's in the old exams. Hint: they are all 12 entries.
+    4, // I chose 4 because of all the old exams all look like that. 
+    //Be sure to see the page size given in those exams
     pageTableEntry
   );
   const [PAGE_TABLE, setPAGE_TABLE] = useState<PAGE_TABLE_ENTRY[][]>(PageTableEntries);
 
+
+
+  // Setting the facit to the correct result
   useEffect(() => {
     if (testing) {
       console.log('------------------------------------')
@@ -246,21 +203,89 @@ function App(): JSX.Element {
       console.log("facit", facit)
 
     }
+    TLBSets = generateTLBSets();
+    TLBWays = generateTLBWays();
+
+    pageSize = possiblePageSizes[Math.floor(Math.random() * possiblePageSizes.length)];
+    PageTableSize = createRandomNumber(3, 5); // PTS                                              
+
+    VPO = Math.log2(pageSize);
+    TLBI = Math.log2(TLBSets);
+    TLB_PPN = createRandomNumberWith(8);
+    Page_PPN = createUniqe(TLB_PPN, 8)
 
 
+    virtualAddressBitWidth = createRandomNumber(10, 14); // VAS
+    physicalAddressBitWidth = TLB_PPN.toString(2).length + VPO;
 
-  }, [assignmentType])
 
-  // Setting the facit to the correct result
-  useEffect(() => {
+    generatedVirtualAddress = createRandomNumberWith(virtualAddressBitWidth);
+    addressInBits = [...generatedVirtualAddress.toString(2)];
+
+    VPO_bits = addressInBits.splice(-VPO).join('');     // VPO_bits = the last VPO bits of the address / log2(pageSize)
+    TLBI_bits = addressInBits.splice(-TLBI).join('');     // TLBI_bits = the next TLBI bits of the address / log2(sets)
+    TLBT_bits = addressInBits.join('');     // TLBT_bits = the remaining bits of the address
+    VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(ChosenBaseConversion);
+
     setFacit(createFacit(assignmentType));
   }, [assignmentType])
+
+  // Function to create a TLB entry
+  function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry: TObj): TObj {
+
+    const valid: Bit = Math.floor(Math.random() * 2) as Bit;
+    const ppn: number = createRandomNumberWith(8);
+    // create unique TLBT address
+    const tag: number = createUniqe(Number('0b' + TLBT_bits), 4 * 2)
+    const vpn: number = createUniqe(Number(VPN), 4 * 2)
+
+    let newEntry: TObj;
+    if (isPageTableEntry(entry)) {
+      newEntry = {
+        ...entry,
+        vpn,
+        ppn,
+        valid
+      };
+    } else {
+      newEntry = {
+        ...entry,
+        ppn,
+        tag,
+        valid
+      };
+    }
+
+
+    return newEntry;
+  }
+
+  // Function to create a geniric table of entries of type TLB_TABLE_ENTRY or PAGE_TABLE_ENTRY
+  // tlb_enty = rows = sets | column = ways
+  // page_entry = rows = pageSize | column = pageTableSize ?????
+  function createTableEntries<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(
+    numOfRows: number,
+    numOfCols: number,
+    tableEntry: TObj
+  ): TObj[][] {
+    const entries: TObj[][] = [];
+
+    for (let i = 0; i < numOfRows; i++) {
+      const array: TObj[] = [];
+      for (let j = 0; j < numOfCols; j++) {
+        let entry = createTableEntry<TObj>(tableEntry)
+        array.push(entry);
+      }
+      entries.push(array);
+    }
+    return entries;
+  }
+
 
   // TODO : Add the page hit case
   // TODO: Make the facit required and complete this function
   // POSTCONDITION : sets facit object in the Facit state
   function createFacit(assignmentType: Result): InputFields {
-
     // Convert the bits to a number
     const TLBI_value: number = Number(addressPrefixMap.Binary + TLBI_bits);
     const TLBT_value: number = Number(addressPrefixMap.Binary + TLBT_bits);
@@ -280,48 +305,54 @@ function App(): JSX.Element {
 
     switch (assignmentType) {
       case InputFieldsMap.TLBHIT:
-        // The correctTagIndex is a random number between 0 and the length of the ways
-        // This correctTagIndex is where we insert the CORRECT tag and PPN
-
-        const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 });
-
-        let deepCopy = createTableEntries<TLB_TABLE_ENTRY>(TLBSets, TLBWays, tlbTableEntry);
 
         // Step 1: Create a deep copy of the TLB table
+        const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 });
+        let tlbTableEntries = createTableEntries<TLB_TABLE_ENTRY>(TLBSets, TLBWays, tlbTableEntry);
+
+        try {
+
+          // Step 2: Generate the correctIndex and dummyIndex
+          // The correctTagIndex is a random number between 0 and the length of the ways
+          // This correctTagIndex is where we insert the CORRECT tag and PPN
+          const correctTagIndex = Math.floor(Math.random() * tlbTableEntries[0].length);
+          const dummyTagIndex = createUniqe(correctTagIndex, Math.floor(Math.random() * tlbTableEntries[0].length))
+
+          console.log("VALUE OF OUT OF BOUNCE MAY BE", TLBI_value)
+          console.log("Correct tag index OF OUT OF BOUNCE MAY BE", correctTagIndex)
+          console.log("Dummy index out of bounce", dummyTagIndex)
+          // Step 3: Update the correctIndex and dummyIndex in the deep copy of the TLB table
+          tlbTableEntries[TLBI_value][correctTagIndex] = {
+            tag: TLBT_value,
+            valid: 1,
+            ppn: TLB_PPN
+          };
+
+          tlbTableEntries[TLBI_value][dummyTagIndex] = {
+            tag: TLBT_value,
+            valid: 0,
+            ppn: createUniqe(TLB_PPN, 4 * 2)
+          };
 
 
-        // Step 2: Generate the correctIndex and dummyIndex
-        const correctTagIndex = Math.floor(Math.random() * deepCopy[0].length);
-        const dummyTagIndex = Math.floor(Math.random() * deepCopy[0].length);
 
-        // Step 3: Update the correctIndex and dummyIndex in the deep copy of the TLB table
-        deepCopy[TLBI_value][correctTagIndex] = {
-          tag: TLBT_value,
-          valid: 1,
-          ppn: TLB_PPN
-        };
+          setTLB_TABLE(tlbTableEntries);
 
-        deepCopy[TLBI_value][dummyTagIndex] = {
-          tag: TLBT_value,
-          valid: 0,
-          ppn: createUniqe(TLB_PPN, 4 * 2)
-        };
-
-
-
-        setTLB_TABLE(deepCopy);
-
-        facitObj = {
-          VirtualAddress: generatedVirtualAddress.toString(2),
-          VPN: VPN,
-          TLBI: TLBI_value.toString(ChosenBaseConversion),
-          TLBT: TLBT_value.toString(ChosenBaseConversion),
-          TLBHIT: 'Y',
-          PageFault: 'N',
-          PPN: deepCopy[TLBI_value][correctTagIndex].ppn.toString(ChosenBaseConversion),
-          PhysicalAddress: deepCopy[TLBI_value][correctTagIndex].ppn.toString(2) + VPO_bits,
-          PageHit: ''
+          facitObj = {
+            VirtualAddress: generatedVirtualAddress.toString(2),
+            VPN: VPN,
+            TLBI: TLBI_value.toString(ChosenBaseConversion),
+            TLBT: TLBT_value.toString(ChosenBaseConversion),
+            TLBHIT: 'Y',
+            PageFault: 'N',
+            PPN: tlbTableEntries[TLBI_value][correctTagIndex].ppn.toString(ChosenBaseConversion),
+            PhysicalAddress: tlbTableEntries[TLBI_value][correctTagIndex].ppn.toString(2) + VPO_bits,
+            PageHit: ''
+          }
+        } catch (error) {
+          console.error("tlbTableEntries" + tlbTableEntries[0] + error)
         }
+
 
 
         break;
@@ -356,24 +387,28 @@ function App(): JSX.Element {
         // CASE 2: There is a VPN with a valid bit 0 and a the same address next
         // to the first address with a valid bit 1 ( both different PPNs )
 
-        const Page_entry = PAGE_TABLE[Math.floor(Math.random() * PAGE_TABLE.length)][Math.floor(Math.random() * PAGE_TABLE[0].length)];
-        Page_entry.ppn = Page_PPN;
-        Page_entry.vpn = Number("0x" + VPN);
-        Page_entry.valid = 1;
 
-        setPAGE_TABLE(PAGE_TABLE)
 
-        facitObj = {
-          VirtualAddress: generatedVirtualAddress.toString(2),
-          VPN: VPN,
-          TLBI: TLBI_value.toString(ChosenBaseConversion),
-          TLBT: TLBT_value.toString(ChosenBaseConversion),
-          TLBHIT: 'N',
-          PageFault: 'N',
-          PPN: Page_PPN.toString(ChosenBaseConversion),
-          PhysicalAddress: Page_PPN.toString(2) + VPO_bits,
-          PageHit: ''
-        }
+        // TODO: Uncomment this when you have the TLB_HIT working
+        /*      const Page_entry = PAGE_TABLE[Math.floor(Math.random() * PAGE_TABLE.length)][Math.floor(Math.random() * PAGE_TABLE[0].length)];
+             Page_entry.ppn = Page_PPN;
+             Page_entry.vpn = Number("0x" + VPN);
+             Page_entry.valid = 1;
+     
+             setPAGE_TABLE(PAGE_TABLE)
+     
+             facitObj = {
+               VirtualAddress: generatedVirtualAddress.toString(2),
+               VPN: VPN,
+               TLBI: TLBI_value.toString(ChosenBaseConversion),
+               TLBT: TLBT_value.toString(ChosenBaseConversion),
+               TLBHIT: 'N',
+               PageFault: 'N',
+               PPN: Page_PPN.toString(ChosenBaseConversion),
+               PhysicalAddress: Page_PPN.toString(2) + VPO_bits,
+               PageHit: ''
+             } */
+        console.log("Not implemented yet");
         break;
       default:
         console.log("No case found");
@@ -442,12 +477,15 @@ function App(): JSX.Element {
             tlb_entries={TLB_TABLE}
             addressPrefix={ChosenAddressPrefix}
             baseConversion={ChosenBaseConversion}
+            TLBSets={TLBSets}
+            TLBWays={TLBWays}
           />
 
           <Page_table
             page_table_entries={PAGE_TABLE}
             addressPrefix={ChosenAddressPrefix}
             baseConversion={ChosenBaseConversion}
+            pageSize={pageSize}
           />
         </div>
 
