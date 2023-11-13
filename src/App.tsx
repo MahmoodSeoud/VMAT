@@ -8,6 +8,7 @@ import { Dropdown } from 'primereact/dropdown';
 
 import 'primeicons/primeicons.css';
 import { SelectItemOptionsType } from 'primereact/selectitem';
+import Settings from './components/Settings/Settings';
 
 
 
@@ -228,10 +229,8 @@ function shuffle(array: any[]) {
 
 function App(): JSX.Element {
   console.log('App rendered')
-  const [showSettings, setShowSettings] = useState<boolean>(false);
   const [assignmentType, setAssignmentType] = useState<Result>(randomAssignmentType);
   const [hasClearedInput, setHasClearedInput] = useState<boolean>(false);
-  const [dropdownValue, setDropdownValue] = useState<SelectItemOptionsType>();
 
 
   // TLB  table information
@@ -283,7 +282,8 @@ function App(): JSX.Element {
 
 
     VPN = Number("0b" + TLBT_bits + TLBI_bits).toString(ChosenBaseConversion);
-    return createFacit()
+    
+    return empty
   }, [assignmentType])
 
 
@@ -328,13 +328,26 @@ function App(): JSX.Element {
         };
 
         console.log('TLBHIT')
-        break;
+
+        return facitObj = {
+          VirtualAddress: generatedVirtualAddress.toString(2),
+          VPN: VPN,
+          TLBI: TLBI_value.toString(ChosenBaseConversion),
+          TLBT: TLBT_value.toString(ChosenBaseConversion),
+          TLBHIT: 'Y',
+          PageFault: 'N',
+          PPN: tlbTableEntries[TLBI_value][correctTagIndex].ppn.toString(ChosenBaseConversion),
+          PhysicalAddress: tlbTableEntries[TLBI_value][correctTagIndex].ppn.toString(2) + VPO_bits,
+          PageHit: ''
+        }
 
 
-      
+
+
+
       default:
         console.log('default')
-        break;
+        return facitObj
     }
 
     /* switch (assignmentType) {
@@ -463,58 +476,16 @@ function App(): JSX.Element {
   }
 
   // TODO: Add the third chosen result case
-  const assignmentTypeOptions: SelectItemOptionsType = [
-    {
-      name: InputFieldsMap.TLBHIT,
-      code: InputFieldsMap.TLBHIT
-    },
-    {
-      name: InputFieldsMap.PageFault,
-      code: InputFieldsMap.PageFault
-    },
-    {
-      name: InputFieldsMap.PageHit,
-      code: InputFieldsMap.PageHit
-    }
-  ]
 
 
-  function handleDropdownChange(value: any) {
-    setDropdownValue(value)
-    setAssignmentType(value.name)
-  }
 
   return (
     <>
 
-      <i
-        className="pi pi-cog"
-        style={{ fontSize: '2em', cursor: 'pointer' }}
-        onClick={() => setShowSettings(!showSettings)}
+      <Settings
+        setAssignmentType={setAssignmentType}
+
       />
-
-      {showSettings && (
-        <>
-          <div className='settings-wrapper'
-            onMouseLeave={() => setShowSettings(false)}>
-            <h3>Settings</h3>
-            <Dropdown
-              value={dropdownValue}
-              onChange={(e) => handleDropdownChange(e.value)}
-              optionLabel="name"
-              options={assignmentTypeOptions}
-              showClear
-              placeholder="Select Assignment Type"
-              className="w-full md:w-14rem"
-            />
-            <p>TLB-Ways:</p>
-            <p>TLB Sets</p>
-            <p>Page size</p>
-            <p>Virtual Address bit length</p>
-          </div>
-        </>
-      )}
-
 
       <div
         className=''
