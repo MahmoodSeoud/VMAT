@@ -207,9 +207,27 @@ function createTableEntries<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(
 }
 
 
+function shuffle(array: any[]) {
+  let currentIndex = array.length, randomIndex;
+
+  // While there remain elements to shuffle.
+  while (currentIndex > 0) {
+
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
+
 
 function App(): JSX.Element {
-
+  console.log('App rendered')
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [assignmentType, setAssignmentType] = useState<Result>(randomAssignmentType);
   const [hasClearedInput, setHasClearedInput] = useState<boolean>(false);
@@ -218,16 +236,13 @@ function App(): JSX.Element {
 
   // TLB  table information
   const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, TLBI_bits, VPN);
-  const tlbTableEntries = useMemo(() => {
-    return createTableEntries<TLB_TABLE_ENTRY>(
-      TLBSets,
-      TLBWays,
-      tlbTableEntry,
-      TLBT_bits,
-      VPN
-    );
-  }, [TLBSets, TLBWays, tlbTableEntry]);
-  const [TLB_TABLE, setTLB_TABLE] = useState<TLB_TABLE_ENTRY[][]>(tlbTableEntries);
+  const tlbTableEntries = useMemo(() => createTableEntries<TLB_TABLE_ENTRY>(
+    TLBSets,
+    TLBWays,
+    tlbTableEntry,
+    TLBT_bits,
+    VPN
+  ), [TLBSets, TLBWays, tlbTableEntry]);
 
   const pageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 }, TLBI_bits, VPN);
   const PageTableEntries: PAGE_TABLE_ENTRY[][] = useMemo(() => createTableEntries<PAGE_TABLE_ENTRY>(
@@ -239,7 +254,6 @@ function App(): JSX.Element {
     TLBT_bits,
     VPN
   ), [pageTableEntry]);
-  const [PAGE_TABLE, setPAGE_TABLE] = useState<PAGE_TABLE_ENTRY[][]>(PageTableEntries);
 
 
 
@@ -297,37 +311,65 @@ function App(): JSX.Element {
 
     switch (assignmentType) {
       case InputFieldsMap.TLBHIT:
-        // Step 1: Create a deep copy of the TLB table
-        const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, TLBI_bits, VPN);
-        const tlbTableEntries = createTableEntries<TLB_TABLE_ENTRY>(TLBSets, TLBWays, tlbTableEntry, TLBT_bits, VPN);
-
-        // Step 2: Generate the correctIndex and dummyIndex
+        shuffle(tlbTableEntries)
         const correctTagIndex = Math.floor(Math.random() * tlbTableEntries[0].length);
         const dummyTagIndex = createUniqe(correctTagIndex, Math.floor(Math.random() * tlbTableEntries[0].length));
 
+        tlbTableEntries[TLBI_value][correctTagIndex] = {
+          tag: TLBT_value,
+          valid: 1,
+          ppn: TLB_PPN
+        };
+
+        tlbTableEntries[TLBI_value][dummyTagIndex] = {
+          tag: TLBT_value,
+          valid: 0,
+          ppn: createUniqe(TLB_PPN, 4 * 2)
+        };
+
+        console.log('TLBHIT')
+        break;
+
+
+      
+      default:
+        console.log('default')
+        break;
+    }
+
+    /* switch (assignmentType) {
+      case InputFieldsMap.TLBHIT:
+        // Step 1: Create a deep copy of the TLB table
+        const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, TLBI_bits, VPN);
+        const tlbTableEntries = createTableEntries<TLB_TABLE_ENTRY>(TLBSets, TLBWays, tlbTableEntry, TLBT_bits, VPN);
+  
+        // Step 2: Generate the correctIndex and dummyIndex
+        const correctTagIndex = Math.floor(Math.random() * tlbTableEntries[0].length);
+        const dummyTagIndex = createUniqe(correctTagIndex, Math.floor(Math.random() * tlbTableEntries[0].length));
+  
         // Create a copy of the row
         const newRow = [...tlbTableEntries[TLBI_value]];
-
+  
         // Modify the copy
         newRow[correctTagIndex] = {
           tag: TLBT_value,
           valid: 1,
           ppn: TLB_PPN
         };
-
+  
         newRow[dummyTagIndex] = {
           tag: TLBT_value,
           valid: 0,
           ppn: createUniqe(TLB_PPN, 4 * 2)
         };
-
+  
         // Replace the row in the table
         tlbTableEntries[TLBI_value] = newRow;
-
+  
         // Update the state with the modified copy
         setTLB_TABLE(tlbTableEntries);
-
-
+  
+  
         facitObj = {
           VirtualAddress: generatedVirtualAddress.toString(2),
           VPN: VPN,
@@ -339,34 +381,34 @@ function App(): JSX.Element {
           PhysicalAddress: tlbTableEntries[TLBI_value][correctTagIndex].ppn.toString(2) + VPO_bits,
           PageHit: ''
         }
-
-
+  
+  
         break;
       case InputFieldsMap.PageFault:
         // Case 1: VPN DOES NOT exists in Page Tables 
-
+  
         // Case 2: VPN EXISTS and VALID bit is 0
-
+  
         // 50% 50% of having a VPN address, but with valid bit 0
         if (Math.random() > 0.5) {
           // Create a copy of PAGE_TABLE
           const newPageTable = [...PAGE_TABLE];
-
+  
           // Get a random row and column
           const randomRow = Math.floor(Math.random() * newPageTable.length);
           const randomCol = Math.floor(Math.random() * newPageTable[0].length);
-
+  
           // Modify the copy
           newPageTable[randomRow][randomCol] = {
             ...newPageTable[randomRow][randomCol],
             vpn: Number("0x" + VPN),
             valid: 0
           };
-
+  
           // Update the state with the modified copy
           setPAGE_TABLE(newPageTable);
         }
-
+  
         facitObj = {
           VirtualAddress: generatedVirtualAddress.toString(2),
           VPN: VPN,
@@ -378,7 +420,7 @@ function App(): JSX.Element {
           PhysicalAddress: '',
           PageHit: ''
         }
-
+  
         break;
       case InputFieldsMap.PageHit:
         // CASE 1: An address in the pagetable with a valid bit 1
@@ -386,11 +428,11 @@ function App(): JSX.Element {
         // to the first address with a valid bit 1 ( both different PPNs )
         // Create a copy of PAGE_TABLE
         const newPageTable = [...PAGE_TABLE];
-
+  
         // Get a random row and column
         const randomRow = Math.floor(Math.random() * newPageTable.length);
         const randomCol = Math.floor(Math.random() * newPageTable[0].length);
-
+  
         // Modify the copy
         newPageTable[randomRow][randomCol] = {
           ...newPageTable[randomRow][randomCol],
@@ -398,7 +440,7 @@ function App(): JSX.Element {
           vpn: Number("0x" + VPN),
           valid: 1
         };
-
+  
         // Update the state with the modified copy
         setPAGE_TABLE(newPageTable);
         facitObj = {
@@ -414,10 +456,9 @@ function App(): JSX.Element {
         }
         break;
       default:
-        console.log("No case found");
         break;
-
-    }
+  
+    } */
     return facitObj;
   }
 
@@ -439,7 +480,6 @@ function App(): JSX.Element {
 
 
   function handleDropdownChange(value: any) {
-    console.log(value)
     setDropdownValue(value)
     setAssignmentType(value.name)
   }
@@ -487,7 +527,7 @@ function App(): JSX.Element {
         <div className='wrapper-tables'>
 
           <Tlb_table
-            tlb_entries={TLB_TABLE}
+            tlb_entries={tlbTableEntries}
             addressPrefix={ChosenAddressPrefix}
             baseConversion={ChosenBaseConversion}
             TLBSets={TLBSets}
@@ -495,7 +535,7 @@ function App(): JSX.Element {
           />
 
           <Page_table
-            page_table_entries={PAGE_TABLE}
+            page_table_entries={PageTableEntries}
             addressPrefix={ChosenAddressPrefix}
             baseConversion={ChosenBaseConversion}
             pageSize={pageSize}

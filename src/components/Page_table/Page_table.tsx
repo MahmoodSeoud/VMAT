@@ -1,4 +1,5 @@
-import { AddressPrefix, BaseConversion, Bit} from "../../App";
+import React from "react";
+import { AddressPrefix, BaseConversion, Bit } from "../../App";
 
 export type PAGE_TABLE_ENTRY = {
     vpn: number;
@@ -15,6 +16,7 @@ type Page_tableProps = {
 
 
 function Page_table({ page_table_entries, addressPrefix, baseConversion, pageSize }: Page_tableProps) {
+    console.log('Page table rendered')
     return (
         <div>
             <h2>Page Table</h2>
@@ -22,13 +24,13 @@ function Page_table({ page_table_entries, addressPrefix, baseConversion, pageSiz
             <table className='table-page'>
                 <thead>
                     <tr>
-                    {page_table_entries[0].map(_ => (
-                        <>
-                            <th>VPN</th>
-                            <th>PPN</th>
-                            <th>Valid</th>
-                        </>
-                    ))}
+                        {page_table_entries[0].map((_, s) => (
+                            <React.Fragment key={s}>
+                                <th>VPN</th>
+                                <th>PPN</th>
+                                <th>Valid</th>
+                            </React.Fragment >
+                        ))}
                     </tr>
                 </thead>
                 <tbody>
@@ -36,13 +38,13 @@ function Page_table({ page_table_entries, addressPrefix, baseConversion, pageSiz
                     {page_table_entries.map((_, i) => {
 
                         return (
-                            <tr>
+                            <tr key={i}>
                                 {page_table_entries[0].map((_, j) => (
-                                    <>
+                                    <React.Fragment key={j}>
                                         <td>{addressPrefix + page_table_entries[i][j].vpn.toString(baseConversion).toUpperCase()}</td>
                                         <td>{addressPrefix + page_table_entries[i][j].ppn.toString(baseConversion).toUpperCase()}</td>
                                         <td>{page_table_entries[i][j].valid}</td>
-                                    </>
+                                    </React.Fragment>
                                 ))}
                             </tr>
                         )

@@ -1,3 +1,4 @@
+import React from 'react';
 import { AddressPrefix, BaseConversion, Bit } from '../../App';
 import '../table.css'
 
@@ -18,6 +19,7 @@ type Tlb_tableProps = {
 
 
 function Tlb_table({ tlb_entries, addressPrefix, baseConversion, TLBSets, TLBWays }: Tlb_tableProps) {
+    console.log('TLB table rendered')
     return (
         <div>
             <h2>TLB</h2>
@@ -26,12 +28,12 @@ function Tlb_table({ tlb_entries, addressPrefix, baseConversion, TLBSets, TLBWay
                 <thead>
                     <tr>
                         <th>Set</th>
-                        {tlb_entries[0].map(_ => (
-                            <>
+                        {tlb_entries[0].map((_, s) => (
+                            <React.Fragment key={s}>
                                 <th>Tag</th>
                                 <th>PPN</th>
                                 <th>Valid</th>
-                            </>
+                            </React.Fragment >
                         ))}
                     </tr>
                 </thead>
@@ -43,11 +45,11 @@ function Tlb_table({ tlb_entries, addressPrefix, baseConversion, TLBSets, TLBWay
                             <tr key={i}>
                                 <td>{i}</td>
                                 {tlb_entries[0].map((_, j) => (
-                                    <>
+                                    <React.Fragment key={j}>
                                         <td>{addressPrefix + tlb_entries[i][j].tag.toString(baseConversion).toUpperCase()}</td>
                                         <td>{addressPrefix + tlb_entries[i][j].ppn.toString(baseConversion).toUpperCase()}</td>
                                         <td>{tlb_entries[i][j].valid}</td>
-                                    </>
+                                    </React.Fragment >
                                 ))}
                             </tr>
                         )

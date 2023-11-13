@@ -107,39 +107,39 @@ function resetColors() {
     }
 }
 
-    // TODO: Please fix all the any's
-    function deepEqual(object1: any, object2: any) {
-        const keys1 = Object.keys(object1);
-        const keys2 = Object.keys(object2);
+// TODO: Please fix all the any's
+function deepEqual(object1: any, object2: any) {
+    const keys1 = Object.keys(object1);
+    const keys2 = Object.keys(object2);
 
-        if (keys1.length !== keys2.length) {
+    if (keys1.length !== keys2.length) {
+        return false;
+    }
+
+    for (const key of keys1) {
+        const val1: any = object1[key];
+        const val2: any = object2[key];
+        const areObjects = isObject(val1) && isObject(val2);
+        if (
+            areObjects && !deepEqual(val1, val2) ||
+            !areObjects && val1 !== val2
+        ) {
             return false;
         }
-
-        for (const key of keys1) {
-            const val1: any = object1[key];
-            const val2: any = object2[key];
-            const areObjects = isObject(val1) && isObject(val2);
-            if (
-                areObjects && !deepEqual(val1, val2) ||
-                !areObjects && val1 !== val2
-            ) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
-    function isObject(object: InputFields) {
-        return object != null && typeof object === 'object';
-    }
+    return true;
+}
+
+function isObject(object: InputFields) {
+    return object != null && typeof object === 'object';
+}
 
 
 
 
 function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAddressWidth, physcialAddressWidth, facit }: Input_tableProps): JSX.Element {
-
+    console.log('input_table rendered');
 
     const [input, setInput] = useState<InputFields>({
         VirtualAddress: '',
@@ -175,7 +175,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
 
 
     useEffect(() => {
-        console.log('inputField changed', input);
 
         if (deepEqual(facit, input) && !deepEqual(input, emptyInput)) {
             // Show success mes
@@ -311,7 +310,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                 break;
 
             default:
-                console.log('idk even know what happened');
                 break;
         }
     };
@@ -356,6 +354,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                 <div className={`list-item-bit-input-wrapper `}>
                                     {createNullArr(virtualAddressWidth).map((_, index) => (
                                         <div
+                                            key={index}
                                             className='input-wrapper'
                                             onMouseDown={handleMouseDown}
                                             onMouseUp={handleMouseUp}
@@ -372,11 +371,11 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                         </div>
                                     ))}
                                 </div>
-                                <button className={'insert-facit-btn'}
-                                    onClick={(ev) => insertFacit(InputFieldsMap.VirtualAddress, ev)}
-                                >
-                                    Insert facit
-                                </button>
+                                    <button className={'insert-facit-btn'}
+                                        onClick={(ev) => insertFacit(InputFieldsMap.VirtualAddress, ev)}
+                                    >
+                                        Insert facit
+                                    </button>
                             </div>
                         </li>
 
@@ -412,7 +411,9 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.VPN)}
                                                 />
                                             </td>
-                                            <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.VPN, ev)}>Insert facit</button>
+                                            <td>
+                                                <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.VPN, ev)}>Insert facit</button>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td
@@ -432,7 +433,10 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBI)}
                                                 />
                                             </td>
-                                            <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.TLBI, ev)}>Insert facit</button>
+
+                                            <td>
+                                                <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.TLBI, ev)}>Insert facit</button>
+                                            </td>
                                         </tr>
                                         <tr >
                                             <td
@@ -452,9 +456,11 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBT)}
                                                 />
                                             </td>
-                                            <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.TLBT, ev)}>Insert facit</button>
+                                            <td>
+                                                <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.TLBT, ev)}>Insert facit</button>
+                                            </td>
                                         </tr>
-                                        <tr >
+                                        <tr>
                                             <td
                                                 onMouseDown={handleMouseDown}
                                                 onMouseUp={handleMouseUp}
@@ -473,7 +479,9 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBHIT)}
                                                 />
                                             </td>
-                                            <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.TLBHIT, ev)}>Insert facit</button>
+                                            <td>
+                                                <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.TLBHIT, ev)}>Insert facit</button>
+                                            </td>
                                         </tr>
                                         <tr className={`${validateFieldInput(InputFieldsMap.PageFault) ? ' correct' : ''}`}>
                                             <td
@@ -494,9 +502,13 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.PageFault)}
                                                 />
                                             </td>
-                                            <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.PageFault, ev)}>Insert facit</button>
+                                            <td>
+                                                <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.PageFault, ev)}>Insert facit</button>
+                                            </td>
                                         </tr>
-                                        <tr className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}>
+                                        <tr
+                                            className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}
+                                        >
                                             <td
                                                 onMouseDown={handleMouseDown}
                                                 onMouseUp={handleMouseUp}
@@ -513,15 +525,17 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                                     className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.PPN)}
                                                     onFocus={() => setIsPPNFocused(true)}
-                                                //onBlur={() => setIsPPNFocused(false)}
                                                 />
                                             </td>
-                                            <button className={'insert-facit-btn'} onClick={(ev) => {
-                                                insertFacit(InputFieldsMap.PPN, ev);
-                                                setIsPPNFocused(true);
-                                            }}>
-                                                Insert facit
-                                            </button>
+                                            <td>
+
+                                                <button className={'insert-facit-btn'} onClick={(ev) => {
+                                                    insertFacit(InputFieldsMap.PPN, ev);
+                                                    setIsPPNFocused(true);
+                                                }}>
+                                                    Insert facit
+                                                </button>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -533,6 +547,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                 <div className={`list-item-bit-input-wrapper`}>
                                     {createNullArr(physcialAddressWidth).map((_, index) => (
                                         <div
+                                            key={index}
                                             className='input-wrapper'
                                             onMouseDown={handleMouseDown}
                                             onMouseUp={handleMouseUp}
@@ -548,15 +563,16 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                         </div>
                                     ))}
                                 </div>
-                                <button
-                                    className={'insert-facit-btn'}
-                                    onClick={(ev) => {
-                                        insertFacit(InputFieldsMap.PhysicalAddress, ev)
-                                        setIsPhysAddFocused(true);
-                                    }}
-                                >
-                                    Insert Facit
-                                </button>
+
+                                    <button
+                                        className={'insert-facit-btn'}
+                                        onClick={(ev) => {
+                                            insertFacit(InputFieldsMap.PhysicalAddress, ev)
+                                            setIsPhysAddFocused(true);
+                                        }}
+                                    >
+                                        Insert Facit
+                                    </button>
                             </div>
                         </li>
                     </ol>
