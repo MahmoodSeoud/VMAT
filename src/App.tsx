@@ -192,7 +192,7 @@ const possiblePageSizes = [16, 32, 64] as const;
 function App(): JSX.Element {
   console.log('App rendered')
 
-  const [facit, setFacit] = useState<InputFields>(empty);
+ const [facit, setFacit] = useState<InputFields>(empty);
 
   const [assignmentType, setAssignmentType] = useState<Result>(randomAssignmentType);
   const [hasClearedInput, setHasClearedInput] = useState<boolean>(false);
@@ -250,6 +250,12 @@ function App(): JSX.Element {
 
 
 
+
+
+// Component did mount
+useEffect(() => {
+  setAssignmentType(randomAssignmentType);
+}, [0])
   useEffect(() => {
     if (testing) {
       console.log('------------------------------------')
@@ -336,8 +342,8 @@ function App(): JSX.Element {
     
     const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN);
     
-    const TLBI_value: number = Number(addressPrefixMap.Binary + newTLBI_bits);
-    const TLBT_value: number = Number(addressPrefixMap.Binary + newTLBT_bits);
+    const newTLBI_value: number = Number(addressPrefixMap.Binary + newTLBI_bits);
+    const newTLBT_value: number = Number(addressPrefixMap.Binary + newTLBT_bits);
     const newTLBTableEntries = createTableEntries<TLB_TABLE_ENTRY>(
       newTLBSets,
       newTLBWays,
@@ -362,18 +368,6 @@ function App(): JSX.Element {
     setTLBWays(newTLBWays);
     setPageSize(newPageSize);
     setPageTableSize(newPageTableSize);
-    setVPO(newVPO);
-    setTLBI(newTLBI);
-    setTLB_PPN(newTLB_PPN);
-    setPage_PPN(newPage_PPN);
-    setVirtualAddressBitWidth(newVirtualAddressBitWidth);
-    setPhysicalAddressBitWidth(newPhysicalAddressBitWidth);
-    setGeneratedVirtualAddress(newGeneratedVirtualAddress);
-    setAddressInBits(newAddressInBitsOrignal);
-    setVPO_bits(newVPO_bits);
-    setTLBI_bits(newTLBI_bits);
-    setTLBT_bits(newTLBT_bits);
-    setVPN(newVPN);
 
 
 
@@ -396,8 +390,8 @@ function App(): JSX.Element {
     console.log('TLBI_bits', newTLBI_bits)
     console.log('VPO_bits', newVPO_bits)
     console.log('VPN', newVPN)
-    console.log('TLBI_value', TLBI_value)
-    console.log('TLBT_value', TLBT_value)
+    console.log('newTLBI_value', newTLBI_value)
+    console.log('newTLBT_value', newTLBT_value)
 
 
     let facitObj: InputFields = {
@@ -417,16 +411,16 @@ function App(): JSX.Element {
         const dummyTagIndex = Math.floor(Math.random() * newTLBTableEntries[0].length);
         const correctTagIndex = Math.floor(Math.random() * newTLBTableEntries[0].length);
         debugger
-        newTLBTableEntries[TLBI_value][correctTagIndex] = {
-          tag: TLBT_value,
+        newTLBTableEntries[newTLBI_value][correctTagIndex] = {
+          tag: newTLBT_value,
           valid: 1,
-          ppn: TLB_PPN
+          ppn: newTLB_PPN
         };
         debugger
-        newTLBTableEntries[TLBI_value][dummyTagIndex] = {
-          tag: TLBT_value,
+        newTLBTableEntries[newTLBI_value][dummyTagIndex] = {
+          tag: newTLBT_value,
           valid: 0,
-          ppn: createUniqe(TLB_PPN, 4 * 2)
+          ppn: createUniqe(newTLB_PPN, 4 * 2)
         };
 
 
@@ -439,12 +433,12 @@ function App(): JSX.Element {
         facitObj = {
           VirtualAddress: newGeneratedVirtualAddress.toString(2),
           VPN: newVPN,
-          TLBI: TLBI_value.toString(ChosenBaseConversion),
-          TLBT: TLBT_value.toString(ChosenBaseConversion),
+          TLBI: newTLBI_value.toString(ChosenBaseConversion),
+          TLBT: newTLBT_value.toString(ChosenBaseConversion),
           TLBHIT: 'Y',
           PageFault: 'N',
-          PPN: newTLBTableEntries[TLBI_value][correctTagIndex].ppn.toString(ChosenBaseConversion),
-          PhysicalAddress: newTLBTableEntries[TLBI_value][correctTagIndex].ppn.toString(2) + newVPO_bits,
+          PPN: newTLBTableEntries[newTLBI_value][correctTagIndex].ppn.toString(ChosenBaseConversion),
+          PhysicalAddress: newTLBTableEntries[newTLBI_value][correctTagIndex].ppn.toString(2) + newVPO_bits,
           PageHit: ''
         }
         break;
@@ -475,23 +469,23 @@ function App(): JSX.Element {
        const dummyTagIndex = createUniqe(correctTagIndex, Math.floor(Math.random() * TLBTableEntries[0].length));
  
        // Create a copy of the row
-       const newRow = [...TLBTableEntries[TLBI_value]];
+       const newRow = [...TLBTableEntries[newTLBI_value]];
  
        // Modify the copy
        newRow[correctTagIndex] = {
-         tag: TLBT_value,
+         tag: newTLBT_value,
          valid: 1,
          ppn: TLB_PPN
        };
  
        newRow[dummyTagIndex] = {
-         tag: TLBT_value,
+         tag: newTLBT_value,
          valid: 0,
          ppn: createUniqe(TLB_PPN, 4 * 2)
        };
  
        // Replace the row in the table
-       TLBTableEntries[TLBI_value] = newRow;
+       TLBTableEntries[newTLBI_value] = newRow;
  
        // Update the state with the modified copy
        setTLB_TABLE(TLBTableEntries);
@@ -500,12 +494,12 @@ function App(): JSX.Element {
        facitObj = {
          VirtualAddress: generatedVirtualAddress.toString(2),
          VPN: VPN,
-         TLBI: TLBI_value.toString(ChosenBaseConversion),
-         TLBT: TLBT_value.toString(ChosenBaseConversion),
+         TLBI: newTLBI_value.toString(ChosenBaseConversion),
+         TLBT: newTLBT_value.toString(ChosenBaseConversion),
          TLBHIT: 'Y',
          PageFault: 'N',
-         PPN: TLBTableEntries[TLBI_value][correctTagIndex].ppn.toString(ChosenBaseConversion),
-         PhysicalAddress: TLBTableEntries[TLBI_value][correctTagIndex].ppn.toString(2) + VPO_bits,
+         PPN: TLBTableEntries[newTLBI_value][correctTagIndex].ppn.toString(ChosenBaseConversion),
+         PhysicalAddress: TLBTableEntries[newTLBI_value][correctTagIndex].ppn.toString(2) + VPO_bits,
          PageHit: ''
        }
  
@@ -539,8 +533,8 @@ function App(): JSX.Element {
        facitObj = {
          VirtualAddress: generatedVirtualAddress.toString(2),
          VPN: VPN,
-         TLBI: TLBI_value.toString(ChosenBaseConversion),
-         TLBT: TLBT_value.toString(ChosenBaseConversion),
+         TLBI: newTLBI_value.toString(ChosenBaseConversion),
+         TLBT: newTLBT_value.toString(ChosenBaseConversion),
          TLBHIT: 'N',
          PageFault: 'Y',
          PPN: '',
@@ -573,8 +567,8 @@ function App(): JSX.Element {
        facitObj = {
          VirtualAddress: generatedVirtualAddress.toString(2),
          VPN: VPN,
-         TLBI: TLBI_value.toString(ChosenBaseConversion),
-         TLBT: TLBT_value.toString(ChosenBaseConversion),
+         TLBI: newTLBI_value.toString(ChosenBaseConversion),
+         TLBT: new_TLBT_value.toString(ChosenBaseConversion),
          TLBHIT: 'N',
          PageFault: 'N',
          PPN: Page_PPN.toString(ChosenBaseConversion),
