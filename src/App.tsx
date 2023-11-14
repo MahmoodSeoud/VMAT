@@ -192,7 +192,7 @@ const possiblePageSizes = [16, 32, 64] as const;
 function App(): JSX.Element {
   console.log('App rendered')
 
- const [facit, setFacit] = useState<InputFields>(empty);
+  const [facit, setFacit] = useState<InputFields>(empty);
 
   const [assignmentType, setAssignmentType] = useState<Result>(randomAssignmentType);
   const [hasClearedInput, setHasClearedInput] = useState<boolean>(false);
@@ -252,10 +252,10 @@ function App(): JSX.Element {
 
 
 
-// Component did mount
-useEffect(() => {
-  setAssignmentType(randomAssignmentType);
-}, [0])
+  // Component did mount
+  useEffect(() => {
+    setAssignmentType(randomAssignmentType);
+  }, [0])
   useEffect(() => {
     if (testing) {
       console.log('------------------------------------')
@@ -330,18 +330,18 @@ useEffect(() => {
     const newPhysicalAddressBitWidth = newTLB_PPN.toString(2).length + newVPO;
 
     const newGeneratedVirtualAddress = createRandomNumberWith(newVirtualAddressBitWidth);
-    
+
     const newAddressInBitsOrignal = [...newGeneratedVirtualAddress.toString(2)];
     const newAddressInBits = JSON.parse(JSON.stringify(newAddressInBitsOrignal));
-    
+
     const newVPO_bits = newAddressInBits.splice(-newVPO).join('');     // VPO_bits = the last VPO bits of the address / log2(pageSize)
     const newTLBI_bits = newAddressInBits.splice(-newTLBI).join('');     // TLBI_bits = the next TLBI bits of the address / log2(sets)
     const newTLBT_bits = newAddressInBits.join('');     // TLBT_bits = the remaining bits of the address
 
     const newVPN = Number("0b" + newTLBT_bits + newTLBI_bits).toString(ChosenBaseConversion);
-    
+
     const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN);
-    
+
     const newTLBI_value: number = Number(addressPrefixMap.Binary + newTLBI_bits);
     const newTLBT_value: number = Number(addressPrefixMap.Binary + newTLBT_bits);
     const newTLBTableEntries = createTableEntries<TLB_TABLE_ENTRY>(
@@ -383,10 +383,6 @@ useEffect(() => {
 
 
 
-
-
-
-
     console.log('------------------------------------')
     console.log("virtualAddressBitWidth", virtualAddressBitWidth)
     console.log("physicalAddressBitWidth", physicalAddressBitWidth)
@@ -425,20 +421,17 @@ useEffect(() => {
       case InputFieldsMap.TLBHIT:
         const dummyTagIndex = Math.floor(Math.random() * newTLBTableEntries[0].length);
         const correctTagIndex = Math.floor(Math.random() * newTLBTableEntries[0].length);
-        newTLBTableEntries[newTLBI_value][correctTagIndex] = {
-          tag: newTLBT_value,
-          valid: 1,
-          ppn: newTLB_PPN
-        };
         newTLBTableEntries[newTLBI_value][dummyTagIndex] = {
           tag: newTLBT_value,
           valid: 0,
           ppn: createUniqe(newTLB_PPN, 4 * 2)
         };
 
-
-
-
+        newTLBTableEntries[newTLBI_value][correctTagIndex] = {
+          tag: newTLBT_value,
+          valid: 1,
+          ppn: newTLB_PPN
+        };
 
         console.log('TLBHIT')
 
@@ -453,13 +446,83 @@ useEffect(() => {
           PhysicalAddress: newTLBTableEntries[newTLBI_value][correctTagIndex].ppn.toString(2) + newVPO_bits,
           PageHit: ''
         }
+        setFacit(facitObj);
+        break;
+
+      case InputFieldsMap.PageHit:
+        // CASE 1: An address in the pagetable with a valid bit 1
+        // CASE 2: There is a VPN with a valid bit 0 and a the same address next
+        // to the first address with a valid bit 1 ( both different PPNs )
+        // Create a copy of PAGE_TABLE
+        const newPageTable = [...newPageTableEntries];
+
+        // Get a random row and column
+        const randomRow = Math.floor(Math.random() * newPageTable.length);
+        const randomCol = Math.floor(Math.random() * newPageTable[0].length);
+
+        // Modify the copy
+        newPageTable[randomRow][randomCol] = {
+          ...newPageTable[randomRow][randomCol],
+          ppn: newPage_PPN,
+          vpn: Number("0x" + newVPN),
+          valid: 1
+        };
+
+
+        facitObj = {
+          VirtualAddress: newGeneratedVirtualAddress.toString(2),
+          VPN: newVPN,
+          TLBI: newTLBI_value.toString(ChosenBaseConversion),
+          TLBT: newTLBT_value.toString(ChosenBaseConversion),
+          TLBHIT: 'N',
+          PageFault: 'N',
+          PPN: newPage_PPN.toString(ChosenBaseConversion),
+          PhysicalAddress: newPage_PPN.toString(2) + newVPO_bits,
+          PageHit: ''
+        }
         break;
 
 
+     case InputFieldsMap.PageFault:
+       // Case 1: VPN DOES NOT exists in Page Tables 
+ 
+       // Case 2: VPN EXISTS and VALID bit is 0
+ 
+       // 50% 50% of having a VPN address, but with valid bit 0
+       if (Math.random() > 0.5) {
+         // Create a copy of PAGE_TABLE
+         const newPageTable = [...newPageTableEntries];
+ 
+         // Get a random row and column
+         const randomRow = Math.floor(Math.random() * newPageTable.length);
+         const randomCol = Math.floor(Math.random() * newPageTable[0].length);
+ 
+         // Modify the copy
+         newPageTable[randomRow][randomCol] = {
+           ...newPageTable[randomRow][randomCol],
+           vpn: Number("0x" + newVPN),
+           valid: 0
+         };
+ 
+       }
+ 
+       facitObj = {
+         VirtualAddress: newGeneratedVirtualAddress.toString(2),
+         VPN: newVPN,
+         TLBI: newTLBI_value.toString(ChosenBaseConversion),
+         TLBT: newTLBT_value.toString(ChosenBaseConversion),
+         TLBHIT: 'N',
+         PageFault: 'Y',
+         PPN: '',
+         PhysicalAddress: '',
+         PageHit: ''
+       }
+ 
+       break;
+ 
       default:
         console.log('default')
     }
-    setFacit(facitObj);
     setPageTableEntries(newPageTableEntries);
     setTLBTableEntries(newTLBTableEntries);
   }, [assignmentType])

@@ -213,7 +213,6 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
     // Insert the facit incase the user does not know the answer
     function insertFacit(inputFieldName: InputField, e: React.BaseSyntheticEvent): void {
 
-        debugger
         const containerElement = (e.target.parentElement as HTMLBodyElement)
 
         switch (inputFieldName) {
@@ -230,7 +229,8 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                 }
                 break;
             default:
-                const textElement = (containerElement.firstChild as HTMLInputElement);
+                const textElement = (containerElement.parentElement?.children[1].firstChild as HTMLInputElement);
+                console.log(containerElement.parentElement)
                 textElement.value = facit[inputFieldName] || '';
                 break;
         }
@@ -412,6 +412,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.VPN)}
                                                 />
                                             </td>
+
                                             <td>
                                                 <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.VPN, ev)}>Insert facit</button>
                                             </td>
