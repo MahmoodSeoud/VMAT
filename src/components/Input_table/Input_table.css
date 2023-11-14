@@ -1,6 +1,6 @@
 .input-table {
     border: 1px white solid;
-    min-width: 60em;
+    min-width: 70em;
     padding: 2em;
     margin: 2em;
 
@@ -113,4 +113,20 @@ tr td input {
 .reset-color-btn:hover:hover:hover:focus,
 .reset-color-btn:focus-visible {
     outline: 4px auto -webkit-focus-ring-color;
+}
+
+#vbit-index,
+#pbit-index {
+    border: 1px solid transparent;
+}
+
+#vbit-index:hover,
+#pbit-index:hover{
+    border-color: rgb(142, 142, 142);
+}
+
+
+#vbit:hover,
+#pbit:hover {
+    background-color: rgb(126, 126, 125);
 }

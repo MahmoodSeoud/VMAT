@@ -161,12 +161,12 @@ function Input_table({
 
 
     function resetAllParameters() {
-            const inputCollection = document.getElementsByTagName("input")
-            for (let i = 0; i < inputCollection.length; i++) {
-                (inputCollection[i] as HTMLInputElement).value = "";
-                (inputCollection[i] as HTMLInputElement).classList.remove('correct');
-                setInput(emptyInput);
-            }
+        const inputCollection = document.getElementsByTagName("input")
+        for (let i = 0; i < inputCollection.length; i++) {
+            (inputCollection[i] as HTMLInputElement).value = "";
+            (inputCollection[i] as HTMLInputElement).classList.remove('correct');
+            setInput(emptyInput);
+        }
     }
 
     const [input, setInput] = useState<InputFields>({
@@ -221,6 +221,7 @@ function Input_table({
 
 
     function handleMouseDown(e: React.MouseEvent) {
+        setIsMouseDown(true);
         const pTagWithIndex = e.currentTarget as HTMLElement;
         const isHighligted = pTagWithIndex.classList.contains('highlight');
 
@@ -230,16 +231,15 @@ function Input_table({
             pTagWithIndex.style.backgroundColor = "";
         } else {
 
-            setIsMouseDown(true);
             // Apply highlight to the current div
             pTagWithIndex.classList.add('highlight');
             // Setting the color the the one selected in the color picker
             pTagWithIndex.style.backgroundColor = color;
 
         }
-    };
+    }
 
-    function handleMouseUp(e: React.MouseEvent) {
+    function handleMouseUp() {
         setIsMouseDown(false);
     };
 
@@ -409,11 +409,12 @@ function Input_table({
                                         <div
                                             key={index}
                                             className='input-wrapper'
+                                            onMouseUp={handleMouseUp}
                                         >
                                             <p
+                                                id='vbit-index'
                                                 className="input-text"
                                                 onMouseDown={handleMouseDown}
-                                                onMouseUp={handleMouseUp}
                                                 onMouseEnter={handleMouseEnter}
 
                                             >
@@ -453,9 +454,9 @@ function Input_table({
                                         <tr >
                                             <td>
                                                 <p
+                                                    onMouseUp={handleMouseUp}
                                                     className={'exercise-label'}
                                                     onMouseDown={handleMouseDown}
-                                                    onMouseUp={handleMouseUp}
                                                     onMouseEnter={handleMouseEnter}
                                                 >
                                                     VPN
@@ -603,16 +604,18 @@ function Input_table({
                                         <div
                                             key={index}
                                             className='input-wrapper'
+                                            onMouseUp={handleMouseUp}
                                         >
                                             <p
+                                                id='pbit-index'
                                                 className="input-text"
                                                 onMouseDown={handleMouseDown}
-                                                onMouseUp={handleMouseUp}
                                                 onMouseEnter={handleMouseEnter}
                                             >
                                                 {physcialAddressWidth - index - 1}
                                             </p>
                                             <input
+                                                id='pbit'
                                                 className={`pbit-input ${validateFieldInput(InputFieldsMap.PhysicalAddress) ? 'correct' : ''}`}
                                                 maxLength={1}
                                                 onChange={(ev) => handleInputChange(ev, InputFieldsMap.PhysicalAddress)}
