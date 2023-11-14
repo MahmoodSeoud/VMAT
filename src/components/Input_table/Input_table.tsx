@@ -26,6 +26,8 @@ type Input_tableProps = {
     addressPrefix: AddressPrefix;
     baseConversion: BaseConversion;
     facit: InputFields;
+    clearInput: boolean;
+    setClearInput: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 
@@ -139,19 +141,33 @@ function isObject(object: InputFields) {
     return object != null && typeof object === 'object';
 }
 
-export function resetAllParameters() {
-    const inputCollection = document.getElementsByTagName("input")
-    for (let i = 0; i < inputCollection.length; i++) {
-        (inputCollection[i] as HTMLInputElement).value = "";
-        (inputCollection[i] as HTMLInputElement).classList.remove('correct');
-        
-    }
-}
 
 
 
-function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAddressWidth, physcialAddressWidth, facit }: Input_tableProps): JSX.Element {
+function Input_table({
+    VirtualAddress,
+    addressPrefix,
+    baseConversion,
+    virtualAddressWidth,
+    physcialAddressWidth,
+    facit,
+    clearInput,
+    setClearInput
+}: Input_tableProps): JSX.Element {
     console.log('input_table rendered');
+
+
+
+
+
+    function resetAllParameters() {
+            const inputCollection = document.getElementsByTagName("input")
+            for (let i = 0; i < inputCollection.length; i++) {
+                (inputCollection[i] as HTMLInputElement).value = "";
+                (inputCollection[i] as HTMLInputElement).classList.remove('correct');
+                setInput(emptyInput);
+            }
+    }
 
     const [input, setInput] = useState<InputFields>({
         VirtualAddress: '',
@@ -164,6 +180,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
         PPN: '',
         PageHit: ''
     })
+
 
 
 
@@ -194,6 +211,13 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
         }
     }, [input])
 
+
+    useEffect(() => {
+        if (clearInput) {
+            resetAllParameters();
+            setClearInput(false);
+        }
+    }, [clearInput])
 
 
     function handleMouseDown(e: React.MouseEvent) {
@@ -360,9 +384,11 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                         Reset the colors
                     </button>
                     <button
-                onClick={resetAllParameters}
-                >Reset Input
-                </button>
+                        className='reset-color-btn'
+                        onClick={resetAllParameters}
+                    >
+                        Reset Input
+                    </button>
 
                     <h2>Virtual address: {addressPrefix + VirtualAddress.toString(baseConversion).toUpperCase()}</h2>
                     <HuePicker

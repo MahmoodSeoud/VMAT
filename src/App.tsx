@@ -1,6 +1,6 @@
 import './App.css'
 import Page_table, { PAGE_TABLE_ENTRY } from './components/Page_table/Page_table';
-import Input_table, { InputFields, resetAllParameters } from './components/Input_table/Input_table';
+import Input_table, { InputFields } from './components/Input_table/Input_table';
 import { RefObject, useEffect, useMemo, useState } from 'react';
 import Tlb_table, { TLB_TABLE_ENTRY } from './components/Tlb_table/Tlb_table';
 import { Dropdown } from 'primereact/dropdown';
@@ -195,6 +195,7 @@ function App(): JSX.Element {
   const [facit, setFacit] = useState<InputFields>(empty);
 
   const [assignmentType, setAssignmentType] = useState<Result>(randomAssignmentType);
+  const [clearInput, setClearInput] = useState<boolean>(false);
 
   const [TLBSets, setTLBSets] = useState(generateTLBSets());
   const [TLBWays, setTLBWays] = useState(generateTLBWays());
@@ -247,14 +248,11 @@ function App(): JSX.Element {
   const [PageTableEntries, setPageTableEntries] = useState<PAGE_TABLE_ENTRY[][]>(pageTableEntries);
 
 
-
-
-
-
   // Component did mount
   useEffect(() => {
     setAssignmentType(randomAssignmentType);
   }, [0])
+
   useEffect(() => {
     if (testing) {
       console.log('------------------------------------')
@@ -276,45 +274,10 @@ function App(): JSX.Element {
 
   }, [0])
 
-  /* // TLB  table information
-  useEffect(() => {
-    const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, TLBI_bits, VPN);
- 
-    const tlbTableEntries = createTableEntries<TLB_TABLE_ENTRY>(
-      TLBSets,
-      TLBWays,
-      tlbTableEntry,
-      TLBT_bits,
-      VPN
-    );
- 
-    setTLBTableEntries(tlbTableEntries);
- 
-  }, [TLBSets, TLBWays, TLBT_bits, VPN, TLBI_bits]);
- 
- 
- 
-  useEffect(() => {
- 
-    const pageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 }, TLBI_bits, VPN);
-    const PageTableEntries: PAGE_TABLE_ENTRY[][] = createTableEntries<PAGE_TABLE_ENTRY>(
-      3, // I choose 3 because of all the old exams all look like that. 
-      // Make sure to see the PTE's in the old exams. Hint: they are all 12 entries.
-      4, // I chose 4 because of all the old exams all look like that. 
-      //Be sure to see the page size given in those exams
-      pageTableEntry,
-      TLBT_bits,
-      VPN
-    );
- 
-    setPageTableEntries(PageTableEntries);
- 
-  }, [TLBT_bits, VPN]);
- */
 
 
   useEffect(() => {
-    resetAllParameters()
+    
     const newTLBSets = generateTLBSets();
     const newTLBWays = generateTLBWays();
     const newPageSize = possiblePageSizes[Math.floor(Math.random() * possiblePageSizes.length)];
@@ -361,6 +324,9 @@ function App(): JSX.Element {
       newTLBT_bits,
       newVPN
     );
+
+    // Reset the input
+    setClearInput(true);
 
 
     setTLBSets(newTLBSets);
@@ -526,140 +492,6 @@ function App(): JSX.Element {
     setTLBTableEntries(newTLBTableEntries);
   }, [assignmentType])
 
-  // TODO : Add the page hit case
-  // TODO: Make the facit required and complete this function
-  // POSTCONDITION : sets facit object in the Facit state
-  function createFacit(): void {
-    // Reset the user input
-    // Convert the bits to a number
-    /* switch (assignmentType) {
-     case InputFieldsMap.TLBHIT:
-       // Step 1: Create a deep copy of the TLB table
-       const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, TLBI_bits, VPN);
-       const TLBTableEntries = createTableEntries<TLB_TABLE_ENTRY>(TLBSets, TLBWays, tlbTableEntry, TLBT_bits, VPN);
- 
-       // Step 2: Generate the correctIndex and dummyIndex
-       const correctTagIndex = Math.floor(Math.random() * TLBTableEntries[0].length);
-       const dummyTagIndex = createUniqe(correctTagIndex, Math.floor(Math.random() * TLBTableEntries[0].length));
- 
-       // Create a copy of the row
-       const newRow = [...TLBTableEntries[newTLBI_value]];
- 
-       // Modify the copy
-       newRow[correctTagIndex] = {
-         tag: newTLBT_value,
-         valid: 1,
-         ppn: TLB_PPN
-       };
- 
-       newRow[dummyTagIndex] = {
-         tag: newTLBT_value,
-         valid: 0,
-         ppn: createUniqe(TLB_PPN, 4 * 2)
-       };
- 
-       // Replace the row in the table
-       TLBTableEntries[newTLBI_value] = newRow;
- 
-       // Update the state with the modified copy
-       setTLB_TABLE(TLBTableEntries);
- 
- 
-       facitObj = {
-         VirtualAddress: generatedVirtualAddress.toString(2),
-         VPN: VPN,
-         TLBI: newTLBI_value.toString(ChosenBaseConversion),
-         TLBT: newTLBT_value.toString(ChosenBaseConversion),
-         TLBHIT: 'Y',
-         PageFault: 'N',
-         PPN: TLBTableEntries[newTLBI_value][correctTagIndex].ppn.toString(ChosenBaseConversion),
-         PhysicalAddress: TLBTableEntries[newTLBI_value][correctTagIndex].ppn.toString(2) + VPO_bits,
-         PageHit: ''
-       }
- 
- 
-       break;
-     case InputFieldsMap.PageFault:
-       // Case 1: VPN DOES NOT exists in Page Tables 
- 
-       // Case 2: VPN EXISTS and VALID bit is 0
- 
-       // 50% 50% of having a VPN address, but with valid bit 0
-       if (Math.random() > 0.5) {
-         // Create a copy of PAGE_TABLE
-         const newPageTable = [...PAGE_TABLE];
- 
-         // Get a random row and column
-         const randomRow = Math.floor(Math.random() * newPageTable.length);
-         const randomCol = Math.floor(Math.random() * newPageTable[0].length);
- 
-         // Modify the copy
-         newPageTable[randomRow][randomCol] = {
-           ...newPageTable[randomRow][randomCol],
-           vpn: Number("0x" + VPN),
-           valid: 0
-         };
- 
-         // Update the state with the modified copy
-         setPAGE_TABLE(newPageTable);
-       }
- 
-       facitObj = {
-         VirtualAddress: generatedVirtualAddress.toString(2),
-         VPN: VPN,
-         TLBI: newTLBI_value.toString(ChosenBaseConversion),
-         TLBT: newTLBT_value.toString(ChosenBaseConversion),
-         TLBHIT: 'N',
-         PageFault: 'Y',
-         PPN: '',
-         PhysicalAddress: '',
-         PageHit: ''
-       }
- 
-       break;
-     case InputFieldsMap.PageHit:
-       // CASE 1: An address in the pagetable with a valid bit 1
-       // CASE 2: There is a VPN with a valid bit 0 and a the same address next
-       // to the first address with a valid bit 1 ( both different PPNs )
-       // Create a copy of PAGE_TABLE
-       const newPageTable = [...PAGE_TABLE];
- 
-       // Get a random row and column
-       const randomRow = Math.floor(Math.random() * newPageTable.length);
-       const randomCol = Math.floor(Math.random() * newPageTable[0].length);
- 
-       // Modify the copy
-       newPageTable[randomRow][randomCol] = {
-         ...newPageTable[randomRow][randomCol],
-         ppn: Page_PPN,
-         vpn: Number("0x" + VPN),
-         valid: 1
-       };
- 
-       // Update the state with the modified copy
-       setPAGE_TABLE(newPageTable);
-       facitObj = {
-         VirtualAddress: generatedVirtualAddress.toString(2),
-         VPN: VPN,
-         TLBI: newTLBI_value.toString(ChosenBaseConversion),
-         TLBT: new_TLBT_value.toString(ChosenBaseConversion),
-         TLBHIT: 'N',
-         PageFault: 'N',
-         PPN: Page_PPN.toString(ChosenBaseConversion),
-         PhysicalAddress: Page_PPN.toString(2) + VPO_bits,
-         PageHit: ''
-       }
-       break;
-     default:
-       break;
- 
-   } */
-    //setFacit(facitObj);
-  }
-
-  // TODO: Add the third chosen result case
-
-
 
   return (
     <>
@@ -701,6 +533,8 @@ function App(): JSX.Element {
           facit={facit}
           addressPrefix={ChosenAddressPrefix}
           baseConversion={ChosenBaseConversion}
+          clearInput={clearInput}
+          setClearInput={setClearInput}
         />
       </div >
     </>
