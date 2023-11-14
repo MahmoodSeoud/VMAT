@@ -24,7 +24,7 @@ function Page_table({ page_table_entries, addressPrefix, baseConversion, pageSiz
             <table className='table-page'>
                 <thead>
                     <tr>
-                        {page_table_entries[0].map((_, s) => (
+                        { page_table_entries && page_table_entries.length > 0&& page_table_entries[0].map((_, s) => (
                             <React.Fragment key={s}>
                                 <th>VPN</th>
                                 <th>PPN</th>
@@ -35,11 +35,11 @@ function Page_table({ page_table_entries, addressPrefix, baseConversion, pageSiz
                 </thead>
                 <tbody>
 
-                    {page_table_entries.map((_, i) => {
+                    {page_table_entries && page_table_entries.length > 0 && page_table_entries.map((_, i) => {
 
                         return (
                             <tr key={i}>
-                                {page_table_entries[0].map((_, j) => (
+                                { page_table_entries && page_table_entries.length > 0 && page_table_entries[0].map((_, j) => (
                                     <React.Fragment key={j}>
                                         <td>{addressPrefix + page_table_entries[i][j].vpn.toString(baseConversion).toUpperCase()}</td>
                                         <td>{addressPrefix + page_table_entries[i][j].ppn.toString(baseConversion).toUpperCase()}</td>

@@ -28,7 +28,7 @@ function Tlb_table({ tlb_entries, addressPrefix, baseConversion, TLBSets, TLBWay
                 <thead>
                     <tr>
                         <th>Set</th>
-                        {tlb_entries[0].map((_, s) => (
+                        {tlb_entries &&tlb_entries.length > 0 &&tlb_entries[0].map((_, s) => (
                             <React.Fragment key={s}>
                                 <th>Tag</th>
                                 <th>PPN</th>
@@ -39,12 +39,12 @@ function Tlb_table({ tlb_entries, addressPrefix, baseConversion, TLBSets, TLBWay
                 </thead>
                 <tbody>
 
-                    {tlb_entries.map((_, i) => {
+                    {tlb_entries && tlb_entries.map((_, i) => {
 
                         return (
                             <tr key={i}>
                                 <td>{i}</td>
-                                {tlb_entries[0].map((_, j) => (
+                                {tlb_entries && tlb_entries.length > 0 && tlb_entries[0].map((_, j) => (
                                     <React.Fragment key={j}>
                                         <td>{addressPrefix + tlb_entries[i][j].tag.toString(baseConversion).toUpperCase()}</td>
                                         <td>{addressPrefix + tlb_entries[i][j].ppn.toString(baseConversion).toUpperCase()}</td>
