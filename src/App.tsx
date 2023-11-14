@@ -425,13 +425,11 @@ useEffect(() => {
       case InputFieldsMap.TLBHIT:
         const dummyTagIndex = Math.floor(Math.random() * newTLBTableEntries[0].length);
         const correctTagIndex = Math.floor(Math.random() * newTLBTableEntries[0].length);
-        debugger
         newTLBTableEntries[newTLBI_value][correctTagIndex] = {
           tag: newTLBT_value,
           valid: 1,
           ppn: newTLB_PPN
         };
-        debugger
         newTLBTableEntries[newTLBI_value][dummyTagIndex] = {
           tag: newTLBT_value,
           valid: 0,
@@ -442,7 +440,6 @@ useEffect(() => {
 
 
 
-        debugger
         console.log('TLBHIT')
 
         facitObj = {

@@ -213,6 +213,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
     // Insert the facit incase the user does not know the answer
     function insertFacit(inputFieldName: InputField, e: React.BaseSyntheticEvent): void {
 
+        debugger
         const containerElement = (e.target.parentElement as HTMLBodyElement)
 
         switch (inputFieldName) {
@@ -229,7 +230,7 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                 }
                 break;
             default:
-                const textElement = (containerElement.children[1].children[0] as HTMLInputElement);
+                const textElement = (containerElement.firstChild as HTMLInputElement);
                 textElement.value = facit[inputFieldName] || '';
                 break;
         }
