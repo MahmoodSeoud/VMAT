@@ -368,6 +368,21 @@ useEffect(() => {
     setTLBWays(newTLBWays);
     setPageSize(newPageSize);
     setPageTableSize(newPageTableSize);
+    setVPO(newVPO);
+    setTLBI(newTLBI);
+    setTLB_PPN(newTLB_PPN);
+    setPage_PPN(newPage_PPN);
+    setVirtualAddressBitWidth(newVirtualAddressBitWidth);
+    setPhysicalAddressBitWidth(newPhysicalAddressBitWidth);
+    setGeneratedVirtualAddress(newGeneratedVirtualAddress);
+    setAddressInBits(newAddressInBitsOrignal);
+    setVPO_bits(newVPO_bits);
+    setTLBI_bits(newTLBI_bits);
+    setTLBT_bits(newTLBT_bits);
+    setVPN(newVPN);
+
+
+
 
 
 
