@@ -1,6 +1,6 @@
 import './App.css'
 import Page_table, { PAGE_TABLE_ENTRY } from './components/Page_table/Page_table';
-import Input_table, { InputFields } from './components/Input_table/Input_table';
+import Input_table, { InputFields, resetAllParameters } from './components/Input_table/Input_table';
 import { RefObject, useEffect, useMemo, useState } from 'react';
 import Tlb_table, { TLB_TABLE_ENTRY } from './components/Tlb_table/Tlb_table';
 import { Dropdown } from 'primereact/dropdown';
@@ -195,7 +195,6 @@ function App(): JSX.Element {
   const [facit, setFacit] = useState<InputFields>(empty);
 
   const [assignmentType, setAssignmentType] = useState<Result>(randomAssignmentType);
-  const [hasClearedInput, setHasClearedInput] = useState<boolean>(false);
 
   const [TLBSets, setTLBSets] = useState(generateTLBSets());
   const [TLBWays, setTLBWays] = useState(generateTLBWays());
@@ -315,7 +314,7 @@ function App(): JSX.Element {
 
 
   useEffect(() => {
-
+    resetAllParameters()
     const newTLBSets = generateTLBSets();
     const newTLBWays = generateTLBWays();
     const newPageSize = possiblePageSizes[Math.floor(Math.random() * possiblePageSizes.length)];

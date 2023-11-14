@@ -107,6 +107,9 @@ function resetColors() {
     }
 }
 
+
+
+
 // TODO: Please fix all the any's
 function deepEqual(object1: any, object2: any) {
     const keys1 = Object.keys(object1);
@@ -128,6 +131,7 @@ function deepEqual(object1: any, object2: any) {
         }
     }
 
+
     return true;
 }
 
@@ -135,6 +139,14 @@ function isObject(object: InputFields) {
     return object != null && typeof object === 'object';
 }
 
+export function resetAllParameters() {
+    const inputCollection = document.getElementsByTagName("input")
+    for (let i = 0; i < inputCollection.length; i++) {
+        (inputCollection[i] as HTMLInputElement).value = "";
+        (inputCollection[i] as HTMLInputElement).classList.remove('correct');
+        
+    }
+}
 
 
 
@@ -185,13 +197,22 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
 
 
     function handleMouseDown(e: React.MouseEvent) {
+        const pTagWithIndex = e.currentTarget as HTMLElement;
+        const isHighligted = pTagWithIndex.classList.contains('highlight');
 
-        setIsMouseDown(true);
-        // Apply highlight to the current div
-        const pTagWithIndex = e.currentTarget.firstChild as HTMLElement;
-        pTagWithIndex.classList.add('highlight');
-        // Setting the color the the one selected in the color picker
-        pTagWithIndex.style.backgroundColor = color;
+        if (isHighligted) {
+            pTagWithIndex.classList.remove('highlight');
+            // Setting the color the the one selected in the color picker
+            pTagWithIndex.style.backgroundColor = "";
+        } else {
+
+            setIsMouseDown(true);
+            // Apply highlight to the current div
+            pTagWithIndex.classList.add('highlight');
+            // Setting the color the the one selected in the color picker
+            pTagWithIndex.style.backgroundColor = color;
+
+        }
     };
 
     function handleMouseUp(e: React.MouseEvent) {
@@ -201,13 +222,14 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
     function handleMouseEnter(e: React.MouseEvent) {
         if (isMouseDown) {
             // Apply highlight to the current div
-            const pTagWithIndex = e.currentTarget.firstChild as HTMLElement;
+            const pTagWithIndex = e.currentTarget as HTMLElement;
             pTagWithIndex.classList.add('highlight');
 
             // Setting the color the the one selected in the color picker
             pTagWithIndex.style.backgroundColor = color;
         }
     };
+
 
 
     // Insert the facit incase the user does not know the answer
@@ -337,6 +359,10 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                     >
                         Reset the colors
                     </button>
+                    <button
+                onClick={resetAllParameters}
+                >Reset Input
+                </button>
 
                     <h2>Virtual address: {addressPrefix + VirtualAddress.toString(baseConversion).toUpperCase()}</h2>
                     <HuePicker
@@ -357,11 +383,16 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                         <div
                                             key={index}
                                             className='input-wrapper'
-                                            onMouseDown={handleMouseDown}
-                                            onMouseUp={handleMouseUp}
-                                            onMouseEnter={handleMouseEnter}
                                         >
-                                            <p className="input-text">{virtualAddressWidth - index - 1}</p>
+                                            <p
+                                                className="input-text"
+                                                onMouseDown={handleMouseDown}
+                                                onMouseUp={handleMouseUp}
+                                                onMouseEnter={handleMouseEnter}
+
+                                            >
+                                                {virtualAddressWidth - index - 1}
+                                            </p>
                                             <input
                                                 id='vbit'
                                                 className={`vbit-input ${validateFieldInput(InputFieldsMap.VirtualAddress) ? 'correct' : ''}`}
@@ -372,11 +403,11 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                         </div>
                                     ))}
                                 </div>
-                                    <button className={'insert-facit-btn'}
-                                        onClick={(ev) => insertFacit(InputFieldsMap.VirtualAddress, ev)}
-                                    >
-                                        Insert facit
-                                    </button>
+                                <button className={'insert-facit-btn'}
+                                    onClick={(ev) => insertFacit(InputFieldsMap.VirtualAddress, ev)}
+                                >
+                                    Insert facit
+                                </button>
                             </div>
                         </li>
 
@@ -394,13 +425,12 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
 
                                     <tbody>
                                         <tr >
-                                            <td
-                                                onMouseDown={handleMouseDown}
-                                                onMouseUp={handleMouseUp}
-                                                onMouseEnter={handleMouseEnter}
-                                            >
+                                            <td>
                                                 <p
                                                     className={'exercise-label'}
+                                                    onMouseDown={handleMouseDown}
+                                                    onMouseUp={handleMouseUp}
+                                                    onMouseEnter={handleMouseEnter}
                                                 >
                                                     VPN
                                                 </p>
@@ -419,12 +449,12 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                         </tr>
                                         <tr>
                                             <td
-                                                onMouseDown={handleMouseDown}
-                                                onMouseUp={handleMouseUp}
-                                                onMouseEnter={handleMouseEnter}
                                             >
                                                 <p
                                                     className={'exercise-label'}
+                                                    onMouseDown={handleMouseDown}
+                                                    onMouseUp={handleMouseUp}
+                                                    onMouseEnter={handleMouseEnter}
                                                 >
                                                     TLB index
                                                 </p>
@@ -441,13 +471,12 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                             </td>
                                         </tr>
                                         <tr >
-                                            <td
-                                                onMouseDown={handleMouseDown}
-                                                onMouseUp={handleMouseUp}
-                                                onMouseEnter={handleMouseEnter}
-                                            >
+                                            <td>
                                                 <p
                                                     className={'exercise-label'}
+                                                    onMouseDown={handleMouseDown}
+                                                    onMouseUp={handleMouseUp}
+                                                    onMouseEnter={handleMouseEnter}
                                                 >
                                                     TLB tag
                                                 </p>
@@ -463,13 +492,12 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td
-                                                onMouseDown={handleMouseDown}
-                                                onMouseUp={handleMouseUp}
-                                                onMouseEnter={handleMouseEnter}
-                                            >
+                                            <td>
                                                 <p
                                                     className={'exercise-label'}
+                                                    onMouseDown={handleMouseDown}
+                                                    onMouseUp={handleMouseUp}
+                                                    onMouseEnter={handleMouseEnter}
                                                 >
                                                     TLB hit? (Y/N)
                                                 </p>
@@ -486,13 +514,12 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                             </td>
                                         </tr>
                                         <tr className={`${validateFieldInput(InputFieldsMap.PageFault) ? ' correct' : ''}`}>
-                                            <td
-                                                onMouseDown={handleMouseDown}
-                                                onMouseUp={handleMouseUp}
-                                                onMouseEnter={handleMouseEnter}
-                                            >
+                                            <td>
                                                 <p
                                                     className={'exercise-label'}
+                                                    onMouseDown={handleMouseDown}
+                                                    onMouseUp={handleMouseUp}
+                                                    onMouseEnter={handleMouseEnter}
                                                 >
                                                     Page fault? (Y/N)
                                                 </p>
@@ -511,13 +538,12 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                         <tr
                                             className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}
                                         >
-                                            <td
-                                                onMouseDown={handleMouseDown}
-                                                onMouseUp={handleMouseUp}
-                                                onMouseEnter={handleMouseEnter}
-                                            >
+                                            <td>
                                                 <p
                                                     className={'exercise-label'}
+                                                    onMouseDown={handleMouseDown}
+                                                    onMouseUp={handleMouseUp}
+                                                    onMouseEnter={handleMouseEnter}
                                                 >
                                                     PPN
                                                 </p>
@@ -551,11 +577,15 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                         <div
                                             key={index}
                                             className='input-wrapper'
-                                            onMouseDown={handleMouseDown}
-                                            onMouseUp={handleMouseUp}
-                                            onMouseEnter={handleMouseEnter}
                                         >
-                                            <p className="input-text">{physcialAddressWidth - index - 1}</p>
+                                            <p
+                                                className="input-text"
+                                                onMouseDown={handleMouseDown}
+                                                onMouseUp={handleMouseUp}
+                                                onMouseEnter={handleMouseEnter}
+                                            >
+                                                {physcialAddressWidth - index - 1}
+                                            </p>
                                             <input
                                                 className={`pbit-input ${validateFieldInput(InputFieldsMap.PhysicalAddress) ? 'correct' : ''}`}
                                                 maxLength={1}
@@ -566,19 +596,20 @@ function Input_table({ VirtualAddress, addressPrefix, baseConversion, virtualAdd
                                     ))}
                                 </div>
 
-                                    <button
-                                        className={'insert-facit-btn'}
-                                        onClick={(ev) => {
-                                            insertFacit(InputFieldsMap.PhysicalAddress, ev)
-                                            setIsPhysAddFocused(true);
-                                        }}
-                                    >
-                                        Insert Facit
-                                    </button>
+                                <button
+                                    className={'insert-facit-btn'}
+                                    onClick={(ev) => {
+                                        insertFacit(InputFieldsMap.PhysicalAddress, ev)
+                                        setIsPhysAddFocused(true);
+                                    }}
+                                >
+                                    Insert Facit
+                                </button>
                             </div>
                         </li>
                     </ol>
                 </div>
+
             </div>
         </>
     )

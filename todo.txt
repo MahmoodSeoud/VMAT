@@ -1,0 +1,15 @@
+- [x] Clear input when switching assignment type 
+- [x] Reclicking the color, removes them 
+- Settings parameters:
+    - tlb ways
+    - Page size 
+    - tlb sets
+    - assignment type
+    - PageTableSize (NTH)
+    - Page_PPN bitSize
+    - TLB_PPN bitSize
+    - VirtualAddress bitSize
+    - PhysicalAddress bitsSize
+
+- Test PageHit
+- Test PageFault
