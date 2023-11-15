@@ -77,17 +77,36 @@ const randomAssignmentType = [
 
 // ------ -Helper functions
 
-// create a random number from bitlength by taking a random number between
-// the previous number of bits and the current max of the bits we want 
+/**
+ * Generates a random number within a range determined by the bit length.
+ *
+ * @param {number} bitLength - The bit length of the number to generate.
+ * @returns {number} - A random number within the range [2^(bitLength-1), 2^bitLength).
+ */
 export function createRandomNumberWith(bitLength: number): number {
   return createRandomNumber(2 ** (bitLength - 1), 2 ** bitLength)
 }
 
-// Create a random number between a and b
-function createRandomNumber(a: number, b: number) {
+
+/**
+ * Generates a random number within the range [a, b).
+ *
+ * @param {number} a - The lower bound of the range (inclusive).
+ * @param {number} b - The upper bound of the range (exclusive).
+ * @returns {number} - A random number within the range [a, b).
+ */
+function createRandomNumber(a: number, b: number): number {
   return Math.floor(Math.random() * (b - a)) + a;
 }
 
+
+/**
+ * Generates a unique number that is not equal to the provided number.
+ *
+ * @param {number} fromNum - The number that the generated number should not be equal to.
+ * @param {number} size - The bit length of the number to generate.
+ * @returns {number} - A unique number that is not equal to fromNum.
+ */
 function createUniqe(fromNum: number, size: number): number {
   // A random address is able to be created to be the actual tag of the virtual
   // address, We have to check for that.
@@ -101,14 +120,23 @@ function createUniqe(fromNum: number, size: number): number {
   return unique;
 }
 
+/**
+ * Generates a random number of TLB sets.
+ *
+ * @returns {number} - A random number of TLB sets, which is a power of 2.
+ */
 function generateTLBSets(): number {
   return 2 ** createRandomNumber(2, 4);
 }
 
+/**
+ * Generates a random number of TLB ways.
+ *
+ * @returns {number} - A random number of TLB ways within the range [3, 5).
+ */
 function generateTLBWays(): number {
   return createRandomNumber(3, 5);
 }
-
 // -----------------
 
 
@@ -129,7 +157,15 @@ let empty: InputFields = {
 }
 
 
-// Function to create a TLB entry
+/**
+ * Creates a table entry of type TLB_TABLE_ENTRY or PAGE_TABLE_ENTRY.
+ *
+ * @template TObj - The type of the table entry, which extends TLB_TABLE_ENTRY or PAGE_TABLE_ENTRY.
+ * @param {TObj} entry - The initial entry object.
+ * @param {string} TLBT_bits - The TLB tag bits.
+ * @param {string} VPN - The Virtual Page Number.
+ * @returns {TObj} - The new table entry.
+ */
 function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry: TObj, TLBT_bits: string, VPN: string): TObj {
 
   const valid: Bit = Math.floor(Math.random() * 2) as Bit;
@@ -159,9 +195,17 @@ function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry
 }
 
 
-// Function to create a geniric table of entries of type TLB_TABLE_ENTRY or PAGE_TABLE_ENTRY
-// tlb_enty = rows = sets | column = ways
-// page_entry = rows = pageSize | column = pageTableSize ?????
+/**
+ * Creates a table of entries of type TLB_TABLE_ENTRY or PAGE_TABLE_ENTRY.
+ *
+ * @template TObj - The type of the table entries, which extends TLB_TABLE_ENTRY or PAGE_TABLE_ENTRY.
+ * @param {number} numOfRows - The number of rows in the table.
+ * @param {number} numOfCols - The number of columns in the table.
+ * @param {TObj} tableEntry - The initial entry object for each entry in the table.
+ * @param {string} TLBT_bits - The TLB tag bits.
+ * @param {string} VPN - The Virtual Page Number.
+ * @returns {TObj[][]} - The table of entries.
+ */
 function createTableEntries<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(
   numOfRows: number,
   numOfCols: number,

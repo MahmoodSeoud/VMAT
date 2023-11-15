@@ -31,12 +31,22 @@ type Input_tableProps = {
 
 
 
-function createNullArr(addresWidth: number): Array<null> {
-    return Array(addresWidth).fill(null);
+/**
+ * Creates an array of nulls with a specified length.
+ *
+ * @param {number} addressWidth - The length of the array to create.
+ * @returns {Array<null>} - An array of nulls with the specified length.
+ */
+function createNullArr(addressWidth: number): Array<null> {
+    return Array(addressWidth).fill(null);
 }
 
-// Brabs the input element based on the classname of the input fields.
-// Appends the value together into one string
+/**
+ * Grabs the input element based on the classname of the input fields and appends the value together into one string.
+ *
+ * @param {string} className - The classname of the input fields to grab.
+ * @returns {string} - The appended string of input field values.
+ */
 function getElementValuesFrom(className: string): string {
     let address = "";
     const container = document.getElementsByClassName(className);
@@ -85,7 +95,10 @@ let emptyInput: InputFields = {
 }
 
 
-function resetColors() {
+/**
+ * Resets the colors of all highlighted elements to their initial state.
+ */
+function resetColors(): void {
     const bitElements = document.getElementsByClassName('input-text') as HTMLCollectionOf<HTMLElement>;
     const textElements = document.getElementsByClassName('exercise-label') as HTMLCollectionOf<HTMLElement>;
 
@@ -111,8 +124,15 @@ function resetColors() {
 
 
 
-// TODO: Please fix all the any's
-function deepEqual(object1: any, object2: any) {
+/**
+ * Performs a deep comparison between two values to determine if they are equivalent.
+ *
+ * @param {any} object1 - The first value to compare.
+ * @param {any} object2 - The second value to compare.
+ * @returns {boolean} - Returns true if the values are equivalent, false otherwise.
+ */
+// TODO: FIx all the any types
+function deepEqual(object1: any, object2: any): boolean {
     const keys1 = Object.keys(object1);
     const keys2 = Object.keys(object2);
 
@@ -136,7 +156,13 @@ function deepEqual(object1: any, object2: any) {
     return true;
 }
 
-function isObject(object: InputFields) {
+/**
+ * Checks if a value is an object.
+ *
+ * @param {InputFields} object - The value to check.
+ * @returns {boolean} - Returns true if the value is an object, false otherwise.
+ */
+function isObject(object: InputFields): boolean {
     return object != null && typeof object === 'object';
 }
 
@@ -155,16 +181,6 @@ function Input_table({
 
     console.log('Recieved virtual address width: ', virtualAddressWidth)
     console.log('Recieved physical address width: ', physcialAddressWidth)
-
-
-    function resetInputFields() {
-        const inputCollection = document.getElementsByTagName("input")
-        for (let i = 0; i < inputCollection.length; i++) {
-            (inputCollection[i] as HTMLInputElement).value = "";
-            (inputCollection[i] as HTMLInputElement).classList.remove('correct');
-            setInput(emptyInput);
-        }
-    }
 
     const [input, setInput] = useState<InputFields>({
         VirtualAddress: '',
@@ -190,7 +206,24 @@ function Input_table({
     const toast = useRef<Toast>(null);
 
 
-    function showSuccess() {
+
+    /**
+   * Resets all input fields to their initial state.
+   */
+    function resetInputFields(): void {
+        const inputCollection = document.getElementsByTagName("input")
+        for (let i = 0; i < inputCollection.length; i++) {
+            (inputCollection[i] as HTMLInputElement).value = "";
+            (inputCollection[i] as HTMLInputElement).classList.remove('correct');
+            setInput(emptyInput);
+        }
+    }
+
+
+    /**
+    * Displays a success toast notification.
+    */
+    function showSuccess(): void {
         toast.current?.show({
             severity: 'success',
             summary: 'Correct!',
@@ -214,6 +247,11 @@ function Input_table({
     }, [assignmentType])
 
 
+    /**
+   * Handles the mouse enter event on an element.
+   *
+   * @param {React.MouseEvent} e - The mouse event object.
+   */
     function handleMouseDown(e: React.MouseEvent) {
         setIsMouseDown(true);
         const pTagWithIndex = e.currentTarget as HTMLElement;
@@ -233,10 +271,19 @@ function Input_table({
         }
     }
 
+    /**
+     * Handles the mouse up event.
+     */
     function handleMouseUp() {
         setIsMouseDown(false);
     };
 
+    /**
+
+ * Handles the mouse enter event on an element.
+ *
+ * @param {React.MouseEvent} e - The mouse event object.
+ */
     function handleMouseEnter(e: React.MouseEvent) {
         if (isMouseDown) {
             // Apply highlight to the current div
@@ -250,7 +297,12 @@ function Input_table({
 
 
 
-    // Insert the facit incase the user does not know the answer
+    /**
+     * Inserts the correct answer (facit) into the input field if the user does not know the answer.
+     *
+     * @param {InputField} inputFieldName - The name of the input field to insert the facit into.
+     * @param {React.BaseSyntheticEvent} e - The event object, which contains information about the event.
+     */
     function insertFacit(inputFieldName: InputField, e: React.BaseSyntheticEvent): void {
 
         const containerElement = (e.target.parentElement as HTMLBodyElement)
@@ -288,7 +340,12 @@ function Input_table({
          const physAddressWidth = Math.floor(Math.log2(physicalPageMemory)); */
 
 
-
+    /**
+     * Validates the input for a specific field.
+     *
+     * @param {InputField} inputFieldName - The name of the input field to validate.
+     * @returns {boolean} - Returns true if the input is valid, false otherwise.
+     */
     function validateFieldInput(inputFieldName: InputField): boolean {
         // TODO: nice to have (in the settings menu)
         // incremental correct feedback
@@ -312,7 +369,12 @@ function Input_table({
 
 
 
-    // Handle changes in input fields
+    /**
+     * Handles changes in input fields.
+     *
+     * @param {React.ChangeEvent<HTMLInputElement>} event - The event object, which contains the new value of the input field.
+     * @param {InputField} fieldName - The name of the input field that has changed.
+     */
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: InputField) => {
         const regexBits = /^[01]*$/; // regular expression to match only 1's and 0's
         const regexYN = /^[YN]*$/; // regular expression to match only Y AND N
@@ -362,7 +424,11 @@ function Input_table({
         }
     };
 
-    // Handle changes in color
+    /**
+     * Handles changes in color selection.
+     *
+     * @param {ColorResult} color - The new color selected by the user.
+     */
     function handleColorChange(color: ColorResult): void {
         setColor(color.hex)
     }
