@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AddressPrefix, BaseConversion, InputField, InputFieldsMap, createRandomNumberWith } from '../../App';
+import { AddressPrefix, BaseConversion, InputField, InputFieldsMap, Result, createRandomNumberWith } from '../../App';
 import './Input_table.css'
 import { ColorResult, HuePicker } from 'react-color';
 import { Toast } from 'primereact/toast';
@@ -26,8 +26,7 @@ type Input_tableProps = {
     addressPrefix: AddressPrefix;
     baseConversion: BaseConversion;
     facit: InputFields;
-    clearInput: boolean;
-    setClearInput: React.Dispatch<React.SetStateAction<boolean>>;
+    assignmentType: Result;
 };
 
 
@@ -151,8 +150,7 @@ function Input_table({
     virtualAddressWidth,
     physcialAddressWidth,
     facit,
-    clearInput,
-    setClearInput
+    assignmentType
 }: Input_tableProps): JSX.Element {
     console.log('input_table rendered');
 
@@ -213,11 +211,8 @@ function Input_table({
 
 
     useEffect(() => {
-        if (clearInput) {
-            resetAllParameters();
-            setClearInput(false);
-        }
-    }, [clearInput])
+        resetAllParameters();
+    }, [assignmentType])
 
 
     function handleMouseDown(e: React.MouseEvent) {

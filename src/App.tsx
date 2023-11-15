@@ -1,14 +1,10 @@
-import './App.css'
 import Page_table, { PAGE_TABLE_ENTRY } from './components/Page_table/Page_table';
 import Input_table, { InputFields } from './components/Input_table/Input_table';
-import { RefObject, useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Tlb_table, { TLB_TABLE_ENTRY } from './components/Tlb_table/Tlb_table';
-import { Dropdown } from 'primereact/dropdown';
-
-
-import 'primeicons/primeicons.css';
-import { SelectItemOptionsType } from 'primereact/selectitem';
 import Settings from './components/Settings/Settings';
+import 'primeicons/primeicons.css';
+import './App.css'
 
 
 
@@ -195,7 +191,6 @@ function App(): JSX.Element {
   const [facit, setFacit] = useState<InputFields>(empty);
 
   const [assignmentType, setAssignmentType] = useState<Result>(randomAssignmentType);
-  const [clearInput, setClearInput] = useState<boolean>(false);
 
   const [TLBSets, setTLBSets] = useState(generateTLBSets());
   const [TLBWays, setTLBWays] = useState(generateTLBWays());
@@ -325,9 +320,6 @@ function App(): JSX.Element {
       newVPN
     );
 
-    // Reset the input
-    setClearInput(true);
-
 
     setTLBSets(newTLBSets);
     setTLBWays(newTLBWays);
@@ -348,26 +340,6 @@ function App(): JSX.Element {
 
 
 
-    console.log('------------------------------------')
-    console.log("virtualAddressBitWidth", virtualAddressBitWidth)
-    console.log("physicalAddressBitWidth", physicalAddressBitWidth)
-    console.log("TLB_PPN", newTLB_PPN)
-    console.log("TLB_PPN (hex)", newTLB_PPN.toString(16))
-    console.log("TLB_PPN (bin)", newTLB_PPN.toString(2))
-    console.log("pageSize", pageSize)
-    console.log("TLBSets", newTLBSets)
-    console.log("TLBWays", newTLBWays)
-    console.log("PageTableSize", newPageTableSize)
-    console.log("VPO", newVPO)
-    console.log("TLBI", newTLBI)
-    console.log("Assignment type: ", assignmentType)
-    console.log("facit", facit)
-    console.log('TLBT_bits', newTLBT_bits)
-    console.log('TLBI_bits', newTLBI_bits)
-    console.log('VPO_bits', newVPO_bits)
-    console.log('VPN', newVPN)
-    console.log('newTLBI_value', newTLBI_value)
-    console.log('newTLBT_value', newTLBT_value)
 
 
     let facitObj: InputFields = {
@@ -490,6 +462,29 @@ function App(): JSX.Element {
     }
     setPageTableEntries(newPageTableEntries);
     setTLBTableEntries(newTLBTableEntries);
+
+
+
+    console.log('------------------------------------')
+    console.log("virtualAddressBitWidth", newVirtualAddressBitWidth)
+    console.log("physicalAddressBitWidth", newPhysicalAddressBitWidth)
+    console.log("TLB_PPN", newTLB_PPN)
+    console.log("TLB_PPN (hex)", newTLB_PPN.toString(16))
+    console.log("TLB_PPN (bin)", newTLB_PPN.toString(2))
+    console.log("pageSize", pageSize)
+    console.log("TLBSets", newTLBSets)
+    console.log("TLBWays", newTLBWays)
+    console.log("PageTableSize", newPageTableSize)
+    console.log("VPO", newVPO)
+    console.log("TLBI", newTLBI)
+    console.log("Assignment type: ", assignmentType)
+    console.log("facit", facitObj)
+    console.log('TLBT_bits', newTLBT_bits)
+    console.log('TLBI_bits', newTLBI_bits)
+    console.log('VPO_bits', newVPO_bits)
+    console.log('VPN', newVPN)
+    console.log('newTLBI_value', newTLBI_value)
+    console.log('newTLBT_value', newTLBT_value)
   }, [assignmentType])
 
 
@@ -533,8 +528,7 @@ function App(): JSX.Element {
           facit={facit}
           addressPrefix={ChosenAddressPrefix}
           baseConversion={ChosenBaseConversion}
-          clearInput={clearInput}
-          setClearInput={setClearInput}
+          assignmentType={assignmentType}
         />
       </div >
     </>
