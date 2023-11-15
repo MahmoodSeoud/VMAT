@@ -158,7 +158,7 @@ function Input_table({
 
 
 
-    function resetAllParameters() {
+    function resetInputFields() {
         const inputCollection = document.getElementsByTagName("input")
         for (let i = 0; i < inputCollection.length; i++) {
             (inputCollection[i] as HTMLInputElement).value = "";
@@ -211,7 +211,7 @@ function Input_table({
 
 
     useEffect(() => {
-        resetAllParameters();
+        resetInputFields();
     }, [assignmentType])
 
 
@@ -380,7 +380,7 @@ function Input_table({
                     </button>
                     <button
                         className='reset-color-btn'
-                        onClick={resetAllParameters}
+                        onClick={resetInputFields}
                     >
                         Reset Input
                     </button>
