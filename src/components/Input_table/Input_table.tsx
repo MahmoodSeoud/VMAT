@@ -29,8 +29,6 @@ type Input_tableProps = {
     assignmentType: Result;
 };
 
-
-
 /**
  * Creates an array of nulls with a specified length.
  *
@@ -82,7 +80,7 @@ function getElementValuesFrom(className: string): string {
 // 7. if there is a pagefault -> Lookup in Page table. write down the PPN and write the physcial address of that
 
 
-let emptyInput: InputFields = {
+const emptyInput: InputFields = {
     VirtualAddress: '',
     VPN: '',
     PhysicalAddress: '',
