@@ -152,10 +152,9 @@ function Input_table({
     facit,
     assignmentType
 }: Input_tableProps): JSX.Element {
-    console.log('input_table rendered');
 
-
-
+    console.log('Recieved virtual address width: ', virtualAddressWidth)
+    console.log('Recieved physical address width: ', physcialAddressWidth)
 
 
     function resetInputFields() {
@@ -266,12 +265,14 @@ function Input_table({
                 for (let i = 0; i < bitElements[0].children.length; i++) {
                     // there is a <p> before the input element hence the 1
                     const inputElement = bitElements[0].children[i].children[1] as HTMLInputElement
+                    inputElement.classList.add('correct');
                     inputElement.value = facit[inputFieldName][i] || '';
                 }
                 break;
             default:
                 const textElement = (containerElement.parentElement?.children[1].firstChild as HTMLInputElement);
-                console.log(containerElement.parentElement)
+                console.log(textElement)
+                textElement.classList.add('correct');
                 textElement.value = facit[inputFieldName] || '';
                 break;
         }
@@ -291,6 +292,7 @@ function Input_table({
     function validateFieldInput(inputFieldName: InputField): boolean {
         // TODO: nice to have (in the settings menu)
         // incremental correct feedback
+
         if (!isPPNFocused && inputFieldName === "PPN") {
             return false
         }
@@ -299,9 +301,13 @@ function Input_table({
             return false
         }
 
-        // If PPN eller phys og at ev ikke findes, så skal den return false;
         //ppnRef.current?.onfocus
-        return input[inputFieldName] == facit[inputFieldName]
+        if ((input[inputFieldName] === facit[inputFieldName]) &&
+            (inputFieldName === 'PhysicalAddress' || inputFieldName === 'VirtualAddress')) {
+            console.log(`they are equal -> ${input[inputFieldName]} === ${facit[inputFieldName]} `)
+        }
+
+        return input[inputFieldName] === facit[inputFieldName]
     }
 
 
@@ -417,7 +423,7 @@ function Input_table({
                                             </p>
                                             <input
                                                 id='vbit'
-                                                className={`vbit-input ${validateFieldInput(InputFieldsMap.VirtualAddress) ? 'correct' : ''}`}
+                                                className={`vbit-input ${() => () => validateFieldInput(InputFieldsMap.VirtualAddress) ? 'correct' : ''}`}
                                                 name='VirtualAddress'
                                                 maxLength={1}
                                                 onChange={(ev) => handleInputChange(ev, InputFieldsMap.VirtualAddress)}
@@ -460,7 +466,7 @@ function Input_table({
 
                                             <td>
                                                 <input
-                                                    className={`${validateFieldInput(InputFieldsMap.VPN) ? ' correct' : ''}`}
+                                                    className={`${() => validateFieldInput(InputFieldsMap.VPN) ? ' correct' : ''}`}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.VPN)}
                                                 />
                                             </td>
@@ -483,7 +489,7 @@ function Input_table({
                                             </td>
                                             <td>
                                                 <input
-                                                    className={`${validateFieldInput(InputFieldsMap.TLBI) ? ' correct' : ''} `}
+                                                    className={`${() => validateFieldInput(InputFieldsMap.TLBI) ? ' correct' : ''} `}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBI)}
                                                 />
                                             </td>
@@ -505,7 +511,7 @@ function Input_table({
                                             </td>
                                             <td>
                                                 <input
-                                                    className={`${validateFieldInput(InputFieldsMap.TLBT) ? ' correct' : ''}`}
+                                                    className={`${() => validateFieldInput(InputFieldsMap.TLBT) ? ' correct' : ''}`}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBT)}
                                                 />
                                             </td>
@@ -526,7 +532,7 @@ function Input_table({
                                             </td>
                                             <td>
                                                 <input
-                                                    className={`${validateFieldInput(InputFieldsMap.TLBHIT) ? ' correct' : ''}`}
+                                                    className={`${() => validateFieldInput(InputFieldsMap.TLBHIT) ? ' correct' : ''}`}
                                                     maxLength={1}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBHIT)}
                                                 />
@@ -535,7 +541,7 @@ function Input_table({
                                                 <button className={'insert-facit-btn'} onClick={(ev) => insertFacit(InputFieldsMap.TLBHIT, ev)}>Insert facit</button>
                                             </td>
                                         </tr>
-                                        <tr className={`${validateFieldInput(InputFieldsMap.PageFault) ? ' correct' : ''}`}>
+                                        <tr className={`${() => validateFieldInput(InputFieldsMap.PageFault) ? ' correct' : ''}`}>
                                             <td>
                                                 <p
                                                     className={'exercise-label'}
@@ -548,7 +554,7 @@ function Input_table({
                                             </td>
                                             <td>
                                                 <input
-                                                    className={`${validateFieldInput(InputFieldsMap.PageFault) ? ' correct' : ''}`}
+                                                    className={`${() => validateFieldInput(InputFieldsMap.PageFault) ? ' correct' : ''}`}
                                                     maxLength={1}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.PageFault)}
                                                 />
@@ -558,7 +564,7 @@ function Input_table({
                                             </td>
                                         </tr>
                                         <tr
-                                            className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}
+                                            className={`${() => validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}
                                         >
                                             <td>
                                                 <p
@@ -572,7 +578,7 @@ function Input_table({
                                             </td>
                                             <td>
                                                 <input
-                                                    className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}
+                                                    className={`${() => validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.PPN)}
                                                     onFocus={() => setIsPPNFocused(true)}
                                                 />

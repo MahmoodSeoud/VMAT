@@ -19,7 +19,6 @@ type Tlb_tableProps = {
 
 
 function Tlb_table({ tlb_entries, addressPrefix, baseConversion, TLBSets, TLBWays }: Tlb_tableProps) {
-    console.log('TLB table rendered')
     return (
         <div>
             <h2>TLB</h2>

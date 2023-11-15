@@ -66,9 +66,9 @@ const testing = true;
 
 // Sorting randomized https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 const randomAssignmentType = [
-  // InputFieldsMap.PageHit,
   InputFieldsMap.TLBHIT,
-  // InputFieldsMap.PageFault
+  InputFieldsMap.PageHit,
+  InputFieldsMap.PageFault
 ]
   .sort(() => (Math.random() > .5) ? 1 : -1)[0];
 // ----------- 
@@ -95,7 +95,6 @@ function createUniqe(fromNum: number, size: number): number {
   // Check if the tag already exists in the TLB table
   while (unique === fromNum) {
 
-    console.log('unique === fromNum')
     unique = createRandomNumber(0, createRandomNumberWith(size))
   }
 
@@ -209,7 +208,6 @@ function App(): JSX.Element {
   const [generatedVirtualAddress, setGeneratedVirtualAddress] = useState(createRandomNumberWith(virtualAddressBitWidth));
   const [addressInBits, setAddressInBits] = useState([...generatedVirtualAddress.toString(2)]);
   const deepCopy = JSON.parse(JSON.stringify(addressInBits));
-  console.log('addressInBits before', addressInBits);
 
 
   const [VPO_bits, setVPO_bits] = useState(deepCopy.splice(-VPO).join(''));     // VPO_bits = the last VPO bits of the address / log2(pageSize)
@@ -218,7 +216,7 @@ function App(): JSX.Element {
   const [VPN, setVPN] = useState<string>(Number("0b" + TLBT_bits + TLBI_bits).toString(ChosenBaseConversion));
 
 
-  const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, TLBI_bits, VPN);
+  const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, TLBT_bits, VPN);
   const tlbTableEntries = createTableEntries<TLB_TABLE_ENTRY>(
     TLBSets,
     TLBWays,
@@ -227,7 +225,7 @@ function App(): JSX.Element {
     VPN
   );
 
-  const pageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 }, TLBI_bits, VPN);
+  const pageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 }, TLBT_bits, VPN);
   const pageTableEntries: PAGE_TABLE_ENTRY[][] = createTableEntries<PAGE_TABLE_ENTRY>(
     3, // I choose 3 because of all the old exams all look like that. 
     // Make sure to see the PTE's in the old exams. Hint: they are all 12 entries.
@@ -243,36 +241,15 @@ function App(): JSX.Element {
   const [PageTableEntries, setPageTableEntries] = useState<PAGE_TABLE_ENTRY[][]>(pageTableEntries);
 
 
-  // Component did mount
+  // Component did mount -> set a random assignmentType
   useEffect(() => {
     setAssignmentType(randomAssignmentType);
   }, [0])
 
-  useEffect(() => {
-    if (testing) {
-      console.log('------------------------------------')
-      console.log("virtualAddressBitWidth", virtualAddressBitWidth)
-      console.log("physicalAddressBitWidth", physicalAddressBitWidth)
-      console.log("TLB_PPN", TLB_PPN)
-      console.log("TLB_PPN (hex)", TLB_PPN.toString(16))
-      console.log("TLB_PPN (bin)", TLB_PPN.toString(2))
-      console.log("pageSize", pageSize)
-      console.log("TLBSets", TLBSets)
-      console.log("TLBWays", TLBWays)
-      console.log("PageTableSize", PageTableSize)
-      console.log("VPO", VPO)
-      console.log("TLBI", TLBI)
-      console.log("Assignment type: ", assignmentType)
-      console.log("facit", facit)
-
-    }
-
-  }, [0])
-
 
 
   useEffect(() => {
-    
+
     const newTLBSets = generateTLBSets();
     const newTLBWays = generateTLBWays();
     const newPageSize = possiblePageSizes[Math.floor(Math.random() * possiblePageSizes.length)];
@@ -287,7 +264,6 @@ function App(): JSX.Element {
     const newPhysicalAddressBitWidth = newTLB_PPN.toString(2).length + newVPO;
 
     const newGeneratedVirtualAddress = createRandomNumberWith(newVirtualAddressBitWidth);
-
     const newAddressInBitsOrignal = [...newGeneratedVirtualAddress.toString(2)];
     const newAddressInBits = JSON.parse(JSON.stringify(newAddressInBitsOrignal));
 
@@ -296,50 +272,28 @@ function App(): JSX.Element {
     const newTLBT_bits = newAddressInBits.join('');     // TLBT_bits = the remaining bits of the address
 
     const newVPN = Number("0b" + newTLBT_bits + newTLBI_bits).toString(ChosenBaseConversion);
-
-    const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN);
-
     const newTLBI_value: number = Number(addressPrefixMap.Binary + newTLBI_bits);
     const newTLBT_value: number = Number(addressPrefixMap.Binary + newTLBT_bits);
+
+    const newTLBTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN);
     const newTLBTableEntries = createTableEntries<TLB_TABLE_ENTRY>(
       newTLBSets,
       newTLBWays,
-      tlbTableEntry,
+      newTLBTableEntry,
       newTLBT_bits,
       newVPN
     );
 
-    const pageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN);
+    const newPageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN);
     const newPageTableEntries: PAGE_TABLE_ENTRY[][] = createTableEntries<PAGE_TABLE_ENTRY>(
       3, // I choose 3 because of all the old exams all look like that. 
       // Make sure to see the PTE's in the old exams. Hint: they are all 12 entries.
       4, // I chose 4 because of all the old exams all look like that. 
       //Be sure to see the page size given in those exams
-      pageTableEntry,
+      newPageTableEntry,
       newTLBT_bits,
       newVPN
     );
-
-
-    setTLBSets(newTLBSets);
-    setTLBWays(newTLBWays);
-    setPageSize(newPageSize);
-    setPageTableSize(newPageTableSize);
-    setVPO(newVPO);
-    setTLBI(newTLBI);
-    setTLB_PPN(newTLB_PPN);
-    setPage_PPN(newPage_PPN);
-    setVirtualAddressBitWidth(newVirtualAddressBitWidth);
-    setPhysicalAddressBitWidth(newPhysicalAddressBitWidth);
-    setGeneratedVirtualAddress(newGeneratedVirtualAddress);
-    setAddressInBits(newAddressInBitsOrignal);
-    setVPO_bits(newVPO_bits);
-    setTLBI_bits(newTLBI_bits);
-    setTLBT_bits(newTLBT_bits);
-    setVPN(newVPN);
-
-
-
 
 
     let facitObj: InputFields = {
@@ -358,6 +312,7 @@ function App(): JSX.Element {
       case InputFieldsMap.TLBHIT:
         const dummyTagIndex = Math.floor(Math.random() * newTLBTableEntries[0].length);
         const correctTagIndex = Math.floor(Math.random() * newTLBTableEntries[0].length);
+
         newTLBTableEntries[newTLBI_value][dummyTagIndex] = {
           tag: newTLBT_value,
           valid: 0,
@@ -391,15 +346,13 @@ function App(): JSX.Element {
         // CASE 2: There is a VPN with a valid bit 0 and a the same address next
         // to the first address with a valid bit 1 ( both different PPNs )
         // Create a copy of PAGE_TABLE
-        const newPageTable = [...newPageTableEntries];
 
         // Get a random row and column
-        const randomRow = Math.floor(Math.random() * newPageTable.length);
-        const randomCol = Math.floor(Math.random() * newPageTable[0].length);
+        const randomRow = Math.floor(Math.random() * newPageTableEntries.length);
+        const randomCol = Math.floor(Math.random() * newPageTableEntries[0].length);
 
         // Modify the copy
-        newPageTable[randomRow][randomCol] = {
-          ...newPageTable[randomRow][randomCol],
+        newPageTableEntries[randomRow][randomCol] = {
           ppn: newPage_PPN,
           vpn: Number("0x" + newVPN),
           valid: 1
@@ -420,65 +373,83 @@ function App(): JSX.Element {
         break;
 
 
-     case InputFieldsMap.PageFault:
-       // Case 1: VPN DOES NOT exists in Page Tables 
- 
-       // Case 2: VPN EXISTS and VALID bit is 0
- 
-       // 50% 50% of having a VPN address, but with valid bit 0
-       if (Math.random() > 0.5) {
-         // Create a copy of PAGE_TABLE
-         const newPageTable = [...newPageTableEntries];
- 
-         // Get a random row and column
-         const randomRow = Math.floor(Math.random() * newPageTable.length);
-         const randomCol = Math.floor(Math.random() * newPageTable[0].length);
- 
-         // Modify the copy
-         newPageTable[randomRow][randomCol] = {
-           ...newPageTable[randomRow][randomCol],
-           vpn: Number("0x" + newVPN),
-           valid: 0
-         };
- 
-       }
- 
-       facitObj = {
-         VirtualAddress: newGeneratedVirtualAddress.toString(2),
-         VPN: newVPN,
-         TLBI: newTLBI_value.toString(ChosenBaseConversion),
-         TLBT: newTLBT_value.toString(ChosenBaseConversion),
-         TLBHIT: 'N',
-         PageFault: 'Y',
-         PPN: '',
-         PhysicalAddress: '',
-         PageHit: ''
-       }
- 
-       break;
- 
+      case InputFieldsMap.PageFault:
+        // Case 1: VPN DOES NOT exists in Page Tables 
+
+        // Case 2: VPN EXISTS and VALID bit is 0
+
+        // 50% 50% of having a VPN address, but with valid bit 0
+        if (Math.random() > 0.5) {
+          // Create a copy of PAGE_TABLE
+
+          // Get a random row and column
+          const randomRow = Math.floor(Math.random() * newPageTableEntries.length);
+          const randomCol = Math.floor(Math.random() * newPageTableEntries[0].length);
+
+          newPageTableEntries[randomRow][randomCol] = {
+            ppn: newPage_PPN,
+            vpn: Number("0x" + newVPN),
+            valid: 0
+          };
+
+        }
+
+        facitObj = {
+          VirtualAddress: newGeneratedVirtualAddress.toString(2),
+          VPN: newVPN,
+          TLBI: newTLBI_value.toString(ChosenBaseConversion),
+          TLBT: newTLBT_value.toString(ChosenBaseConversion),
+          TLBHIT: 'N',
+          PageFault: 'Y',
+          PPN: '',
+          PhysicalAddress: '',
+          PageHit: ''
+        }
+
+        break;
+
       default:
         console.log('default')
     }
+
+
+    setTLBSets(newTLBSets);
+    setTLBWays(newTLBWays);
+    setPageSize(newPageSize);
+    setPageTableSize(newPageTableSize);
+    setVPO(newVPO);
+    setTLBI(newTLBI);
+    setTLB_PPN(newTLB_PPN);
+    setPage_PPN(newPage_PPN);
+    setVirtualAddressBitWidth(newVirtualAddressBitWidth);
+    setPhysicalAddressBitWidth(newPhysicalAddressBitWidth);
+    setGeneratedVirtualAddress(newGeneratedVirtualAddress);
+    setAddressInBits(newAddressInBitsOrignal);
+    setVPO_bits(newVPO_bits);
+    setTLBI_bits(newTLBI_bits);
+    setTLBT_bits(newTLBT_bits);
+    setVPN(newVPN);
+
+
     setPageTableEntries(newPageTableEntries);
     setTLBTableEntries(newTLBTableEntries);
 
 
 
     console.log('------------------------------------')
+    console.log("facit", facitObj)
+    console.log("Assignment type: ", assignmentType)
     console.log("virtualAddressBitWidth", newVirtualAddressBitWidth)
     console.log("physicalAddressBitWidth", newPhysicalAddressBitWidth)
     console.log("TLB_PPN", newTLB_PPN)
     console.log("TLB_PPN (hex)", newTLB_PPN.toString(16))
     console.log("TLB_PPN (bin)", newTLB_PPN.toString(2))
-    console.log("pageSize", pageSize)
+    console.log("pageSize", newPageSize)
     console.log("TLBSets", newTLBSets)
     console.log("TLBWays", newTLBWays)
     console.log("PageTableSize", newPageTableSize)
     console.log("VPO", newVPO)
     console.log("TLBI", newTLBI)
-    console.log("Assignment type: ", assignmentType)
-    console.log("facit", facitObj)
     console.log('TLBT_bits', newTLBT_bits)
     console.log('TLBI_bits', newTLBI_bits)
     console.log('VPO_bits', newVPO_bits)
@@ -491,18 +462,11 @@ function App(): JSX.Element {
   return (
     <>
       <Settings
+        assignmentType={assignmentType}
         setAssignmentType={setAssignmentType}
-
       />
 
-      <div
-        className=''
-      >
-
-      </div>
       <div className='wrapper'>
-
-
         <div className='wrapper-tables'>
 
           <Tlb_table

@@ -16,7 +16,6 @@ type Page_tableProps = {
 
 
 function Page_table({ page_table_entries, addressPrefix, baseConversion, pageSize }: Page_tableProps) {
-    console.log('Page table rendered')
     return (
         <div>
             <h2>Page Table</h2>

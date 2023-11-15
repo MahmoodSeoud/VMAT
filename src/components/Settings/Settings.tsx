@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { InputFieldsMap } from "../../App";
+import { SetStateAction, useState } from "react";
+import { InputFieldsMap, Result } from "../../App";
 import { SelectItemOptionsType } from "primereact/selectitem";
 import { Dropdown } from "primereact/dropdown";
 
@@ -7,13 +7,13 @@ import { Dropdown } from "primereact/dropdown";
 
 
 interface SettingsProps {
-    setAssignmentType: (assignmentType: any) => void;
+    setAssignmentType: React.Dispatch<SetStateAction<Result>>;
+    assignmentType: Result;
 }
 
 
-function Settings({ setAssignmentType }: SettingsProps) {
+function Settings({ setAssignmentType, assignmentType }: SettingsProps) {
     const [showSettings, setShowSettings] = useState<boolean>(false);
-    const [dropdownValue, setDropdownValue] = useState<SelectItemOptionsType>();
 
     const assignmentTypeOptions: SelectItemOptionsType = [
         {
@@ -31,7 +31,6 @@ function Settings({ setAssignmentType }: SettingsProps) {
     ]
 
     function handleDropdownChange(value: any) {
-        setDropdownValue(value)
         setAssignmentType(value.name)
     }
 
@@ -49,7 +48,7 @@ function Settings({ setAssignmentType }: SettingsProps) {
                         onMouseLeave={() => setShowSettings(false)}>
                         <h3>Settings</h3>
                         <Dropdown
-                            value={dropdownValue}
+                            value={{name: assignmentType, code: assignmentType}}
                             onChange={(e) => handleDropdownChange(e.value)}
                             optionLabel="name"
                             options={assignmentTypeOptions}
