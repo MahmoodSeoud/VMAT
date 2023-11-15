@@ -53,15 +53,21 @@ const bitMap = {
 export type BaseConversion = typeof baseConversionMap[keyof typeof baseConversionMap];
 export type AddressPrefix = typeof addressPrefixMap[keyof typeof addressPrefixMap];
 export type InputField = typeof InputFieldsMap[keyof typeof InputFieldsMap];
-// TODO: add the PageHit case
+export type Result = Pick<typeof InputFieldsMap,
+  'TLBHIT' |
+  'PageFault' |
+  'PageHit'>[keyof Pick<typeof InputFieldsMap,
+    'TLBHIT' |
+    'PageFault' |
+    'PageHit'>];
 
-export type Result = Pick<typeof InputFieldsMap, 'TLBHIT' | 'PageFault' | 'PageHit'>[keyof Pick<typeof InputFieldsMap, 'TLBHIT' | 'PageFault' | 'PageHit'>];
 export type Bit = typeof bitMap[keyof typeof bitMap];
 // ------
 
 // ----------- Test choices
 const ChosenAddressPrefix: AddressPrefix = addressPrefixMap.Hexadecimal;
 const ChosenBaseConversion: BaseConversion = baseConversionMap.Hexadecimal;
+const possiblePageSizes = [16, 32, 64] as const;
 const testing = true;
 
 // Sorting randomized https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
@@ -145,7 +151,6 @@ function generateTLBSets(): number {
 function generateTLBWays(): number {
   return createRandomNumber(3, 5);
 }
-// -----------------
 
 
 /**
@@ -229,7 +234,6 @@ function createTableEntries<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(
   return entries;
 }
 
-const possiblePageSizes = [16, 32, 64] as const;
 
 function App(): JSX.Element {
   console.log('App rendered')
@@ -385,7 +389,7 @@ function App(): JSX.Element {
           PhysicalAddress: newTLBTableEntries[newTLBI_value][correctTagIndex].ppn.toString(2) + newVPO_bits,
           PageHit: ''
         }
-        setFacit(facitObj);
+
         break;
 
       case InputFieldsMap.PageHit:
@@ -476,7 +480,7 @@ function App(): JSX.Element {
     setTLBI_bits(newTLBI_bits);
     setTLBT_bits(newTLBT_bits);
     setVPN(newVPN);
-
+    setFacit(facitObj);
 
     setPageTableEntries(newPageTableEntries);
     setTLBTableEntries(newTLBTableEntries);

@@ -5,11 +5,15 @@
     - Page size 
     - tlb sets
     - assignment type
-    - PageTableSize (NTH)
+    - PageTableSize (Nice to have)
     - Page_PPN bitSize
     - TLB_PPN bitSize
     - VirtualAddress bitSize
     - PhysicalAddress bitsSize
+
+- Make bits be written from right to left and then add 0's if bitwidth is not yet filled up.
+- Make either facit or input strictly lowercase or uppercase and then check for that
+
 
 - Test PageHit
 - Test PageFault
