@@ -73,9 +73,17 @@ const randomAssignmentType = [
   .sort(() => (Math.random() > .5) ? 1 : -1)[0];
 // ----------- 
 
-// ----- Given parameters for exercis
-
-// ------ -Helper functions
+const empty: InputFields = {
+  VirtualAddress: '',
+  VPN: '',
+  TLBI: '',
+  TLBT: '',
+  TLBHIT: '',
+  PageFault: '',
+  PPN: '',
+  PhysicalAddress: '',
+  PageHit: ''
+}
 
 /**
  * Generates a random number within a range determined by the bit length.
@@ -140,21 +148,16 @@ function generateTLBWays(): number {
 // -----------------
 
 
+/**
+ * Type guard to check if a table entry is of type PAGE_TABLE_ENTRY.
+ *
+ * @param {TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY} entry - The table entry to check.
+ * @returns {entry is PAGE_TABLE_ENTRY} - Returns true if the entry is of type PAGE_TABLE_ENTRY, false otherwise.
+ */
 function isPageTableEntry(entry: TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY): entry is PAGE_TABLE_ENTRY {
   return 'vpn' in entry;
 }
 
-let empty: InputFields = {
-  VirtualAddress: '',
-  VPN: '',
-  TLBI: '',
-  TLBT: '',
-  TLBHIT: '',
-  PageFault: '',
-  PPN: '',
-  PhysicalAddress: '',
-  PageHit: ''
-}
 
 
 /**

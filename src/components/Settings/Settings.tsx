@@ -3,9 +3,6 @@ import { InputFieldsMap, Result } from "../../App";
 import { SelectItemOptionsType } from "primereact/selectitem";
 import { Dropdown } from "primereact/dropdown";
 
-
-
-
 interface SettingsProps {
     setAssignmentType: React.Dispatch<SetStateAction<Result>>;
     assignmentType: Result;
