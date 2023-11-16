@@ -177,9 +177,6 @@ function Input_table({
     assignmentType
 }: Input_tableProps): JSX.Element {
 
-    console.log('Recieved virtual address width: ', virtualAddressWidth)
-    console.log('Recieved physical address width: ', physcialAddressWidth)
-
     const [input, setInput] = useState<InputFields>({
         VirtualAddress: '',
         VPN: '',
@@ -358,7 +355,7 @@ function Input_table({
         //ppnRef.current?.onfocus
         if ((input[inputFieldName] === facit[inputFieldName]) &&
             (inputFieldName === 'PhysicalAddress' || inputFieldName === 'VirtualAddress')) {
-            console.log(`they are equal -> ${input[inputFieldName]} === ${facit[inputFieldName]} `)
+            // console.log(`they are equal -> ${input[inputFieldName]} === ${facit[inputFieldName]} `)
         }
 
         return input[inputFieldName] === facit[inputFieldName]
@@ -374,7 +371,7 @@ function Input_table({
      */
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: InputField) => {
         const regexBits = /^[01]*$/; // regular expression to match only 1's and 0's
-        const regexYN = /^[YN]*$/; // regular expression to match only Y AND N
+        const regexYN = /^[YNyn]*$/; // regular expression to match only Y AND N
         const regexHexChars = /^[0-9a-fA-F]*$/; // regular expression to match only hex characters
         const input = event.target.value;
 
@@ -395,7 +392,7 @@ function Input_table({
                     event.target.value = '';
                     return;
                 }
-                setInput((prevState: InputFields) => ({ ...prevState, [fieldName]: input }));
+                setInput((prevState: InputFields) => ({ ...prevState, [fieldName]: input.toLowerCase() }));
                 break;
 
             case InputFieldsMap.PageFault:
@@ -405,7 +402,7 @@ function Input_table({
                     return;
                 }
 
-                setInput((prevState: InputFields) => ({ ...prevState, [fieldName]: input }));
+                setInput((prevState: InputFields) => ({ ...prevState, [fieldName]: input.toUpperCase() }));
                 break;
 
             case InputFieldsMap.PhysicalAddress:
