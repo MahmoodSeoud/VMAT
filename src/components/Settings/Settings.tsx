@@ -2,14 +2,44 @@ import { SetStateAction, useState } from "react";
 import { InputFieldsMap, Result } from "../../App";
 import { SelectItemOptionsType } from "primereact/selectitem";
 import { Dropdown } from "primereact/dropdown";
+import { Slider } from "primereact/slider";
+import { InputNumber } from "primereact/inputnumber";
+import { Card } from 'primereact/card';
+
+import './Settings.css';
+import '../../Laratheme.css'
+
 
 interface SettingsProps {
     setAssignmentType: React.Dispatch<SetStateAction<Result>>;
     assignmentType: Result;
+    TLBWays: number;
+    setTLBWays: React.Dispatch<SetStateAction<number>>;
+    TLBSets: number;
+    setTLBSets: React.Dispatch<SetStateAction<number>>;
+    pageSize: number;
+    setPageSize: React.Dispatch<SetStateAction<16 | 32 | 64>>;
+    virtualAddressBitWidth: number;
+    setVirtualAddressBitWidth: React.Dispatch<SetStateAction<number>>;
+    physicalAddressBitWidth: number;
+    setPhysicalAddressBitWidth: React.Dispatch<SetStateAction<number>>;
 }
 
 
-function Settings({ setAssignmentType, assignmentType }: SettingsProps) {
+function Settings({
+    setAssignmentType,
+    setPageSize,
+    setPhysicalAddressBitWidth,
+    setTLBSets,
+    setTLBWays,
+    setVirtualAddressBitWidth,
+    assignmentType,
+    TLBSets,
+    TLBWays,
+    virtualAddressBitWidth,
+    physicalAddressBitWidth,
+    pageSize
+}: SettingsProps) {
     const [showSettings, setShowSettings] = useState<boolean>(false);
 
     const assignmentTypeOptions: SelectItemOptionsType = [
@@ -27,12 +57,13 @@ function Settings({ setAssignmentType, assignmentType }: SettingsProps) {
         }
     ]
 
-    function handleDropdownChange(value: any) {
-        setAssignmentType(value.name)
-    }
+
+
+
 
     return (
         <>
+
             <i
                 className="pi pi-cog"
                 style={{ fontSize: '2em', cursor: 'pointer' }}
@@ -41,23 +72,47 @@ function Settings({ setAssignmentType, assignmentType }: SettingsProps) {
 
             {showSettings && (
                 <>
-                    <div className='settings-wrapper'
-                        onMouseLeave={() => setShowSettings(false)}>
-                        <h3>Settings</h3>
-                        <Dropdown
-                            value={{name: assignmentType, code: assignmentType}}
-                            onChange={(e) => handleDropdownChange(e.value)}
-                            optionLabel="name"
-                            options={assignmentTypeOptions}
-                            showClear
-                            placeholder="Select Assignment Type"
-                            className="w-full md:w-14rem"
-                        />
-                        <p>TLB-Ways:</p>
-                        <p>TLB Sets</p>
-                        <p>Page size</p>
-                        <p>Virtual Address bit length</p>
-                    </div>
+                    <Card className="p-m-2">
+                        <h3 className="p-text-center">Settings</h3>
+
+                        <div className="p-field p-mt-3">
+                            <Dropdown
+                                id="assignmentType"
+                                value={{ name: assignmentType, code: assignmentType }}
+                                onChange={(e) => setAssignmentType(e.value.name)}
+                                optionLabel="name"
+                                options={assignmentTypeOptions}
+                                placeholder="Select Assignment Type"
+                                className="w-full md:w-14rem"
+                            />
+                            <label htmlFor="assignmentType" className="p-d-block">Select an assignmentType</label>
+                        </div>
+
+                        <div className="p-field p-mt-1">
+                            <div className="p-inputgroup">
+                                <InputNumber
+                                    id="tlbWays"
+                                    value={TLBSets}
+                                    className="w-full md:w-14rem"
+                                    disabled
+                                />
+                                    </div>
+                                <Slider
+                                    id="tlbWaysSlider"
+                                    value={TLBSets}
+                                    onChange={(e) => setTLBSets(e.value as number)}
+                                    min={4}
+                                    max={8}
+                                    className="w-full"
+                                    step={1}
+                                />
+                            </div>
+
+                       
+
+                    </Card>
+
+
                 </>
             )}
         </>

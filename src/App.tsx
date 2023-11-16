@@ -515,6 +515,17 @@ function App(): JSX.Element {
       <Settings
         assignmentType={assignmentType}
         setAssignmentType={setAssignmentType}
+        TLBWays={TLBWays}
+        setTLBWays={setTLBWays}
+        TLBSets={TLBSets}
+        setTLBSets={setTLBSets}
+        pageSize={pageSize}
+        setPageSize={setPageSize}
+        virtualAddressBitWidth={virtualAddressBitWidth}
+        setVirtualAddressBitWidth={setVirtualAddressBitWidth}
+        physicalAddressBitWidth={physicalAddressBitWidth}
+        setPhysicalAddressBitWidth={setPhysicalAddressBitWidth}
+
       />
 
       <div className='wrapper'>
@@ -545,9 +556,10 @@ function App(): JSX.Element {
           baseConversion={ChosenBaseConversion}
           assignmentType={assignmentType}
         />
-      </div >
+      </div>
     </>
   )
 }
+
 
 export default App
