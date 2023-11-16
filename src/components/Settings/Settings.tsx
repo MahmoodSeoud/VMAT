@@ -61,6 +61,10 @@ function Settings({
 
 
 
+    function showDescription(parameter?: SettingsProps): void {
+        throw new Error("Function not implemented.");
+    }
+
     return (
         <>
 
@@ -76,6 +80,7 @@ function Settings({
                         <h3 className="p-text-center">Settings</h3>
 
                         <div className="p-field p-mt-3">
+                            <label htmlFor="assignmentType" className="p-d-block">Select an Assignment Type: </label>
                             <Dropdown
                                 id="assignmentType"
                                 value={{ name: assignmentType, code: assignmentType }}
@@ -85,30 +90,62 @@ function Settings({
                                 placeholder="Select Assignment Type"
                                 className="w-full md:w-14rem"
                             />
-                            <label htmlFor="assignmentType" className="p-d-block">Select an assignmentType</label>
                         </div>
 
                         <div className="p-field p-mt-1">
+
                             <div className="p-inputgroup">
+                                <i
+                                    className="pi pi-question-circle"
+                                    style={{ fontSize: '1.2em', cursor: 'pointer' }}
+                                    onFocus={() => showDescription()}
+                                />
+                                <label htmlFor="assignmentType" className="p-d-block"> TLB Ways: </label>
                                 <InputNumber
                                     id="tlbWays"
                                     value={TLBSets}
                                     className="w-full md:w-14rem"
                                     disabled
                                 />
-                                    </div>
-                                <Slider
-                                    id="tlbWaysSlider"
+                            </div>
+                            <Slider
+                                id="tlbWaysSlider"
+                                value={TLBSets}
+                                onChange={(e) => setTLBWays(e.value as number)}
+                                min={4}
+                                max={8}
+                                className="w-full"
+                                step={1}
+                            />
+                        </div>
+
+                        <div className="p-field p-mt-1">
+                            <div className="p-inputgroup">
+                                <i
+                                    className="pi pi-question-circle"
+                                    style={{ fontSize: '1.2em', cursor: 'pointer' }}
+                                    onFocus={() => showDescription()}
+                                />
+                                <label htmlFor="assignmentType" className="p-d-block"> TLB Sets: </label>
+                                <InputNumber
+                                    id="tlbSets"
                                     value={TLBSets}
-                                    onChange={(e) => setTLBSets(e.value as number)}
-                                    min={4}
-                                    max={8}
-                                    className="w-full"
-                                    step={1}
+                                    className="w-full md:w-14rem"
+                                    disabled
                                 />
                             </div>
+                            <Slider
+                                id="tlbSetsSlider"
+                                value={TLBSets}
+                                onChange={(e) => setTLBSets(e.value as number)}
+                                min={4}
+                                max={8}
+                                className="w-full"
+                                step={1}
+                            />
+                        </div>
 
-                       
+
 
                     </Card>
 

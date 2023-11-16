@@ -12,8 +12,12 @@
     - PhysicalAddress bitsSize
 
 - Make bits be written from right to left and then add 0's if bitwidth is not yet filled up.
-- Make either facit or input strictly lowercase or uppercase and then check for that
+- [x] Make either facit or input strictly lowercase or uppercase and then check for that
 
 
-- Test PageHit
-- Test PageFault
+- [x] Test PageHit 
+- [x] Test PageFault
+
+
+# BUGS:
+- Pagefault is a bit funky when you switch to the assignment type
