@@ -242,6 +242,7 @@ function Input_table({
 
     useEffect(() => {
         resetInputFields();
+        resetColors();
     }, [assignmentType])
 
 
