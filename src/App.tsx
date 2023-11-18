@@ -251,7 +251,6 @@ function App(): JSX.Element {
   const [VPO, setVPO] = useState(Math.log2(pageSize));
   const [TLBI, setTLBI] = useState(Math.log2(TLBSets));
   const [TLB_PPN, setTLB_PPN] = useState(createRandomNumberWith(8));
-  const [Page_PPN, setPage_PPN] = useState(createUniqe(TLB_PPN, 8));
 
   const [virtualAddressBitWidth, setVirtualAddressBitWidth] = useState(createRandomNumber(10, 14)); // VAS
   const [physicalAddressBitWidth, setPhysicalAddressBitWidth] = useState(TLB_PPN.toString(2).length + VPO);
@@ -312,7 +311,7 @@ function App(): JSX.Element {
     const newPage_PPN = createUniqe(newTLB_PPN, 8);
 
     const newVirtualAddressBitWidth = createRandomNumber(10, 14); // VAS
-    const newPhysicalAddressBitWidth = newTLB_PPN.toString(2).length + newVPO;
+    let newPhysicalAddressBitWidth = newTLB_PPN.toString(2).length + newVPO;
 
     const newGeneratedVirtualAddress = createRandomNumberWith(newVirtualAddressBitWidth);
     const newAddressInBitsOrignal = [...newGeneratedVirtualAddress.toString(2)];
@@ -401,6 +400,8 @@ function App(): JSX.Element {
         // Get a random row and column
         const randomRow = Math.floor(Math.random() * newPageTableEntries.length);
         const randomCol = Math.floor(Math.random() * newPageTableEntries[0].length);
+        
+        newPhysicalAddressBitWidth = newPage_PPN.toString(2).length + newVPO;
 
         // Modify the copy
         newPageTableEntries[randomRow][randomCol] = {
@@ -421,6 +422,7 @@ function App(): JSX.Element {
           PhysicalAddress: newPage_PPN.toString(2) + newVPO_bits,
           PageHit: ''
         }
+
         break;
 
 
@@ -471,7 +473,6 @@ function App(): JSX.Element {
     setVPO(newVPO);
     setTLBI(newTLBI);
     setTLB_PPN(newTLB_PPN);
-    setPage_PPN(newPage_PPN);
     setVirtualAddressBitWidth(newVirtualAddressBitWidth);
     setPhysicalAddressBitWidth(newPhysicalAddressBitWidth);
     setGeneratedVirtualAddress(newGeneratedVirtualAddress);
