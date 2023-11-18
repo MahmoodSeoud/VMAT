@@ -1,6 +1,7 @@
 import { SetStateAction, useState } from "react";
 import { InputFieldsMap, Result } from "../../App";
 import { SelectItemOptionsType } from "primereact/selectitem";
+import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { styled, alpha, Box } from '@mui/system';
 import { Slider as BaseSlider, sliderClasses } from '@mui/base/Slider';
@@ -8,6 +9,7 @@ import { Card } from 'primereact/card';
 
 import './Settings.css';
 import '../../Laratheme.css'
+import { Tooltip } from "primereact/tooltip";
 
 
 interface SettingsProps {
@@ -153,6 +155,12 @@ export default function Settings({
 
 
 
+    const footer = (
+        <>
+            <Button onClick={() => setShowSettings(false)} label="Cancel" severity="secondary" icon="pi pi-times" style={{ marginLeft: '0.5em' }} />
+        </>
+    );
+
     return (
         <>
 
@@ -162,46 +170,47 @@ export default function Settings({
                 onClick={() => setShowSettings(!showSettings)}
             />
 
+
             {showSettings && (
-                <>
-                    <Card className="p-m-4 p-d-flex p-flex-column p-ai-center p-jc-center">
 
-                        <h3>Settings</h3>
-
-                        <div className="p-d-flex p-flex-column p-ai-center p-jc-center">
-
-                            <label htmlFor="assignmentType" className="p-d-block">Select an Assignment Type: </label>
-                            <Dropdown
-                                id="assignmentType"
-                                value={{ name: assignmentType, code: assignmentType }}
-                                onChange={(e) => setAssignmentType(e.value.name)}
-                                optionLabel="name"
-                                options={assignmentTypeOptions}
-                                placeholder="Select Assignment Type"
-                                className="w-full md:w-14rem"
-                            />
-                        </div>
-
+                <Card title="Settings" footer={footer} className="md:w-25rem">
+                    <div>
+                        <label htmlFor="assignmentType" className="p-d-block">Select an Assignment Type: </label>
+                        <Dropdown
+                            id="assignmentType"
+                            value={{ name: assignmentType, code: assignmentType }}
+                            onChange={(e) => setAssignmentType(e.value.name)}
+                            optionLabel="name"
+                            options={assignmentTypeOptions}
+                            placeholder="Select Assignment Type"
+                            className="w-full md:w-14rem"
+                        />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                         {/* Slider for the TLB sets */}
-                        <div className="p-d-flex p-flex-column p-ai-center p-jc-center">
-                            <label>Select the TLB Sets: </label>
-                            <DiscreteSliderValues
-                                handleSliderChange={handleTLBSetState}
-                                marks={TLBSetMarks}
-                                value={TLBSets}
-                            />
-                        </div>
-                        <div className="p-d-flex p-flex-column p-ai-center p-jc-center">
-                            <label>Select the TLB Ways: </label>
-                            <DiscreteSliderValues
-                                handleSliderChange={handleTLBWaysState}
-                                marks={TLBWaysMarks}
-                                value={TLBWays}
-                            />
-                        </div>
-                    </Card>
-                </>
+                        <label>Select the TLB Sets: </label>
+                        <DiscreteSliderValues
+                            handleSliderChange={handleTLBSetState}
+                            marks={TLBSetMarks}
+                            value={TLBSets}
+                        />
+                    </div>
+
+                    {/* Slider for the TLB Ways */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <label>Select the TLB Ways: </label>
+                        <DiscreteSliderValues
+                            handleSliderChange={handleTLBWaysState}
+                            marks={TLBWaysMarks}
+                            value={TLBWays}
+                        />
+                    </div>
+
+
+                </Card>
+
             )}
+
         </>
     );
 }
@@ -217,13 +226,17 @@ interface DiscreteSliderValuesProps {
 function DiscreteSliderValues(props: DiscreteSliderValuesProps) {
     const defaultValue = props.marks.find((mark) => mark.label === props.value.toString())?.value
     return (
-        <Slider
-            defaultValue={defaultValue}
-            getAriaValueText={valuetext}
-            step={null}
-            onChange={(e, value): any => props.handleSliderChange(value)}
-            marks={props.marks}
-        />
+        <Box sx={{ width: 1 / 2 }}>
+
+            <Slider
+                defaultValue={defaultValue}
+                getAriaValueText={valuetext}
+                step={null}
+                style={{ width: '28rem'}}
+                onChange={(e, value): any => props.handleSliderChange(value)}
+                marks={props.marks}
+            />
+        </Box>
     );
 }
 
