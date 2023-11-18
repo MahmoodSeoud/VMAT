@@ -483,6 +483,11 @@ function Input_table({
                                             </p>
                                             <input
                                                 id='vbit'
+                                                autoComplete='off'
+                                                autoCorrect='off'
+                                                autoSave='off'
+                                                autoFocus={false}
+                                                autoCapitalize='off'
                                                 className={`vbit-input ${validateFieldInput(InputFieldsMap.VirtualAddress) ? 'correct' : ''}`}
                                                 name='VirtualAddress'
                                                 maxLength={1}
@@ -526,6 +531,11 @@ function Input_table({
 
                                             <td>
                                                 <input
+                                                    autoComplete='off'
+                                                    autoCorrect='off'
+                                                    autoSave='off'
+                                                    autoFocus={false}
+                                                    autoCapitalize='off'
                                                     className={`${validateFieldInput(InputFieldsMap.VPN) ? ' correct' : ''}`}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.VPN)}
                                                 />
@@ -549,6 +559,11 @@ function Input_table({
                                             </td>
                                             <td>
                                                 <input
+                                                    autoComplete='off'
+                                                    autoCorrect='off'
+                                                    autoSave='off'
+                                                    autoFocus={false}
+                                                    autoCapitalize='off'
                                                     className={`${validateFieldInput(InputFieldsMap.TLBI) ? ' correct' : ''} `}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBI)}
                                                 />
@@ -571,6 +586,11 @@ function Input_table({
                                             </td>
                                             <td>
                                                 <input
+                                                    autoComplete='off'
+                                                    autoCorrect='off'
+                                                    autoSave='off'
+                                                    autoFocus={false}
+                                                    autoCapitalize='off'
                                                     className={`${validateFieldInput(InputFieldsMap.TLBT) ? ' correct' : ''}`}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBT)}
                                                 />
@@ -592,6 +612,11 @@ function Input_table({
                                             </td>
                                             <td>
                                                 <input
+                                                    autoComplete='off'
+                                                    autoCorrect='off'
+                                                    autoSave='off'
+                                                    autoFocus={false}
+                                                    autoCapitalize='off'
                                                     className={`${validateFieldInput(InputFieldsMap.TLBHIT) ? ' correct' : ''}`}
                                                     maxLength={1}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.TLBHIT)}
@@ -614,6 +639,11 @@ function Input_table({
                                             </td>
                                             <td>
                                                 <input
+                                                    autoComplete='off'
+                                                    autoCorrect='off'
+                                                    autoSave='off'
+                                                    autoFocus={false}
+                                                    autoCapitalize='off'
                                                     className={`${validateFieldInput(InputFieldsMap.PageFault) ? ' correct' : ''}`}
                                                     maxLength={1}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.PageFault)}
@@ -638,6 +668,11 @@ function Input_table({
                                             </td>
                                             <td>
                                                 <input
+                                                    autoComplete='off'
+                                                    autoCorrect='off'
+                                                    autoSave='off'
+                                                    autoFocus={false}
+                                                    autoCapitalize='off'
                                                     className={`${validateFieldInput(InputFieldsMap.PPN) ? ' correct' : ''}`}
                                                     onChange={(ev) => handleInputChange(ev, InputFieldsMap.PPN)}
                                                     onFocus={() => setIsPPNFocused(true)}
@@ -676,6 +711,11 @@ function Input_table({
                                                 {physcialAddressWidth - index - 1}
                                             </p>
                                             <input
+                                                autoComplete='off'
+                                                autoCorrect='off'
+                                                autoSave='off'
+                                                autoFocus={false}
+                                                autoCapitalize='off'
                                                 id='pbit'
                                                 className={`pbit-input ${validateFieldInput(InputFieldsMap.PhysicalAddress) ? 'correct' : ''}`}
                                                 maxLength={1}
