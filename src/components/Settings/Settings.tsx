@@ -4,13 +4,10 @@ import { SelectItemOptionsType } from "primereact/selectitem";
 import { Dropdown } from "primereact/dropdown";
 import { styled, alpha, Box } from '@mui/system';
 import { Slider as BaseSlider, sliderClasses } from '@mui/base/Slider';
-import { InputNumber } from "primereact/inputnumber";
 import { Card } from 'primereact/card';
 
 import './Settings.css';
 import '../../Laratheme.css'
-import Tlb_table from "../Tlb_table/Tlb_table";
-import { Mark } from "@mui/base";
 
 
 interface SettingsProps {
@@ -28,7 +25,14 @@ interface SettingsProps {
     setPhysicalAddressBitWidth: React.Dispatch<SetStateAction<number>>;
 }
 
-const marks = [
+interface Mark {
+    value: number;
+    label: string
+};
+
+
+
+const TLBSetMarks: Mark[] = [
     {
         value: 0,
         label: '4',
@@ -48,6 +52,30 @@ const marks = [
     {
         value: 100,
         label: '64',
+    },
+];
+
+
+const TLBWaysMarks: Mark[] = [
+    {
+        value: 0,
+        label: '1',
+    },
+    {
+        value: 25,
+        label: '2',
+    },
+    {
+        value: 50,
+        label: '3',
+    },
+    {
+        value: 75,
+        label: '4',
+    },
+    {
+        value: 100,
+        label: '5',
     },
 ];
 
@@ -99,11 +127,31 @@ export default function Settings({
     }
 
 
-    function handleTLBSetTable(value: number): void {
+    function handleTLBSetState(value: number | number[]): void {
 
-        const index = marks.findIndex(mark => value === mark.value);
-        setTLBSets(Number(marks[index].label))
+        const index = TLBSetMarks.findIndex(mark => value === mark.value);
+        setTLBSets(Number(TLBSetMarks[index].label))
     }
+
+    function handleTLBWaysState(value: number | number[]): void {
+        const index = TLBWaysMarks.findIndex(mark => value === mark.value);
+        setTLBWays(Number(TLBWaysMarks[index].label))
+    }
+
+
+    function handlePageSizeState(value: number | number[]): void {
+        setPageSize(value as 16 | 32 | 64)
+    }
+
+    function handleVirtualAddressBitWidthState(value: number | number[]): void {
+        setVirtualAddressBitWidth(value as number)
+    }
+
+    function handlePhysicalAddressBitWidthState(value: number | number[]): void {
+        setPhysicalAddressBitWidth(value as number)
+    }
+
+
 
     return (
         <>
@@ -116,10 +164,12 @@ export default function Settings({
 
             {showSettings && (
                 <>
-                    <Card className="p-m-2">
-                        <h3 className="p-text-center">Settings</h3>
+                    <Card className="p-m-4 p-d-flex p-flex-column p-ai-center p-jc-center">
 
-                        <div className="p-field p-mt-3">
+                        <h3>Settings</h3>
+
+                        <div className="p-d-flex p-flex-column p-ai-center p-jc-center">
+
                             <label htmlFor="assignmentType" className="p-d-block">Select an Assignment Type: </label>
                             <Dropdown
                                 id="assignmentType"
@@ -131,35 +181,49 @@ export default function Settings({
                                 className="w-full md:w-14rem"
                             />
                         </div>
+
+                        {/* Slider for the TLB sets */}
+                        <div className="p-d-flex p-flex-column p-ai-center p-jc-center">
+                            <label>Select the TLB Sets: </label>
+                            <DiscreteSliderValues
+                                handleSliderChange={handleTLBSetState}
+                                marks={TLBSetMarks}
+                                value={TLBSets}
+                            />
+                        </div>
+                        <div className="p-d-flex p-flex-column p-ai-center p-jc-center">
+                            <label>Select the TLB Ways: </label>
+                            <DiscreteSliderValues
+                                handleSliderChange={handleTLBWaysState}
+                                marks={TLBWaysMarks}
+                                value={TLBWays}
+                            />
+                        </div>
                     </Card>
-
-
                 </>
-            )
-            }
-            <DiscreteSliderValues
-                handleTLBSetTable={handleTLBSetTable}
-            />
+            )}
         </>
     );
 }
 
 
+interface DiscreteSliderValuesProps {
+    handleSliderChange: (value: number | number[]) => void;
+    value: number;
+    marks: Mark[];
+}
 
 
-
-function DiscreteSliderValues(props: any) {
-
+function DiscreteSliderValues(props: DiscreteSliderValuesProps) {
+    const defaultValue = props.marks.find((mark) => mark.label === props.value.toString())?.value
     return (
-        <Box sx={{ width: 300 }}>
-            <Slider
-                defaultValue={25}
-                getAriaValueText={valuetext}
-                step={null}
-                onChange={(e, value): any => props.handleTLBSetTable(value)}
-                marks={marks}
-            />
-        </Box>
+        <Slider
+            defaultValue={defaultValue}
+            getAriaValueText={valuetext}
+            step={null}
+            onChange={(e, value): any => props.handleSliderChange(value)}
+            marks={props.marks}
+        />
     );
 }
 

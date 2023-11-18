@@ -1,5 +1,4 @@
 .settings-wrapper {
-  position: absolute;
   top: 5em;
   float: left;
   background-color: grey;
@@ -11,6 +10,8 @@
   border: 1px solid white;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 

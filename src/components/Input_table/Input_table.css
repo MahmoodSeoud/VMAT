@@ -1,3 +1,9 @@
+.input-buttons {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+
 .input-table {
     border: 1px white solid;
     min-width: 70em;
@@ -114,6 +120,27 @@ tr td input {
 .reset-color-btn:focus-visible {
     outline: 4px auto -webkit-focus-ring-color;
 }
+
+
+.reset-input-btn {
+    background-color: rgb(175, 110, 70);
+    border: 1px solid rgb(128, 22, 138);
+    border-radius: 5px;
+    padding: .5em;
+    font-size: 16px;
+    margin: .5em;
+}
+
+.reset-input-btn:hover {
+    background-color: rgb(252, 184, 131);
+    border-color: rgb(25, 111, 154);
+}
+
+.reset-input-btn:hover:hover:hover:focus,
+.reset-input-btn:focus-visible {
+    outline: 4px auto -webkit-focus-ring-input;
+}
+
 
 #vbit-index,
 #pbit-index {

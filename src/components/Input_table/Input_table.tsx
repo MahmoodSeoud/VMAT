@@ -438,6 +438,8 @@ function Input_table({
             <div className="input-table">
 
                 <div className='input-header'>
+                    <div className="input-buttons">
+
                     <button
                         className='reset-color-btn'
                         onClick={resetColors}
@@ -445,12 +447,13 @@ function Input_table({
                         Reset the colors
                     </button>
                     <button
-                        className='reset-color-btn'
+                        className='reset-input-btn'
                         onClick={resetInputFields}
                     >
                         Reset Input
                     </button>
 
+                    </div>
                     <h2>Virtual address: {addressPrefix + VirtualAddress.toString(baseConversion).toUpperCase()}</h2>
                     <HuePicker
                         width={'200px'}
