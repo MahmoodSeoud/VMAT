@@ -102,6 +102,9 @@ tr td input {
     margin-right: 1em;
 }
 
+.exercise-label:hover {
+    background-color: rgb(126, 126, 125);
+}
 
 .reset-color-btn {
     background-color: rgb(37, 66, 231);
