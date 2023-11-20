@@ -1,5 +1,5 @@
 import { SetStateAction, useState } from "react";
-import { InputFieldsMap, Result } from "../../App";
+import { InputFieldsMap, Result, createRandomNumber, createRandomNumberWith } from "../../App";
 import { SelectItemOptionsType } from "primereact/selectitem";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
@@ -81,6 +81,28 @@ const TLBWaysMarks: Mark[] = [
     },
 ];
 
+const virtualBitLengthMark: Mark[] = [
+    {
+        value: 0,
+        label: '12',
+    },
+    {
+        value: 25,
+        label: '16',
+    },
+    {
+        value: 50,
+        label: '24',
+    },
+    {
+        value: 75,
+        label: '28',
+    },
+    {
+        value: 100,
+        label: '32',
+    },
+];
 
 export default function Settings({
     setAssignmentType,
@@ -98,7 +120,6 @@ export default function Settings({
 }: SettingsProps) {
     setPageSize
     setPhysicalAddressBitWidth
-    setVirtualAddressBitWidth
     TLBWays
     virtualAddressBitWidth
     physicalAddressBitWidth
@@ -146,7 +167,9 @@ export default function Settings({
     }
 
     function handleVirtualAddressBitWidthState(value: number | number[]): void {
-        setVirtualAddressBitWidth(value as number)
+        const index = virtualBitLengthMark.findIndex(mark => value === mark.value)
+        const chosenNumber = Number(virtualBitLengthMark[index].label)
+        setVirtualAddressBitWidth(createRandomNumber(chosenNumber - 4, chosenNumber))
     }
 
     function handlePhysicalAddressBitWidthState(value: number | number[]): void {
@@ -206,6 +229,16 @@ export default function Settings({
                         />
                     </div>
 
+                    {/* Slider for the TLB Ways */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <label>Select the bit length of the virtual address: </label>
+                        <DiscreteSliderValues
+                            handleSliderChange={handleVirtualAddressBitWidthState}
+                            marks={virtualBitLengthMark}
+                            value={virtualAddressBitWidth}
+                        />
+                    </div>
+
 
                 </Card>
 
@@ -232,7 +265,7 @@ function DiscreteSliderValues(props: DiscreteSliderValuesProps) {
                 defaultValue={defaultValue}
                 getAriaValueText={valuetext}
                 step={null}
-                style={{ width: '28rem'}}
+                style={{ width: '28rem' }}
                 onChange={(e, value): any => props.handleSliderChange(value)}
                 marks={props.marks}
             />

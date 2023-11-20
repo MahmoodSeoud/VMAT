@@ -109,7 +109,7 @@ export function createRandomNumberWith(bitLength: number): number {
  * @param {number} b - The upper bound of the range (exclusive).
  * @returns {number} - A random number within the range [a, b).
  */
-function createRandomNumber(a: number, b: number): number {
+export function createRandomNumber(a: number, b: number): number {
   return Math.floor(Math.random() * (b - a)) + a;
 }
 
@@ -174,16 +174,16 @@ function isPageTableEntry(entry: TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY): entry is P
  * @param {string} VPN - The Virtual Page Number.
  * @returns {TObj} - The new table entry.
  */
-function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry: TObj, TLBT_bits: string, VPN: string): TObj {
+function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry: TObj, TLBT_bits: string, VPN: string, randomBitLength: number): TObj {
 
   const valid: Bit = Math.floor(Math.random() * 2) as Bit;
   const ppn: number = createRandomNumberWith(8);
   // create unique TLBT address
-  const tag: number = createUniqe(Number('0b' + TLBT_bits), 4 * 2)
-  const vpn: number = createUniqe(Number(VPN), 4 * 2)
+  const tag: number = createUniqe(Number('0b' + TLBT_bits), randomBitLength)
 
   let newEntry: TObj;
   if (isPageTableEntry(entry)) {
+  const vpn: number = createUniqe(Number(VPN), randomBitLength)
     newEntry = {
       ...entry,
       vpn,
@@ -212,6 +212,7 @@ function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry
  * @param {TObj} tableEntry - The initial entry object for each entry in the table.
  * @param {string} TLBT_bits - The TLB tag bits.
  * @param {string} VPN - The Virtual Page Number.
+ * @param {number} randomBitLength - The random bit length the Tag and VPN will be
  * @returns {TObj[][]} - The table of entries.
  */
 function createTableEntries<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(
@@ -219,14 +220,15 @@ function createTableEntries<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(
   numOfCols: number,
   tableEntry: TObj,
   TLBT_bits: string,
-  VPN: string
+  VPN: string,
+  randomBitLength: number
 ): TObj[][] {
   const entries: TObj[][] = [];
 
   for (let i = 0; i < numOfRows; i++) {
     const array: TObj[] = [];
     for (let j = 0; j < numOfCols; j++) {
-      let entry = createTableEntry<TObj>(tableEntry, TLBT_bits, VPN)
+      let entry = createTableEntry<TObj>(tableEntry, TLBT_bits, VPN, randomBitLength)
       array.push(entry);
     }
     entries.push(array);
@@ -266,16 +268,17 @@ function App(): JSX.Element {
   const [VPN, setVPN] = useState<string>(Number("0b" + TLBT_bits + TLBI_bits).toString(ChosenBaseConversion));
 
 
-  const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, TLBT_bits, VPN);
+  const tlbTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, TLBT_bits, VPN, virtualAddressBitWidth);
   const tlbTableEntries = createTableEntries<TLB_TABLE_ENTRY>(
     TLBSets,
     TLBWays,
     tlbTableEntry,
     TLBT_bits,
-    VPN
+    VPN,
+    virtualAddressBitWidth
   );
 
-  const pageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 }, TLBT_bits, VPN);
+  const pageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 }, TLBT_bits, VPN, virtualAddressBitWidth);
   const pageTableEntries: PAGE_TABLE_ENTRY[][] = createTableEntries<PAGE_TABLE_ENTRY>(
     3, // I choose 3 because of all the old exams all look like that. 
     // Make sure to see the PTE's in the old exams. Hint: they are all 12 entries.
@@ -283,7 +286,8 @@ function App(): JSX.Element {
     //Be sure to see the page size given in those exams
     pageTableEntry,
     TLBT_bits,
-    VPN
+    VPN,
+    virtualAddressBitWidth
   );
 
 
@@ -326,16 +330,17 @@ function App(): JSX.Element {
     const newTLBI_value: number = Number(addressPrefixMap.Binary + newTLBI_bits);
     const newTLBT_value: number = Number(addressPrefixMap.Binary + newTLBT_bits);
 
-    const newTLBTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN);
+    const newTLBTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN,virtualAddressBitWidth);
     const newTLBTableEntries = createTableEntries<TLB_TABLE_ENTRY>(
       newTLBSets,
       newTLBWays,
       newTLBTableEntry,
       newTLBT_bits,
-      newVPN
+      newVPN,
+      virtualAddressBitWidth
     );
 
-    const newPageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN);
+    const newPageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN, virtualAddressBitWidth);
     const newPageTableEntries: PAGE_TABLE_ENTRY[][] = createTableEntries<PAGE_TABLE_ENTRY>(
       3, // I choose 3 because of all the old exams all look like that. 
       // Make sure to see the PTE's in the old exams. Hint: they are all 12 entries.
@@ -343,7 +348,8 @@ function App(): JSX.Element {
       //Be sure to see the page size given in those exams
       newPageTableEntry,
       newTLBT_bits,
-      newVPN
+      newVPN,
+      virtualAddressBitWidth
     );
 
 
@@ -523,7 +529,7 @@ useEffect(() => {
     const newTLB_PPN = createRandomNumberWith(8);
     const newPage_PPN = createUniqe(newTLB_PPN, 8);
 
-    const newVirtualAddressBitWidth = createRandomNumber(10, 14); // VAS
+    const newVirtualAddressBitWidth = virtualAddressBitWidth; // VAS
     let newPhysicalAddressBitWidth = newTLB_PPN.toString(2).length + newVPO;
     
 
@@ -539,16 +545,17 @@ useEffect(() => {
     const newTLBI_value: number = Number(addressPrefixMap.Binary + newTLBI_bits);
     const newTLBT_value: number = Number(addressPrefixMap.Binary + newTLBT_bits);
 
-    const newTLBTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN);
+    const newTLBTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN, virtualAddressBitWidth);
     const newTLBTableEntries = createTableEntries<TLB_TABLE_ENTRY>(
      TLBSets,
       TLBWays,
       newTLBTableEntry,
       newTLBT_bits,
-      newVPN
+      newVPN,
+      virtualAddressBitWidth
     );
 
-    const newPageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN);
+    const newPageTableEntry = createTableEntry<PAGE_TABLE_ENTRY>({ vpn: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN, virtualAddressBitWidth);
     const newPageTableEntries: PAGE_TABLE_ENTRY[][] = createTableEntries<PAGE_TABLE_ENTRY>(
       3, // I choose 3 because of all the old exams all look like that. 
       // Make sure to see the PTE's in the old exams. Hint: they are all 12 entries.
@@ -556,7 +563,8 @@ useEffect(() => {
       //Be sure to see the page size given in those exams
       newPageTableEntry,
       newTLBT_bits,
-      newVPN
+      newVPN, 
+      virtualAddressBitWidth
     );
 
 
@@ -702,7 +710,7 @@ useEffect(() => {
     setTLBTableEntries(newTLBTableEntries);
 
 
-}, [TLBWays, TLBSets])
+}, [TLBWays, TLBSets, virtualAddressBitWidth])
 
 
 
