@@ -522,7 +522,7 @@ function App(): JSX.Element {
 
 useEffect(() => {
     const newPageSize = possiblePageSizes[Math.floor(Math.random() * possiblePageSizes.length)];
-    const newPageTableSize = createRandomNumber(3, 5); // PTS
+    // const newPageTableSize = createRandomNumber(3, 5); // PTS
 
     const newVPO = Math.log2(newPageSize);
     const newTLBI = Math.log2(TLBSets);

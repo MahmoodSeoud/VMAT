@@ -1,5 +1,5 @@
 import { SetStateAction, useState } from "react";
-import { InputFieldsMap, Result, createRandomNumber, createRandomNumberWith } from "../../App";
+import { InputFieldsMap, Result, createRandomNumber } from "../../App";
 import { SelectItemOptionsType } from "primereact/selectitem";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
@@ -9,7 +9,7 @@ import { Card } from 'primereact/card';
 
 import './Settings.css';
 import '../../Laratheme.css'
-import { Tooltip } from "primereact/tooltip";
+// import { Tooltip } from "primereact/tooltip";
 
 
 interface SettingsProps {
@@ -141,15 +141,6 @@ export default function Settings({
         }
     ]
 
-
-
-
-
-    function showDescription(): void {
-        throw new Error("Function not implemented.");
-    }
-
-
     function handleTLBSetState(value: number | number[]): void {
 
         const index = TLBSetMarks.findIndex(mark => value === mark.value);
@@ -162,9 +153,9 @@ export default function Settings({
     }
 
 
-    function handlePageSizeState(value: number | number[]): void {
-        setPageSize(value as 16 | 32 | 64)
-    }
+    // function handlePageSizeState(value: number | number[]): void {
+    //     setPageSize(value as 16 | 32 | 64)
+    // }
 
     function handleVirtualAddressBitWidthState(value: number | number[]): void {
         const index = virtualBitLengthMark.findIndex(mark => value === mark.value)
@@ -172,9 +163,9 @@ export default function Settings({
         setVirtualAddressBitWidth(createRandomNumber(chosenNumber - 4, chosenNumber))
     }
 
-    function handlePhysicalAddressBitWidthState(value: number | number[]): void {
-        setPhysicalAddressBitWidth(value as number)
-    }
+    // function handlePhysicalAddressBitWidthState(value: number | number[]): void {
+    //     setPhysicalAddressBitWidth(value as number)
+    // }
 
 
 
@@ -266,7 +257,7 @@ function DiscreteSliderValues(props: DiscreteSliderValuesProps) {
                 getAriaValueText={valuetext}
                 step={null}
                 style={{ width: '28rem' }}
-                onChange={(e, value): any => props.handleSliderChange(value)}
+                onChange={(_e, value): any => props.handleSliderChange(value)}
                 marks={props.marks}
             />
         </Box>
