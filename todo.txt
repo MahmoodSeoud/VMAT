@@ -1,20 +1,18 @@
 - [x] Clear input when switching assignment type 
 - [x] Reclicking the color, removes them 
 - Settings parameters:
-    - tlb ways
-    - Page size 
-    - tlb sets
-    - assignment type
-    - PageTableSize (Nice to have)
-    - Page_PPN bitSize
-    - TLB_PPN bitSize
-    - VirtualAddress bitSize
-    - PhysicalAddress bitsSize
+    - [x] tlb ways
+    - [x] Page size 
+    - [x] tlb sets
+    - [x] assignment type
+    - [x] VirtualAddress bitSize
+    - [] PageTableSize (Nice to have)
+    - [] Page_PPN bitSize
+    - [] TLB_PPN bitSize
+    - [] PhysicalAddress bitsSize
 
-- Make bits be written from right to left and then add 0's if bitwidth is not yet filled up.
+- [x] Make bits be written from right to left and then add 0's if bitwidth is not yet filled up.
 - [x] Make either facit or input strictly lowercase or uppercase and then check for that
-
-
 - [x] Test PageHit 
 - [x] Test PageFault
 
