@@ -196,7 +196,7 @@ export default function Settings({
 
             {showSettings && (
 
-                <Card title="Settings" footer={footer} className="md:w-25rem">
+                <Card title="Settings" footer={footer} className="md:w-25rem settingItem">
                     <div>
                         <label htmlFor="assignmentType" className="p-d-block">Select an Assignment Type: </label>
                         <Dropdown
@@ -209,7 +209,7 @@ export default function Settings({
                             className="w-full md:w-14rem"
                         />
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }} className="settingItem">
                         {/* Slider for the TLB sets */}
                         <label>Select the TLB Sets: </label>
                         <DiscreteSliderValues
@@ -220,7 +220,7 @@ export default function Settings({
                     </div>
 
                     {/* Slider for the TLB Ways */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }} className="settingItem">
                         <label>Select the TLB Ways: </label>
                         <DiscreteSliderValues
                             handleSliderChange={handleTLBWaysState}
@@ -230,8 +230,8 @@ export default function Settings({
                     </div>
 
                     {/* Slider for the TLB Ways */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <label>Select the bit length of the virtual address: </label>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }} className="settingItem">
+                        <label>Select maximum bit length of Virtual Address: </label>
                         <DiscreteSliderValues
                             handleSliderChange={handleVirtualAddressBitWidthState}
                             marks={virtualBitLengthMark}

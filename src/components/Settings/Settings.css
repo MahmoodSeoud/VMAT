@@ -16,9 +16,12 @@
 
 
 .pi.pi-cog {
-  position: sticky;
   top: 0;
   padding: .6em;
   float: left;
 }
 
+
+.settingItem {
+  margin: 2em;
+}

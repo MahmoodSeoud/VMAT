@@ -6,9 +6,10 @@
 
 .input-table {
     border: 1px white solid;
-    min-width: 70em;
+    /* min-width: 70em; */
     padding: 2em;
     margin: 2em;
+    width:100%
 
     /* height: 40em; */
 }
