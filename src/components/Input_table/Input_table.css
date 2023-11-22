@@ -24,7 +24,7 @@
     width: 1.5em;
     border: solid white .1em;
     padding: .3em;
-    font-size: 20px;
+    font-size: 16px;
 }
 
 .input-text {
@@ -52,11 +52,11 @@
 .table th {
     border-bottom: 1px solid white;
     padding: .5em;
-    font-size: 26px;
+    font-size: 16px;
 }
 
 tr td input {
-    font-size: 1.4em;
+    font-size: 16px;
 }
 
 .highlight {
@@ -79,7 +79,7 @@ tr td input {
     border-radius: 8px;
     border: 1px solid transparent;
     padding: 0.6em 1.2em;
-    font-size: 1em;
+    font-size: 16px;
     font-weight: 500;
     font-family: inherit;
     background-color: #1a1a1a;
