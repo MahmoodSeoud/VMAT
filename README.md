@@ -26,9 +26,9 @@ npm run dev
 
 - **Page Size:** Set the size of memory pages to experiment with different granularity.
   
-- **Number of TLB-sets:** Define the number of pages in the virtual memory space to observe the impact on translation.
+- **Number of TLB-sets:** Define the TLB-sets in the TLB table to observe the impact on translation.
 
-- **Number of TLB-ways:** Define the number of pages in the virtual memory space to observe the impact on translation.
+- **Number of TLB-ways:** Define the TLB-ways in the TLB table to observe the impact on translation.
 
 - **Virtual memory address bit length:** Choose between various memory management schemes (e.g., paging, segmentation) to understand their differences.
 
