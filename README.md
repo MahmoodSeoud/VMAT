@@ -14,8 +14,8 @@ Welcome to the Virtual Memory Address Translation Simulator, a project designed 
 
 ## Getting started
 You can visit the app (here)[https://abdsecondhand.site/]
+you can also clone the project and do:
 
-To run the project, do:
 ```
 npm i
 npm run dev
