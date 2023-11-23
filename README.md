@@ -2,7 +2,7 @@
 
 ## Overview
 
-Welcome to the Virtual Memory Address Translation Simulator, a project designed to assist students in understanding and experimenting with virtual memory address translation in computer systems exams. This simulator was created by [me](https://github.com/MahmoodSeoud) and [Phillip](https://github.com/Nidocq) to provide a hands-on and interactive learning experience for computer system students.
+Welcome to the Virtual Memory Address Translation Simulator, a project designed to assist students in understanding and experimenting with virtual memory address translation in computer systems exams. This simulator was created by )[Phillip](https://github.com/Nidocq) and [I](https://github.com/MahmoodSeoud to provide a hands-on and interactive learning experience for computer system students.
 
 ## Features
 
