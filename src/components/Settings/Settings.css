@@ -1,27 +1,12 @@
-.settings-wrapper {
-  top: 5em;
-  float: left;
-  background-color: grey;
-  padding: 1rem;
-  margin: 1rem;
-  border-radius: 0.5rem;
-  width: 50em;
-  z-index: 1;
-  border: 1px solid white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-
-.pi.pi-cog {
-  top: 0;
-  padding: .6em;
-  float: left;
-}
-
-
 .settingItem {
   margin: 2em;
 }
+
+.input-card {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    width: 203px;
+    padding: 10px;
+}
+

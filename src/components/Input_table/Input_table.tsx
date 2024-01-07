@@ -3,7 +3,7 @@ import { AddressPrefix, BaseConversion, InputField, InputFieldsMap, Result, crea
 import './Input_table.css'
 import { ColorResult, HuePicker } from 'react-color';
 import { Toast } from 'primereact/toast';
-import '../../theme.css';
+import { Button } from 'primereact/button';
 
 
 export type InputFields = {
@@ -440,18 +440,27 @@ function Input_table({
                 <div className='input-header'>
                     <div className="input-buttons">
 
-                    <button
-                        className='reset-color-btn'
-                        onClick={resetColors}
-                    >
-                        Reset the colors
-                    </button>
-                    <button
-                        className='reset-input-btn'
-                        onClick={resetInputFields}
-                    >
-                        Reset Input
-                    </button>
+                        <Button
+                            severity='warning'
+                            onClick={resetColors}
+                            label="Reset the colors"
+                            style={{ marginRight: '1rem' }}
+                        />
+
+                        <Button
+                            severity='success'
+                            label="Generate New Random Assignment"
+                            onClick={() => window.location.reload()}
+                            style={{ marginRight: '1rem' }}
+                        />
+
+                        <Button
+                            severity='danger'
+                            onClick={resetInputFields}
+                            label='Reset Input'
+                            style={{ marginRight: '1rem' }}
+                        />
+
 
                     </div>
                     <h2>Virtual address: {addressPrefix + VirtualAddress.toString(baseConversion).toUpperCase()}</h2>
@@ -461,9 +470,13 @@ function Input_table({
                         onChange={handleColorChange}
                     />
                     <h4>Click and drag to highlight bits or labels <br /> </h4>
-
                 </div>
                 <div className='virtual-wrapper'>
+                    <h2
+                        style={{ textAlign: 'center', margin: 0 }}
+                    >
+                        VPN, TLBI, TLBT and PPN are all written in hexa decimal
+                    </h2>
                     <ol>
                         <li>
                             <div className={`list-item-wrapper`}>

@@ -2,14 +2,14 @@ import { SetStateAction, useState } from "react";
 import { InputFieldsMap, Result, createRandomNumber } from "../../App";
 import { SelectItemOptionsType } from "primereact/selectitem";
 import { Button } from "primereact/button";
+import { Sidebar } from 'primereact/sidebar';
 import { Dropdown } from "primereact/dropdown";
 import { styled, alpha, Box } from '@mui/system';
 import { Slider as BaseSlider, sliderClasses } from '@mui/base/Slider';
 import { Card } from 'primereact/card';
+import 'primereact/resources/themes/lara-light-teal/theme.css';
 
 import './Settings.css';
-import '../../Laratheme.css'
-// import { Tooltip } from "primereact/tooltip";
 
 
 interface SettingsProps {
@@ -169,75 +169,79 @@ export default function Settings({
 
 
 
-    const footer = (
-        <>
-            <Button onClick={() => setShowSettings(false)} label="Cancel" severity="secondary" icon="pi pi-times" style={{ marginLeft: '0.5em' }} />
-        </>
-    );
 
     return (
         <>
 
-            <i
-                className="pi pi-cog"
-                style={{ fontSize: '2em', cursor: 'pointer' }}
-                onClick={() => setShowSettings(!showSettings)}
+
+            <Button
+                icon="pi pi-cog"
+                onClick={() => setShowSettings(true)}
+                severity="info"
             />
+            <Sidebar
+                visible={showSettings}
+                onHide={() => setShowSettings(false)}
+                style={{ backgroundColor: 'var(--primary-color)', width: '30rem', color: 'var(--primary-color-text)' }}
+            >
+
+                <Card
+                    title="VMAT Settings"
+                    className="md:w-25rem settingItem">
+                    <div className="card flex justify-content-center" >
 
 
-            {showSettings && (
+                        <div className="input-card">
+                            <label htmlFor="assignmentType" className="p-d-block">Select an Assignment Type: </label>
+                            <Dropdown
+                                id="assignmentType"
+                                value={{ name: assignmentType, code: assignmentType }}
+                                onChange={(e) => setAssignmentType(e.value.name)}
+                                optionLabel="name"
+                                options={assignmentTypeOptions}
+                                placeholder="Select Assignment Type"
+                                className="w-full md:w-14rem"
+                            />
+                        </div>
+                        <div className="input-card">
+                            {/* Slider for the TLB sets */}
+                            <label>Select the TLB Sets: </label>
+                            <DiscreteSliderValues
+                                handleSliderChange={handleTLBSetState}
+                                marks={TLBSetMarks}
+                                value={TLBSets}
+                            />
+                        </div>
 
-                <Card title="Settings" footer={footer} className="md:w-25rem settingItem">
-                    <div>
-                        <label htmlFor="assignmentType" className="p-d-block">Select an Assignment Type: </label>
-                        <Dropdown
-                            id="assignmentType"
-                            value={{ name: assignmentType, code: assignmentType }}
-                            onChange={(e) => setAssignmentType(e.value.name)}
-                            optionLabel="name"
-                            options={assignmentTypeOptions}
-                            placeholder="Select Assignment Type"
-                            className="w-full md:w-14rem"
-                        />
+                        {/* Slider for the TLB Ways */}
+                        <div className="input-card">
+                            <label>Select the TLB Ways: </label>
+                            <DiscreteSliderValues
+                                handleSliderChange={handleTLBWaysState}
+                                marks={TLBWaysMarks}
+                                value={TLBWays}
+                            />
+                        </div>
+
+                        {/* Slider for the TLB Ways */}
+                        <div className="input-card">
+                            <label>Select maximum bit length of Virtual Address: </label>
+                            <DiscreteSliderValues
+                                handleSliderChange={handleVirtualAddressBitWidthState}
+                                marks={virtualBitLengthMark}
+                                value={virtualAddressBitWidth}
+                            />
+                        </div>
+
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }} className="settingItem">
-                        {/* Slider for the TLB sets */}
-                        <label>Select the TLB Sets: </label>
-                        <DiscreteSliderValues
-                            handleSliderChange={handleTLBSetState}
-                            marks={TLBSetMarks}
-                            value={TLBSets}
-                        />
-                    </div>
-
-                    {/* Slider for the TLB Ways */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }} className="settingItem">
-                        <label>Select the TLB Ways: </label>
-                        <DiscreteSliderValues
-                            handleSliderChange={handleTLBWaysState}
-                            marks={TLBWaysMarks}
-                            value={TLBWays}
-                        />
-                    </div>
-
-                    {/* Slider for the TLB Ways */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }} className="settingItem">
-                        <label>Select maximum bit length of Virtual Address: </label>
-                        <DiscreteSliderValues
-                            handleSliderChange={handleVirtualAddressBitWidthState}
-                            marks={virtualBitLengthMark}
-                            value={virtualAddressBitWidth}
-                        />
-                    </div>
-
-
                 </Card>
 
-            )}
-
+            </Sidebar>
         </>
     );
 }
+
+
 
 
 interface DiscreteSliderValuesProps {
@@ -256,7 +260,7 @@ function DiscreteSliderValues(props: DiscreteSliderValuesProps) {
                 defaultValue={defaultValue}
                 getAriaValueText={valuetext}
                 step={null}
-                style={{ width: '28rem' }}
+                style={{ width: '203px' }}
                 onChange={(_e, value): any => props.handleSliderChange(value)}
                 marks={props.marks}
             />

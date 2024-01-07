@@ -3,6 +3,7 @@ import Input_table, { InputFields } from './components/Input_table/Input_table';
 import { useEffect, useState } from 'react';
 import Tlb_table, { TLB_TABLE_ENTRY } from './components/Tlb_table/Tlb_table';
 import Settings from './components/Settings/Settings';
+import 'primereact/resources/themes/lara-light-teal/theme.css';
 import 'primeicons/primeicons.css';
 import './App.css'
 
@@ -164,7 +165,6 @@ function isPageTableEntry(entry: TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY): entry is P
 }
 
 
-
 /**
  * Creates a table entry of type TLB_TABLE_ENTRY or PAGE_TABLE_ENTRY.
  *
@@ -183,7 +183,7 @@ function createTableEntry<TObj extends TLB_TABLE_ENTRY | PAGE_TABLE_ENTRY>(entry
 
   let newEntry: TObj;
   if (isPageTableEntry(entry)) {
-  const vpn: number = createUniqe(Number(VPN), randomBitLength)
+    const vpn: number = createUniqe(Number(VPN), randomBitLength)
     newEntry = {
       ...entry,
       vpn,
@@ -316,7 +316,7 @@ function App(): JSX.Element {
 
     const newVirtualAddressBitWidth = createRandomNumber(10, 14); // VAS
     let newPhysicalAddressBitWidth = newTLB_PPN.toString(2).length + newVPO;
-    
+
 
     const newGeneratedVirtualAddress = createRandomNumberWith(newVirtualAddressBitWidth);
     const newAddressInBitsOrignal = [...newGeneratedVirtualAddress.toString(2)];
@@ -330,7 +330,7 @@ function App(): JSX.Element {
     const newTLBI_value: number = Number(addressPrefixMap.Binary + newTLBI_bits);
     const newTLBT_value: number = Number(addressPrefixMap.Binary + newTLBT_bits);
 
-    const newTLBTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN,virtualAddressBitWidth);
+    const newTLBTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN, virtualAddressBitWidth);
     const newTLBTableEntries = createTableEntries<TLB_TABLE_ENTRY>(
       newTLBSets,
       newTLBWays,
@@ -520,7 +520,7 @@ function App(): JSX.Element {
     console.log('newTLBT_value', newTLBT_value)
   }, [assignmentType])
 
-useEffect(() => {
+  useEffect(() => {
     const newPageSize = possiblePageSizes[Math.floor(Math.random() * possiblePageSizes.length)];
     // const newPageTableSize = createRandomNumber(3, 5); // PTS
 
@@ -531,7 +531,7 @@ useEffect(() => {
 
     const newVirtualAddressBitWidth = virtualAddressBitWidth; // VAS
     let newPhysicalAddressBitWidth = newTLB_PPN.toString(2).length + newVPO;
-    
+
 
     const newGeneratedVirtualAddress = createRandomNumberWith(newVirtualAddressBitWidth);
     const newAddressInBitsOrignal = [...newGeneratedVirtualAddress.toString(2)];
@@ -547,7 +547,7 @@ useEffect(() => {
 
     const newTLBTableEntry = createTableEntry<TLB_TABLE_ENTRY>({ tag: 0, ppn: 0, valid: 0 }, newTLBI_bits, newVPN, virtualAddressBitWidth);
     const newTLBTableEntries = createTableEntries<TLB_TABLE_ENTRY>(
-     TLBSets,
+      TLBSets,
       TLBWays,
       newTLBTableEntry,
       newTLBT_bits,
@@ -563,7 +563,7 @@ useEffect(() => {
       //Be sure to see the page size given in those exams
       newPageTableEntry,
       newTLBT_bits,
-      newVPN, 
+      newVPN,
       virtualAddressBitWidth
     );
 
@@ -710,7 +710,7 @@ useEffect(() => {
     setTLBTableEntries(newTLBTableEntries);
 
 
-}, [TLBWays, TLBSets, virtualAddressBitWidth])
+  }, [TLBWays, TLBSets, virtualAddressBitWidth])
 
 
 
