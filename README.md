@@ -8,7 +8,7 @@
 ![Demo](./assets/demo.gif)  
 
 An **interactive learning simulator** for **Computer Systemer** students to explore **virtual memory address translation** through simulations and exercises. 
-This simulator was created by [Phillip](https://github.com/Nidocq) and I
+This simulator was created by [Nidocq](https://github.com/Nidocq) and I
 
 ## Features
 - **Exam Digitalization:** The simulator digitally recreates computer systems exams, allowing students to practice virtual memory address translation in a controlled environment.
