@@ -25,7 +25,7 @@ npm run dev
 ```
 
 ### VMAT vs Exam
-![Screenshot](./assets/demo.jpg)  
+![Screenshot](./assets/demo.png)  
 vs
 ![Screenshot](./assets/vmatexam.png)  
 
