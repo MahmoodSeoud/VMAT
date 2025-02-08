@@ -25,9 +25,10 @@ npm run dev
 ```
 
 ### VMAT vs Exam
-![Screenshot](./assets/demo.png)  
-vs
-![Screenshot](./assets/vmatexam.png)  
+<p align="center">
+  <img src="./assets/demo.png" alt="Demo" width="45%">
+  <img src="./assets/vmatexam.png" alt="VMAT Exam" width="45%">
+</p>
 
 ---
 ## **Project Report**
